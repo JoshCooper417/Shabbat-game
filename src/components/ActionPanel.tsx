@@ -71,12 +71,16 @@ export function ActionPanel({
     <section className="action-panel" aria-label="Turn Actions">
       <div className="turn-banner">
         <div className="turn-helper-id">
-          <img
-            src={assetUrl(activeDef.avatarImage)}
-            alt={activeDef.name}
-            className="turn-helper-avatar"
+          <div
+            className="turn-figurine-badge"
             style={{ '--helper-color': activeDef.accent } as React.CSSProperties}
-          />
+          >
+            <img
+              src={assetUrl(activeDef.figurineImage)}
+              alt={`${activeDef.name} 3D figurine`}
+              className="turn-helper-figurine"
+            />
+          </div>
           <div>
             <h2 className="turn-helper-title">
               {state.phase === 'CHOOSE_HELPER'
@@ -105,9 +109,9 @@ export function ActionPanel({
       </div>
 
       <div className="step-tracker">
-        <div className={`step-pill ${step1State}`}>1. Move</div>
-        <div className={`step-pill ${step2State}`}>2. Act</div>
-        <div className={`step-pill ${step3State}`}>3. Event</div>
+        <div className={`step-pill ${step1State}`}>1. Move Piece</div>
+        <div className={`step-pill ${step2State}`}>2. Act / Play</div>
+        <div className={`step-pill ${step3State}`}>3. Flip Event</div>
       </div>
 
       {coachEnabled && <CoachBanner state={state} legalMoves={legalMoves} />}
@@ -432,12 +436,19 @@ export function ActionPanel({
 
       {/* STEP 3A: READY TO FLIP EVENT */}
       {state.phase === 'EVENT_READY' && (
-        <div className="event-deck-box">
-          <img
-            src={assetUrl(SHARED_BACKS.eventsAndTools)}
-            alt="Friday Events Deck"
-            className="event-deck-back-img"
-          />
+        <div className="event-deck-box ready-glow">
+          <button
+            type="button"
+            className="physical-deck-stack clickable-deck"
+            onClick={onFlipEvent}
+            title="Click the Event Deck to flip the top card!"
+          >
+            <img
+              src={assetUrl(SHARED_BACKS.eventsAndTools)}
+              alt="Click to flip Friday Events Deck"
+            />
+            <span className="deck-count-badge">{state.eventDeck.length}</span>
+          </button>
           <div className="action-btn-body" style={{ gap: 8 }}>
             <div>
               <strong>Friday Events Deck</strong>

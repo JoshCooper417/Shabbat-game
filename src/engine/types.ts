@@ -33,6 +33,7 @@ export interface HelperDef {
   softBg: string;
   cardImage: string;
   avatarImage: string;
+  figurineImage: string;
   flavor: string;
   powers: {
     name: string;

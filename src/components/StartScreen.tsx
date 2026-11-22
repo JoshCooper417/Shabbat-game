@@ -127,8 +127,8 @@ export function StartScreen({
       </section>
 
       <section className="start-helpers-section">
-        <div>
-          <h2 className="section-heading">Meet Your 4 Family Helpers</h2>
+        <div className="start-helpers-head">
+          <h2 className="section-heading">Meet Your 4 3D Family Figurines &amp; Helper Cards</h2>
           <p className="section-sub">
             Click any Helper card to inspect full-size. Clockwise turn order: Abba → Nael → Mommy →
             Mekimi.
@@ -139,21 +139,30 @@ export function StartScreen({
           {SEAT_ORDER.map((id) => {
             const h = HELPER_DEFS[id];
             return (
-              <button
-                key={id}
-                type="button"
-                className="showcase-card-btn"
-                onClick={() =>
-                  onInspectCard({
-                    title: `${h.name} — Helper Power Card`,
-                    subtitle: `Carry ${h.carryLimit} Errand${h.carryLimit > 1 ? 's' : ''}`,
-                    frontImage: h.cardImage,
-                    backImage: SHARED_BACKS.helpers,
-                  })
-                }
-              >
-                <img src={assetUrl(h.cardImage)} alt={`${h.name} Helper Card`} />
-              </button>
+              <div key={id} className="showcase-helper-col">
+                <div className="showcase-figurine-stand">
+                  <div className="figurine-shadow large" />
+                  <img
+                    src={assetUrl(h.figurineImage)}
+                    alt={`${h.name} 3D tabletop figurine`}
+                    className={`showcase-figurine-img ${id === 'MEKIMI' ? 'mekimi' : ''}`}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="showcase-card-btn"
+                  onClick={() =>
+                    onInspectCard({
+                      title: `${h.name} — Helper Power Card`,
+                      subtitle: `Carry ${h.carryLimit} Errand${h.carryLimit > 1 ? 's' : ''}`,
+                      frontImage: h.cardImage,
+                      backImage: SHARED_BACKS.helpers,
+                    })
+                  }
+                >
+                  <img src={assetUrl(h.cardImage)} alt={`${h.name} Helper Card`} />
+                </button>
+              </div>
             );
           })}
         </div>

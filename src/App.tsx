@@ -10,7 +10,7 @@ import { FigureBar } from './components/FigureBar';
 import { HistoryLogModal } from './components/HistoryLogModal';
 import { StartScreen } from './components/StartScreen';
 import { TableCardsPanel } from './components/TableCardsPanel';
-import { DIFFICULTY_CONFIGS } from './data/cards';
+import { assetUrl, DIFFICULTY_CONFIGS, TABLE_WOOD_IMAGE } from './data/cards';
 import { getLegalMoves } from './engine/movement';
 import {
   applyAction,
@@ -128,7 +128,14 @@ export default function App() {
   const cfg = gameState ? DIFFICULTY_CONFIGS[gameState.difficulty] : null;
 
   return (
-    <div className="app-shell">
+    <div
+      className="app-shell tabletop-surface"
+      style={
+        {
+          '--table-wood-url': `url(${assetUrl(TABLE_WOOD_IMAGE)})`,
+        } as React.CSSProperties
+      }
+    >
       <header className="topbar">
         <div className="topbar-brand">
           <button
@@ -223,6 +230,7 @@ export default function App() {
                 state={gameState}
                 legalMoves={legalMoves}
                 onClickMoveSlot={handleMove}
+                onClickBoardAction={handleAction}
                 onClickSubstepSlot={handleBoardSubstepClick}
                 onInspectCard={setInspectedCard}
               />
@@ -243,7 +251,11 @@ export default function App() {
                 onAdvanceTurn={handleAdvanceTurn}
                 onInspectCard={setInspectedCard}
               />
-              <TableCardsPanel state={gameState} onInspectCard={setInspectedCard} />
+              <TableCardsPanel
+                state={gameState}
+                onPlayAction={handleAction}
+                onInspectCard={setInspectedCard}
+              />
             </div>
           </div>
         </main>

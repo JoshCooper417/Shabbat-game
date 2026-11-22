@@ -34,6 +34,7 @@ export const SHARED_BACKS = {
 } as const;
 
 export const COVER_IMAGE = 'assets/cover_family.webp';
+export const TABLE_WOOD_IMAGE = 'assets/oak_tabletop.webp';
 
 export const BOOKLET_PAGES: readonly { page: number; title: string; image: string }[] = [
   { page: 1, title: 'Cover', image: 'assets/booklet/small_booklet_page_01.webp' },
@@ -100,6 +101,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
     softBg: '#edf3ff',
     cardImage: 'assets/cards/helper_01_abba.webp',
     avatarImage: 'assets/avatars/abba.webp',
+    figurineImage: 'assets/figurines/abba.webp',
     flavor: '“Flour on the counter? Fine. Total meltdown? Not on his watch.”',
     powers: [
       {
@@ -124,6 +126,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
     softBg: '#e8faf3',
     cardImage: 'assets/cards/helper_03_nael.webp',
     avatarImage: 'assets/avatars/nael.webp',
+    figurineImage: 'assets/figurines/nael.webp',
     flavor: "“Messy room? Doesn't stop the sous-chef.”",
     powers: [
       {
@@ -143,6 +146,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
     softBg: '#fdf0f7',
     cardImage: 'assets/cards/helper_02_mommy.webp',
     avatarImage: 'assets/avatars/mommy.webp',
+    figurineImage: 'assets/figurines/mommy.webp',
     flavor: '“Tracking 47 things in her head and already three steps ahead.”',
     powers: [
       {
@@ -162,6 +166,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
     softBg: '#f3edff',
     cardImage: 'assets/cards/helper_04_mekimi.webp',
     avatarImage: 'assets/avatars/mekimi.webp',
+    figurineImage: 'assets/figurines/mekimi.webp',
     flavor: '“One giant grin and suddenly everyone has energy again.”',
     powers: [
       {

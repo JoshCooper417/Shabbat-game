@@ -9,10 +9,10 @@ interface FigureBarProps {
 
 export function FigureBar({ state, onInspectCard }: FigureBarProps) {
   return (
-    <section className="helpers-bar-panel" aria-label="4 Family Helpers">
+    <section className="player-seats-tray" aria-label="4 Family Helper Seats Around the Table">
       <div className="panel-header-row">
-        <h2 className="panel-title">Family Helpers (Turn Order)</h2>
-        <span className="panel-hint">Resting teammates still help with combos, relays &amp; powers!</span>
+        <h2 className="panel-title">Helper Cards Around the Table</h2>
+        <span className="panel-hint">Sideways = Resting (still helps with combos, relays &amp; powers!)</span>
       </div>
 
       <div className="helpers-bar-grid">
@@ -20,7 +20,8 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
           const def = HELPER_DEFS[id];
           const hs = state.helpers[id];
           const room = state.rooms[hs.slotIndex];
-          const isActive = state.activeHelperId === id && state.phase !== 'WON' && state.phase !== 'LOST';
+          const isActive =
+            state.activeHelperId === id && state.phase !== 'WON' && state.phase !== 'LOST';
 
           return (
             <div
@@ -36,11 +37,29 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
               }
             >
               <div className="helper-seat-top">
-                <img
-                  src={assetUrl(def.avatarImage)}
-                  alt={def.name}
-                  className="helper-seat-avatar"
-                />
+                <div className="seat-mini-visuals">
+                  <img
+                    src={assetUrl(def.figurineImage)}
+                    alt={`${def.name} figurine`}
+                    className={`seat-mini-figurine ${id === 'MEKIMI' ? 'mekimi' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    className={`seat-mini-card-btn ${hs.resting ? 'sideways' : ''}`}
+                    title={`Inspect ${def.name}'s Helper Card (${hs.resting ? 'Resting / Sideways' : 'Ready / Upright'})`}
+                    onClick={() =>
+                      onInspectCard({
+                        title: `${def.name} — Helper Power Card`,
+                        subtitle: `Carry limit: ${def.carryLimit} Errand${def.carryLimit > 1 ? 's' : ''}`,
+                        frontImage: def.cardImage,
+                        backImage: SHARED_BACKS.helpers,
+                      })
+                    }
+                  >
+                    <img src={assetUrl(def.cardImage)} alt={`${def.name} card`} />
+                  </button>
+                </div>
+
                 <div className="helper-seat-meta">
                   <div className="helper-seat-name-row">
                     <span className="helper-seat-name">{def.name}</span>
@@ -55,29 +74,14 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
                   <div className="helper-seat-loc">
                     In <strong>{room.card.name}</strong> ({ZONE_META[room.card.zone].shortName})
                   </div>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() =>
-                    onInspectCard({
-                      title: `${def.name} — Helper Power Card`,
-                      subtitle: `Carry limit: ${def.carryLimit} Errand${def.carryLimit > 1 ? 's' : ''}`,
-                      frontImage: def.cardImage,
-                      backImage: SHARED_BACKS.helpers,
-                    })
-                  }
-                >
-                  Card
-                </button>
-              </div>
-
-              <div className="helper-seat-power">
-                {def.powers.map((p) => (
-                  <div key={p.name}>
-                    <strong>{p.name}</strong> ({p.timing}): {p.text}
+                  <div className="helper-seat-power">
+                    {def.powers.map((p) => (
+                      <div key={p.name}>
+                        <strong>{p.name}</strong>: {p.text}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
 
               {hs.carriedErrands.length > 0 && (
