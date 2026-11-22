@@ -277,7 +277,7 @@ export function resolveEventFlip(state: GameState): GameState {
       };
       notes.push({
         kind: 'CLOCK_SHIELDED',
-        text: 'Early Prep Paid Off! blocked the Time Flies Clock flip and returned to the box!',
+        text: 'Cousin Aviel Drops By! blocked the Time Flies Clock flip and returned to the box!',
       });
     } else {
       const nextClockIdx = next.clockRow.findIndex((c) => !c.flipped);
@@ -442,11 +442,11 @@ export function advanceAfterEvent(state: GameState): GameState {
       clockShield: null,
       boxedTools: [...next.boxedTools, shield],
     };
-    clockNote = 'Early Prep blocked the Clock flip';
+    clockNote = 'Cousin Aviel blocked the Clock flip';
     next = appendLog(
       next,
       'ROUND',
-      `End of Round ${next.round}: Early Prep Paid Off! blocked the Clock flip and returned to the box!`,
+      `End of Round ${next.round}: Cousin Aviel Drops By! blocked the Clock flip and returned to the box!`,
     );
   } else {
     const nextClockIdx = next.clockRow.findIndex((c) => !c.flipped);

@@ -529,7 +529,7 @@ export function ActionPanel({
           <button type="button" className="btn btn-primary" onClick={onAdvanceTurn}>
             {isFinalTurn
               ? state.clockShield
-                ? `Rest ${activeDef.name} & End Round (Early Prep Shields Clock!)`
+                ? `Rest ${activeDef.name} & End Round (Cousin Aviel Shields Clock!)`
                 : `Rest ${activeDef.name} & End Round (Flip Shabbat Clock)`
               : `Rest ${activeDef.name} & Next Helper`}
           </button>

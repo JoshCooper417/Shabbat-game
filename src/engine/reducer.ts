@@ -398,7 +398,7 @@ export function applyAction(state: GameState, actionId: string): GameState {
       const tool = state.readyTools.find((t) => t.id === candidate.toolId);
       if (!tool || state.clockShield !== null) return state;
       const nextReady = state.readyTools.filter((t) => t.id !== tool.id);
-      const note = `${getHelperName(activeId)} played Early Prep Paid Off! — next Clock flip is shielded!`;
+      const note = `${getHelperName(activeId)} played Cousin Aviel Drops By! — next Clock flip is shielded!`;
       const next = appendLog(
         { ...state, readyTools: nextReady, clockShield: tool },
         'ACTION',

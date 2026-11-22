@@ -44,7 +44,7 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
                 card.flipped
                   ? `${card.title} (Flipped)`
                   : isShielded
-                    ? 'Next Clock card — shielded by Early Prep Paid Off!'
+                    ? 'Next Clock card — shielded by Cousin Aviel Drops By!'
                     : idx === state.clockRow.length - 1
                       ? 'Rightmost Clock card: Shabbat Begins! (face-down)'
                       : `Clock card #${idx + 1} (face-down)`
@@ -82,10 +82,10 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
         >
           <img
             src={assetUrl(state.clockShield.frontImage)}
-            alt="Early Prep Paid Off! shield"
+            alt="Cousin Aviel Drops By! shield"
             className="clock-shield-thumb"
           />
-          Shield Active: Early Prep Paid Off!
+          Shield Active: Cousin Aviel Drops By!
         </button>
       )}
     </section>

@@ -372,13 +372,13 @@ export function getActionEvaluation(state: GameState): ActionEvaluation {
           category: 'TOOL',
           toolId: tool.id,
           cardImage: tool.frontImage,
-          label: 'Use: Early Prep Paid Off!',
+          label: 'Use: Cousin Aviel Drops By!',
           detail: 'Place shield on the next face-down Clock card (blocks 1 Clock flip, then boxed).',
           bonusTag: '+1 Round Shield',
         });
       } else {
         disabledHints.push({
-          label: 'Use: Early Prep Paid Off!',
+          label: 'Use: Cousin Aviel Drops By!',
           reason: 'The Shabbat Clock already has a shield on it (max 1 shield at a time).',
         });
       }

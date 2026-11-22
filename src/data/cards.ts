@@ -575,17 +575,17 @@ export const TOOL_DECK: readonly ToolCardDef[] = [
       frontImage: 'assets/cards/tool_39_41_strategic_snack_summons_QTY3.webp',
     }),
   ),
-  // 3 Early Prep Paid Off!
+  // 3 Cousin Aviel Drops By!
   ...([42, 43, 44] as const).map(
     (n): ToolCardDef => ({
       id: `TOOL_${n}`,
       kind: 'EARLY_PREP',
-      title: 'Early Prep Paid Off!',
+      title: 'Cousin Aviel Drops By!',
       badge: 'One-Time Shield',
       rulesText:
         'Step 2 Action: Place on the next face-down Clock card (only 1 shield on the Clock at a time). When it blocks a Clock flip, return this card to the box.',
-      flavor: '“Thank you, Thursday-night us—ahead of schedule!”',
-      frontImage: 'assets/cards/tool_42_44_early_prep_paid_off_QTY3.webp',
+      flavor: '“Extra pair of hands right when we needed it!”',
+      frontImage: 'assets/cards/tool_42_44_cousin_aviel_drops_by_QTY3.webp',
     }),
   ),
 ];
@@ -810,7 +810,7 @@ export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
     kind: 'TIME_FLIES',
     title: '“Wait—Shabbat Is at WHAT Time?!”',
     rulesText:
-      '1. Flip the next Clock card (unless Early Prep blocks it). 2. Pick the 1st Clear Kitchen (or 1st Cluttered if none are Clear): turn Clear sideways, or flip Cluttered to Blocked. 3. Return this card to the box.',
+      '1. Flip the next Clock card (unless Cousin Aviel blocks it). 2. Pick the 1st Clear Kitchen (or 1st Cluttered if none are Clear): turn Clear sideways, or flip Cluttered to Blocked. 3. Return this card to the box.',
     flavor: '“Winter Friday strikes again!”',
     frontImage: 'assets/cards/slowdown_62_what_time.webp',
   },
@@ -896,10 +896,10 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
   {
     id: 'GAL_TOOL_EARLY_PREP',
     category: 'Tools',
-    title: 'Early Prep Paid Off!',
+    title: 'Cousin Aviel Drops By!',
     subtitle: 'One-Time Shield · Block next Clock flip',
     qty: 3,
-    frontImage: 'assets/cards/tool_42_44_early_prep_paid_off_QTY3.webp',
+    frontImage: 'assets/cards/tool_42_44_cousin_aviel_drops_by_QTY3.webp',
     backImage: SHARED_BACKS.eventsAndTools,
   },
   ...SLOW_DOWN_DECK.map((s) => ({

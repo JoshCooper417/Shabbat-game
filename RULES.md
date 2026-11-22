@@ -37,7 +37,7 @@ Work together to finish all **Game Chores** (**9** Standard; **7** Beginner; **1
 - **10 Shabbat Clock Cards:** 9 *Friday Afternoon* + 1 *Shabbat Begins!*
 - **28 Friday Events & Tools (same card back!):**
   - **18 Slow-Downs:** 15 Single-Zone (`1st` / `2nd` / `3rd`), 2 Double Trouble, 1 Time Flies.
-  - **10 Household Tools:** 4 *Ice Coffee Boost*, 3 *Strategic Snack Summons*, 3 *Early Prep Paid Off!*
+  - **10 Household Tools:** 4 *Ice Coffee Boost*, 3 *Strategic Snack Summons*, 3 *Cousin Aviel Drops By!*
 
 ---
 
@@ -58,7 +58,7 @@ Work together to finish all **Game Chores** (**9** Standard; **7** Beginner; **1
 - **G. Tools & Event Deck:** Shuffle all 10 Tools:
   - **2 face-up** in the **Ready Tool Row** (max 3).
   - **2 face-up** in **Backup Tools** (doesn't count toward the 3-card Ready limit).
-  - Shuffle **2 Tools + 15 Slow-Downs** (*Beginner: 14; Hard: 16*) to make the **Event Deck**. Box the other 4 Tools & unused Slow-Downs unseen *(some games have fewer or no Early Prep cards)*.
+  - Shuffle **2 Tools + 15 Slow-Downs** (*Beginner: 14; Hard: 16*) to make the **Event Deck**. Box the other 4 Tools & unused Slow-Downs unseen *(some games have fewer or no Cousin Aviel cards)*.
 
 > **Two Separate Discards:** Keep **Slow-Down Discard** (reshuffles when Event Deck empties) separate from **Tool Discard** (for Recharging only — never shuffled into Events).
 
@@ -114,7 +114,7 @@ With a teammate in **your room** (Clear, or Cluttered with **Nael + 1**), choose
 Choose **one** (never both). Tools are played **only** as your Step 2 action from the Ready Tool Row — never out of turn or in reaction to an Event:
 - **Ice Coffee Boost (Reusable):** Turn **1 or 2 Cluttered rooms** anywhere Clear (requires at least 1 Cluttered room; can't fix Blocked), then put in Tool Discard.
 - **Strategic Snack Summons (Reusable):** Move **any teammate** from anywhere into your room (if under 2 Helpers here), then put in Tool Discard.
-- **Early Prep Paid Off! (One-Time Shield):** Place on next face-down Clock card *(works even on Shabbat Begins!; frees its Ready slot immediately; max 1 shield on Clock at a time)*. When it blocks a flip, **box it forever**. *(If sent to Tool Discard as overflow before shielding, it CAN be Recharged!)*
+- **Cousin Aviel Drops By! (One-Time Shield):** Place on next face-down Clock card *(works even on Shabbat Begins!; frees its Ready slot immediately; max 1 shield on Clock at a time)*. When it blocks a flip, **box it forever**. *(If sent to Tool Discard as overflow before shielding, it CAN be Recharged!)*
 - **Recharge Action (With a Teammate):** Return **1 used Tool** of choice from Tool Discard to Ready (if under 3). **Mekimi's Big Smile Reset** returns **up to 2** *(Recharge action only!)*.
 
 ### Step 3: Events & Round End
@@ -126,7 +126,7 @@ Choose **one** (never both). Tools are played **only** as your Step 2 action fro
    - **Empty Event Deck?** Shuffle **only Slow-Down Discard** to form a new Event Deck. *(If both Event Deck and Slow-Down Discard are empty, skip the flip; still Rest.)*
 2. **Rest Your Helper:** Turn your Helper card sideways (**Resting**). Carried Errands stay underneath.
 3. **End of Round (All 4 Helpers Resting):**
-   - **Clock Flip:** If *Early Prep Paid Off!* is on the next Clock card, box Early Prep instead of flipping. Otherwise flip the leftmost Clock card (**Shabbat Begins!** = lose!).
+   - **Clock Flip:** If *Cousin Aviel Drops By!* is on the next Clock card, box Cousin Aviel instead of flipping. Otherwise flip the leftmost Clock card (**Shabbat Begins!** = lose!).
    - **Refresh:** Stand all 4 Helper cards upright (**Ready**).
    - **Arrival Chore:** Flip 1 Arrival Chore into the Chore Row (if any remain).
 
@@ -139,7 +139,7 @@ Choose **one** (never both). Tools are played **only** as your Step 2 action fro
 - **Exact Number First:** Always pick that numbered room — even if Cluttered! Only if fewer non-Blocked rooms of that zone exist, fall back to the **1st Clear** (else **1st Cluttered**).
 - **Double Trouble (2 icons):** Resolve left icon, then right icon. For each, pick the **1st Clear** room (else **1st Cluttered**).
 - **Time Flies (*"Wait—Shabbat Is at WHAT Time?!"*):**
-  1. Flip next Clock card **first** (skip round-end Refresh/Arrival!). If *Early Prep* absorbs it, box Early Prep now — End-of-Round flip later is **not** absorbed unless a new one is played. If *Shabbat Begins!* flips, lose right away (skip steps 2–3 & don't Rest).
+  1. Flip next Clock card **first** (skip round-end Refresh/Arrival!). If *Cousin Aviel* absorbs it, box Cousin Aviel now — End-of-Round flip later is **not** absorbed unless a new one is played. If *Shabbat Begins!* flips, lose right away (skip steps 2–3 & don't Rest).
   2. Hit **1st Clear Kitchen** (else **1st Cluttered**).
   3. **Always** box this card (even if all Kitchens are Blocked).
 - **All Blocked?** If every room of that zone is Blocked, that room effect is lost harmlessly.
@@ -182,7 +182,7 @@ Choose **one** (never both). Tools are played **only** as your Step 2 action fro
 
 ### Family Winning Tips
 - Empty the Chore Row early to reveal Arrival Chores right away!
-- Shield the Clock with *Early Prep Paid Off!* (+1 round each!).
+- Shield the Clock with *Cousin Aviel Drops By!* (+1 round each!).
 - Use Mommy for Cluttered Errands and Nael for Cluttered Chores!
 
 ---
@@ -227,7 +227,7 @@ Choose **one** (never both). Tools are played **only** as your Step 2 action fro
 | 34 | Restore Order | **Everyone in Shabbat Clothes!** | Upstairs (All Clear) |
 | 35–38 | Tool (×4) | **Ice Coffee Boost** | Clear 1–2 Cluttered rooms anywhere (Reusable) |
 | 39–41 | Tool (×3) | **Strategic Snack Summons** | Move any teammate into your room (Reusable) |
-| 42–44 | Tool (×3) | **Early Prep Paid Off!** | Shield next Clock card, box when used (One-Time Shield) |
+| 42–44 | Tool (×3) | **Cousin Aviel Drops By!** | Shield next Clock card, box when used (One-Time Shield) |
 | 45 | Slow-Down | **Wait—Where's That Ingredient?!** | Kitchen · 1st |
 | 46 | Slow-Down | **Sticky Counter Situation** | Kitchen · 2nd |
 | 47 | Slow-Down | **Fridge Tetris Crisis** | Kitchen · 3rd |

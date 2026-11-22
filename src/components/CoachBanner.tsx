@@ -87,7 +87,7 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
       const hasEarlyPrep = state.readyTools.some((t) => t.kind === 'EARLY_PREP');
       if (hasEarlyPrep) {
         tips.push(
-          'Turn 4 of 4! Playing Early Prep Paid Off! right now will block tonight’s Clock flip!',
+          'Turn 4 of 4! Playing Cousin Aviel Drops By! right now will block tonight’s Clock flip!',
         );
       } else {
         tips.push('Turn 4 of 4: After this turn’s Event flip, the Shabbat Clock will flip 1 card.');
@@ -130,7 +130,7 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
     if (isFinalTurnOfRound) {
       tips.push(
         state.clockShield
-          ? 'End of Round next — Early Prep Paid Off! is ready to block the Clock flip!'
+          ? 'End of Round next — Cousin Aviel Drops By! is ready to block the Clock flip!'
           : 'End of Round next: after this Event, all 4 Helpers will refresh and 1 Clock card will flip.',
       );
     }
