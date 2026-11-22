@@ -584,7 +584,7 @@ export const TOOL_DECK: readonly ToolCardDef[] = [
       badge: 'One-Time Shield',
       rulesText:
         'Step 2 Action: Place on the next face-down Clock card (only 1 shield on the Clock at a time). When it blocks a Clock flip, return this card to the box.',
-      flavor: '“Extra pair of hands right when we needed it!”',
+      flavor: '“Game co-designer to the rescue—buying you extra time before sunset!”',
       frontImage: 'assets/cards/tool_42_44_cousin_aviel_drops_by_QTY3.webp',
     }),
   ),
