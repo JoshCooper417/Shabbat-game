@@ -1,0 +1,964 @@
+import {
+  ChoreCardDef,
+  ClockCard,
+  DifficultyConfig,
+  DifficultyId,
+  HelperDef,
+  HelperId,
+  RoomCardDef,
+  SlowDownCardDef,
+  ToolCardDef,
+  ZoneId,
+  ZoneMeta,
+} from '../engine/types';
+
+export const assetUrl = (relPath: string): string => {
+  const base = import.meta.env?.BASE_URL ?? './';
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`;
+  const normalizedRel = relPath.startsWith('/') ? relPath.slice(1) : relPath;
+  return `${normalizedBase}${normalizedRel}`;
+};
+
+export const SEAT_ORDER: readonly HelperId[] = ['ABBA', 'NAEL', 'MOMMY', 'MEKIMI'];
+
+export const GROUP_HELPERS: Record<'A' | 'B', readonly HelperId[]> = {
+  A: ['ABBA', 'NAEL'],
+  B: ['MEKIMI', 'MOMMY'],
+};
+
+export const SHARED_BACKS = {
+  chores: 'assets/cards/back_SHARED_chores.webp',
+  eventsAndTools: 'assets/cards/back_SHARED_events_and_tools.webp',
+  helpers: 'assets/cards/back_SHARED_helpers.webp',
+  clock: 'assets/cards/back_SHARED_shabbat_clock.webp',
+} as const;
+
+export const COVER_IMAGE = 'assets/cover_family.webp';
+
+export const BOOKLET_PAGES: readonly { page: number; title: string; image: string }[] = [
+  { page: 1, title: 'Cover', image: 'assets/booklet/small_booklet_page_01.webp' },
+  { page: 2, title: '1. Goal & Key Terms', image: 'assets/booklet/small_booklet_page_02.webp' },
+  { page: 3, title: "2. What's in the Box", image: 'assets/booklet/small_booklet_page_03.webp' },
+  { page: 4, title: '3. Setup (Steps A–D)', image: 'assets/booklet/small_booklet_page_04.webp' },
+  { page: 5, title: '3. Setup (Steps E–G)', image: 'assets/booklet/small_booklet_page_05.webp' },
+  { page: 6, title: '4. Turn Order & Step 1: Move', image: 'assets/booklet/small_booklet_page_06.webp' },
+  { page: 7, title: '4. Step 2: Tidy & Do Chore', image: 'assets/booklet/small_booklet_page_07.webp' },
+  { page: 8, title: '4. Step 2: Errands & Combos', image: 'assets/booklet/small_booklet_page_08.webp' },
+  { page: 9, title: '4. Step 2: Household Tools', image: 'assets/booklet/small_booklet_page_09.webp' },
+  { page: 10, title: '4. Step 3: Events & Round End', image: 'assets/booklet/small_booklet_page_10.webp' },
+  { page: 11, title: '5. Slow-Down Targeting', image: 'assets/booklet/small_booklet_page_11.webp' },
+  { page: 12, title: '5. Red Blocked Rooms', image: 'assets/booklet/small_booklet_page_12.webp' },
+  { page: 13, title: '6. Meet the 4 Helpers', image: 'assets/booklet/small_booklet_page_13.webp' },
+  { page: 14, title: '7. Difficulty Modes', image: 'assets/booklet/small_booklet_page_14.webp' },
+  { page: 15, title: "Kid's First-Game Guide (6+)", image: 'assets/booklet/small_booklet_page_15.webp' },
+  { page: 16, title: 'Tabletop Quick Reference', image: 'assets/booklet/small_booklet_page_16.webp' },
+];
+
+export const ZONE_META: Record<ZoneId, ZoneMeta> = {
+  KITCHEN: {
+    id: 'KITCHEN',
+    name: 'Kitchen',
+    shortName: 'Kitchen',
+    color: '#c96a07',
+    softBg: '#fef6e4',
+    border: '#ebd09b',
+  },
+  DOWNSTAIRS: {
+    id: 'DOWNSTAIRS',
+    name: 'Downstairs Balagan',
+    shortName: 'Downstairs',
+    color: '#0e7c66',
+    softBg: '#e8f7f3',
+    border: '#a5dcd0',
+  },
+  TABLE: {
+    id: 'TABLE',
+    name: 'Table',
+    shortName: 'Table',
+    color: '#2458c4',
+    softBg: '#ebf2ff',
+    border: '#b5ccf8',
+  },
+  UPSTAIRS: {
+    id: 'UPSTAIRS',
+    name: 'Upstairs',
+    shortName: 'Upstairs',
+    color: '#7a2fd1',
+    softBg: '#f4ecff',
+    border: '#d1b7f7',
+  },
+};
+
+export const HELPER_DEFS: Record<HelperId, HelperDef> = {
+  ABBA: {
+    id: 'ABBA',
+    name: 'Abba',
+    startSlot: 0, // Top-Left
+    carryLimit: 1,
+    group: 'A',
+    accent: '#2358d4',
+    softBg: '#edf3ff',
+    cardImage: 'assets/cards/helper_01_abba.webp',
+    avatarImage: 'assets/avatars/abba.webp',
+    flavor: '“Flour on the counter? Fine. Total meltdown? Not on his watch.”',
+    powers: [
+      {
+        name: 'Solo Cleanup',
+        timing: 'Your Turn',
+        text: "Flip a Blocked room you're in back to Clear all by yourself (no teammate needed).",
+      },
+      {
+        name: 'Balagan Barrier',
+        timing: 'Always On',
+        text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it to Blocked.",
+      },
+    ],
+  },
+  NAEL: {
+    id: 'NAEL',
+    name: 'Nael',
+    startSlot: 2, // Top-Right
+    carryLimit: 1,
+    group: 'A',
+    accent: '#0d8a5f',
+    softBg: '#e8faf3',
+    cardImage: 'assets/cards/helper_03_nael.webp',
+    avatarImage: 'assets/avatars/nael.webp',
+    flavor: "“Messy room? Doesn't stop the sous-chef.”",
+    powers: [
+      {
+        name: 'Learning Tower Power!',
+        timing: 'Always On',
+        text: 'When Nael and a teammate are in a Cluttered room together, either one can finish a tucked Chore or do a Team Combo there.',
+      },
+    ],
+  },
+  MOMMY: {
+    id: 'MOMMY',
+    name: 'Mommy',
+    startSlot: 8, // Bottom-Right
+    carryLimit: 2,
+    group: 'B',
+    accent: '#c82074',
+    softBg: '#fdf0f7',
+    cardImage: 'assets/cards/helper_02_mommy.webp',
+    avatarImage: 'assets/avatars/mommy.webp',
+    flavor: '“Tracking 47 things in her head and already three steps ahead.”',
+    powers: [
+      {
+        name: 'Errand Express',
+        timing: 'Your Turn',
+        text: 'On your turn, you may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
+      },
+    ],
+  },
+  MEKIMI: {
+    id: 'MEKIMI',
+    name: 'Mekimi',
+    startSlot: 6, // Bottom-Left
+    carryLimit: 2,
+    group: 'B',
+    accent: '#7834d8',
+    softBg: '#f3edff',
+    cardImage: 'assets/cards/helper_04_mekimi.webp',
+    avatarImage: 'assets/avatars/mekimi.webp',
+    flavor: '“One giant grin and suddenly everyone has energy again.”',
+    powers: [
+      {
+        name: 'Turbo Crawl',
+        timing: 'Your Turn',
+        text: 'In Step 1, you may move 1 room diagonally (unless 2 Helpers are already there).',
+      },
+      {
+        name: 'Big Smile Reset',
+        timing: 'Your Turn',
+        text: 'When you Recharge with a teammate, return up to 2 used Tools to Ready instead of 1 (up to 3 Ready total).',
+      },
+    ],
+  },
+};
+
+export const DIFFICULTY_CONFIGS: Record<DifficultyId, DifficultyConfig> = {
+  BEGINNER: {
+    id: 'BEGINNER',
+    name: 'Beginner',
+    tagline: 'First Game · Recommended',
+    clockLength: 9,
+    afternoonCards: 8,
+    totalChores: 7,
+    startingChoreRow: 3,
+    arrivalChores: 4,
+    slowDownCount: 14,
+    startingClutter: 1,
+  },
+  STANDARD: {
+    id: 'STANDARD',
+    name: 'Standard',
+    tagline: 'Balanced Family Challenge',
+    clockLength: 8,
+    afternoonCards: 7,
+    totalChores: 9,
+    startingChoreRow: 5,
+    arrivalChores: 4,
+    slowDownCount: 15,
+    startingClutter: 2,
+  },
+  HARD: {
+    id: 'HARD',
+    name: 'Hard',
+    tagline: 'Expert Friday Rush',
+    clockLength: 6,
+    afternoonCards: 5,
+    totalChores: 10,
+    startingChoreRow: 6,
+    arrivalChores: 4,
+    slowDownCount: 16,
+    startingClutter: 2,
+  },
+};
+
+export const ROOM_DECK: readonly RoomCardDef[] = [
+  {
+    id: 'ROOM_05',
+    number: 5,
+    name: 'The Giant Island',
+    zone: 'KITCHEN',
+    frontImage: 'assets/cards/room_05_giant_island.webp',
+    blockedImage: 'assets/cards/back_room_05_giant_island_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_05_giant_island.webp',
+  },
+  {
+    id: 'ROOM_06',
+    number: 6,
+    name: 'Mixer Counter',
+    subtitle: 'Plata & Kumkum',
+    zone: 'KITCHEN',
+    frontImage: 'assets/cards/room_06_mixer_counter.webp',
+    blockedImage: 'assets/cards/back_room_06_mixer_counter_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_06_mixer_counter.webp',
+  },
+  {
+    id: 'ROOM_07',
+    number: 7,
+    name: 'The Fridge',
+    zone: 'KITCHEN',
+    frontImage: 'assets/cards/room_07_the_fridge.webp',
+    blockedImage: 'assets/cards/back_room_07_the_fridge_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_07_the_fridge.webp',
+  },
+  {
+    id: 'ROOM_08',
+    number: 8,
+    name: 'The Mamad',
+    subtitle: 'Playroom',
+    zone: 'DOWNSTAIRS',
+    frontImage: 'assets/cards/room_08_the_mamad.webp',
+    blockedImage: 'assets/cards/back_room_08_the_mamad_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_08_the_mamad.webp',
+  },
+  {
+    id: 'ROOM_09',
+    number: 9,
+    name: 'The Salon',
+    zone: 'DOWNSTAIRS',
+    frontImage: 'assets/cards/room_09_the_salon.webp',
+    blockedImage: 'assets/cards/back_room_09_the_salon_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_09_the_salon.webp',
+  },
+  {
+    id: 'ROOM_10',
+    number: 10,
+    name: 'Sink & Dishwasher',
+    zone: 'DOWNSTAIRS',
+    frontImage: 'assets/cards/room_10_sink_dishwasher.webp',
+    blockedImage: 'assets/cards/back_room_10_sink_dishwasher_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_10_sink_dishwasher.webp',
+  },
+  {
+    id: 'ROOM_11',
+    number: 11,
+    name: 'The Dining Table',
+    zone: 'TABLE',
+    frontImage: 'assets/cards/room_11_dining_table.webp',
+    blockedImage: 'assets/cards/back_room_11_dining_table_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_11_dining_table.webp',
+  },
+  {
+    id: 'ROOM_12',
+    number: 12,
+    name: 'Shabbat Candles Cabinet',
+    zone: 'TABLE',
+    frontImage: 'assets/cards/room_12_candles_cabinet.webp',
+    blockedImage: 'assets/cards/back_room_12_candles_cabinet_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_12_candles_cabinet.webp',
+  },
+  {
+    id: 'ROOM_13',
+    number: 13,
+    name: 'Chairs',
+    zone: 'TABLE',
+    frontImage: 'assets/cards/room_13_chairs.webp',
+    blockedImage: 'assets/cards/back_room_13_chairs_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_13_chairs.webp',
+  },
+  {
+    id: 'ROOM_14',
+    number: 14,
+    name: 'The Bathtub',
+    zone: 'UPSTAIRS',
+    frontImage: 'assets/cards/room_14_the_bathtub.webp',
+    blockedImage: 'assets/cards/back_room_14_the_bathtub_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_14_the_bathtub.webp',
+  },
+  {
+    id: 'ROOM_15',
+    number: 15,
+    name: 'The Shower',
+    zone: 'UPSTAIRS',
+    frontImage: 'assets/cards/room_15_the_shower.webp',
+    blockedImage: 'assets/cards/back_room_15_the_shower_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_15_the_shower.webp',
+  },
+  {
+    id: 'ROOM_16',
+    number: 16,
+    name: 'The Bedrooms',
+    zone: 'UPSTAIRS',
+    frontImage: 'assets/cards/room_16_the_bedrooms.webp',
+    blockedImage: 'assets/cards/back_room_16_the_bedrooms_BLOCKED.webp',
+    artImage: 'assets/rooms-art/room_16_the_bedrooms.webp',
+  },
+];
+
+export const CHORE_DECK: readonly ChoreCardDef[] = [
+  // 5 Room Chores
+  {
+    id: 'CHORE_17',
+    number: 17,
+    type: 'ROOM_CHORE',
+    title: 'Challah: Mixer to Oven',
+    zone: 'KITCHEN',
+    rulesText:
+      'Option 1 (2 steps): Tuck under a Clear Kitchen, then finish later while a teammate is in the same row, column, or room. Option 2 (1 step): Finish right away with 2 Helpers in a Clear Kitchen.',
+    flavor: '“Kneaded in the mixer, pulled from the oven at the exact right minute.”',
+    frontImage: 'assets/cards/chore_17_challah_oven.webp',
+  },
+  {
+    id: 'CHORE_18',
+    number: 18,
+    type: 'ROOM_CHORE',
+    title: 'Fill Kumkum & Set Plata Timer',
+    zone: 'KITCHEN',
+    rulesText:
+      'Option 1 (2 steps): Tuck under a Clear Kitchen, then finish later while a teammate is in the same row, column, or room. Option 2 (1 step): Finish right away with 2 Helpers in a Clear Kitchen.',
+    flavor: '“Water topped all the way up and the Shabbat timer is looking good.”',
+    frontImage: 'assets/cards/chore_18_kumkum_plata.webp',
+  },
+  {
+    id: 'CHORE_19',
+    number: 19,
+    type: 'ROOM_CHORE',
+    title: 'Dishwasher Round #3',
+    zone: 'DOWNSTAIRS',
+    rulesText:
+      'Option 1 (2 steps): Tuck under a Clear Downstairs room, then finish later while a teammate is in the same row, column, or room. Option 2 (1 step): Finish right away with 2 Helpers in a Clear Downstairs room.',
+    flavor: '“Strategic Friday dish-tetris so the next load finishes on time.”',
+    frontImage: 'assets/cards/chore_19_dishwasher_round3.webp',
+  },
+  {
+    id: 'CHORE_20',
+    number: 20,
+    type: 'ROOM_CHORE',
+    title: 'High Chair & Chair Stack',
+    zone: 'TABLE',
+    rulesText:
+      'Option 1 (2 steps): Tuck under a Clear Table room, then finish later while a teammate is in the same row, column, or room. Option 2 (1 step): Finish right away with 2 Helpers in a Clear Table room.',
+    flavor: '“Unstack the extra chairs and pull the high chair into position.”',
+    frontImage: 'assets/cards/chore_20_high_chair_stack.webp',
+  },
+  {
+    id: 'CHORE_21',
+    number: 21,
+    type: 'ROOM_CHORE',
+    title: 'Lay Out the Shabbat Outfits',
+    zone: 'UPSTAIRS',
+    rulesText:
+      'Option 1 (2 steps): Tuck under a Clear Upstairs room, then finish later while a teammate is in the same row, column, or room. Option 2 (1 step): Finish right away with 2 Helpers in a Clear Upstairs room.',
+    flavor: '“Tiny shirts, clean diapers, and picking out super cute outfits.”',
+    frontImage: 'assets/cards/chore_21_shabbat_outfits.webp',
+  },
+
+  // 5 Errands
+  {
+    id: 'CHORE_22',
+    number: 22,
+    type: 'ERRAND',
+    title: 'Half Baked Harvest Showstopper',
+    zone: 'KITCHEN',
+    endZone: 'TABLE',
+    rulesText:
+      'Pick up in a Clear Kitchen and deliver to a Clear Table (Mommy can do either in Cluttered rooms). When delivered, return 1 used Tool to Ready!',
+    flavor: '“23 ingredients, 4 mixing bowls, zero regrets—straight to the table.”',
+    frontImage: 'assets/cards/chore_22_hbh_showstopper.webp',
+  },
+  {
+    id: 'CHORE_23',
+    number: 23,
+    type: 'ERRAND',
+    title: 'Shabbat Flowers to the Center',
+    zone: 'DOWNSTAIRS',
+    endZone: 'TABLE',
+    rulesText:
+      'Pick up in a Clear Downstairs room and deliver to a Clear Table (Mommy can do either in Cluttered rooms). When delivered, return 1 used Tool to Ready!',
+    flavor: '“Put them with water in a vase on the table.”',
+    frontImage: 'assets/cards/chore_23_shabbat_flowers.webp',
+  },
+  {
+    id: 'CHORE_24',
+    number: 24,
+    type: 'ERRAND',
+    title: 'Mystery Table Pile',
+    zone: 'TABLE',
+    endZone: 'KITCHEN',
+    rulesText:
+      'Pick up in a Clear Table room and deliver to a Clear Kitchen (Mommy can do either in Cluttered rooms). When delivered, return 1 used Tool to Ready!',
+    flavor: '“Why is there a toy truck next to the Kiddush cup?”',
+    frontImage: 'assets/cards/chore_24_mystery_table_pile.webp',
+  },
+  {
+    id: 'CHORE_25',
+    number: 25,
+    type: 'ERRAND',
+    title: 'Herd the Kids Upstairs for Baths',
+    zone: 'DOWNSTAIRS',
+    endZone: 'UPSTAIRS',
+    rulesText:
+      'Pick up in a Clear Downstairs room and deliver to a Clear Upstairs room (Mommy can do either in Cluttered rooms). When delivered, return 1 used Tool to Ready!',
+    flavor: '“Peel everyone away from the toys and up the stairs.”',
+    frontImage: 'assets/cards/chore_25_herd_kids_baths.webp',
+  },
+  {
+    id: 'CHORE_26',
+    number: 26,
+    type: 'ERRAND',
+    title: "Dressed Kids Downstairs—Keep 'Em Clean!",
+    zone: 'UPSTAIRS',
+    endZone: 'TABLE',
+    rulesText:
+      'Pick up in a Clear Upstairs room and deliver to a Clear Table (Mommy can do either in Cluttered rooms). When delivered, return 1 used Tool to Ready!',
+    flavor: '“Steer freshly dressed kids straight down without touching anything sticky.”',
+    frontImage: 'assets/cards/chore_26_dressed_kids_clean.webp',
+  },
+
+  // 4 Team Pairs
+  {
+    id: 'CHORE_27',
+    number: 27,
+    type: 'TEAM_PAIR',
+    title: 'Learning Tower Bake-Off',
+    zone: 'KITCHEN',
+    rulesText:
+      'With 2 Helpers in a Clear Kitchen (or Cluttered if Nael is there), finish this together and return 1 used Tool to Ready!',
+    flavor: "“Nael's on the tower—time to get the white sugar!”",
+    frontImage: 'assets/cards/chore_27_learning_tower.webp',
+  },
+  {
+    id: 'CHORE_28',
+    number: 28,
+    type: 'TEAM_PAIR',
+    title: 'Mamad Toy Avalanche',
+    zone: 'DOWNSTAIRS',
+    rulesText:
+      'With 2 Helpers in a Clear Downstairs room (or Cluttered if Nael is there), finish this together and return 1 used Tool to Ready!',
+    flavor: '“A two-person scoop-and-bin operation.”',
+    frontImage: 'assets/cards/chore_28_mamad_avalanche.webp',
+  },
+  {
+    id: 'CHORE_29',
+    number: 29,
+    type: 'TEAM_PAIR',
+    title: 'Set the Shabbat Table',
+    zone: 'TABLE',
+    rulesText:
+      'With 2 Helpers in a Clear Table room (or Cluttered if Nael is there), finish this together and return 1 used Tool to Ready!',
+    flavor: '“Plates, cups, silverware—teamwork makes the dream work.”',
+    frontImage: 'assets/cards/chore_29_set_shabbat_table.webp',
+  },
+  {
+    id: 'CHORE_30',
+    number: 30,
+    type: 'TEAM_PAIR',
+    title: 'Bath Time Splash Squad',
+    zone: 'UPSTAIRS',
+    rulesText:
+      'With 2 Helpers in a Clear Upstairs room (or Cluttered if Nael is there), finish this together and return 1 used Tool to Ready!',
+    flavor: '“Soap, soap, soap!”',
+    frontImage: 'assets/cards/chore_30_bath_splash_squad.webp',
+  },
+
+  // 4 Restore Order
+  {
+    id: 'CHORE_31',
+    number: 31,
+    type: 'RESTORE_ORDER',
+    title: 'Clear the Giant Island',
+    zone: 'KITCHEN',
+    rulesText:
+      'Finish this while standing in a Clear Kitchen when it and every room next to it (up, down, left, right) are Clear.',
+    flavor: '“Wait... we actually have a countertop under there?!”',
+    frontImage: 'assets/cards/chore_31_clear_giant_island.webp',
+  },
+  {
+    id: 'CHORE_32',
+    number: 32,
+    type: 'RESTORE_ORDER',
+    title: 'The Great Salon Reset',
+    zone: 'DOWNSTAIRS',
+    rulesText:
+      'Finish this while standing in a Clear Downstairs room when it and every room next to it (up, down, left, right) are Clear.',
+    flavor: '“Not a single rogue toy underfoot.”',
+    frontImage: 'assets/cards/chore_32_great_salon_reset.webp',
+  },
+  {
+    id: 'CHORE_33',
+    number: 33,
+    type: 'RESTORE_ORDER',
+    title: 'Shabbat Candles Ready',
+    zone: 'TABLE',
+    rulesText:
+      'Finish this while standing in a Clear Table room when it and every room next to it (up, down, left, right) are Clear.',
+    flavor: "“Out of the cabinet, last week's wicks removed, waiting for sunset.”",
+    frontImage: 'assets/cards/chore_33_shabbat_candles_ready.webp',
+  },
+  {
+    id: 'CHORE_34',
+    number: 34,
+    type: 'RESTORE_ORDER',
+    title: 'Everyone in Shabbat Clothes!',
+    zone: 'UPSTAIRS',
+    rulesText:
+      'Finish this while standing in a Clear Upstairs room when it and every room next to it (up, down, left, right) are Clear.',
+    flavor: '“Clean, dressed, and spotless (for the next 30 seconds).”',
+    frontImage: 'assets/cards/chore_34_everyone_shabbat_clothes.webp',
+  },
+];
+
+export const TOOL_DECK: readonly ToolCardDef[] = [
+  // 4 Ice Coffee Boost
+  ...([35, 36, 37, 38] as const).map(
+    (n): ToolCardDef => ({
+      id: `TOOL_${n}`,
+      kind: 'ICE_COFFEE',
+      title: 'Ice Coffee Boost',
+      badge: 'Reusable Tool',
+      rulesText:
+        "Step 2 Action: Turn 1 or 2 Cluttered rooms anywhere on the board back to Clear (doesn't work on Blocked rooms), then put this card in Tool Discard.",
+      flavor: '“Caffeine hits and two rooms get cleared in record time.”',
+      frontImage: 'assets/cards/tool_35_38_ice_coffee_boost_QTY4.webp',
+    }),
+  ),
+  // 3 Strategic Snack Summons
+  ...([39, 40, 41] as const).map(
+    (n): ToolCardDef => ({
+      id: `TOOL_${n}`,
+      kind: 'SNACK_SUMMONS',
+      title: 'Strategic Snack Summons',
+      badge: 'Reusable Tool',
+      rulesText:
+        'Step 2 Action: Move any teammate from anywhere into your room (unless 2 Helpers are already here), then put this card in Tool Discard.',
+      flavor: '“Crinkle one snack bag and watch everyone materialize.”',
+      frontImage: 'assets/cards/tool_39_41_strategic_snack_summons_QTY3.webp',
+    }),
+  ),
+  // 3 Early Prep Paid Off!
+  ...([42, 43, 44] as const).map(
+    (n): ToolCardDef => ({
+      id: `TOOL_${n}`,
+      kind: 'EARLY_PREP',
+      title: 'Early Prep Paid Off!',
+      badge: 'One-Time Shield',
+      rulesText:
+        'Step 2 Action: Place on the next face-down Clock card (only 1 shield on the Clock at a time). When it blocks a Clock flip, return this card to the box.',
+      flavor: '“Thank you, Thursday-night us—ahead of schedule!”',
+      frontImage: 'assets/cards/tool_42_44_early_prep_paid_off_QTY3.webp',
+    }),
+  ),
+];
+
+export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
+  // Kitchen (3)
+  {
+    id: 'SLOW_45',
+    number: 45,
+    kind: 'SINGLE_ZONE',
+    title: "Wait—Where's That Ingredient?!",
+    zone: 'KITCHEN',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Kitchen that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Fridge and cabinet excavation begins.”',
+    frontImage: 'assets/cards/slowdown_45_missing_ingredient.webp',
+  },
+  {
+    id: 'SLOW_46',
+    number: 46,
+    kind: 'SINGLE_ZONE',
+    title: 'Sticky Counter Situation',
+    zone: 'KITCHEN',
+    ordinal: 2,
+    rulesText:
+      "Count Kitchen rooms that aren't Blocked (left to right, top to bottom) and pick the 2nd. If fewer than 2 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Every spoon in the house is somehow dirty.”',
+    frontImage: 'assets/cards/slowdown_46_sticky_counter.webp',
+  },
+  {
+    id: 'SLOW_47',
+    number: 47,
+    kind: 'SINGLE_ZONE',
+    title: 'Fridge Tetris Crisis',
+    zone: 'KITCHEN',
+    ordinal: 3,
+    rulesText:
+      "Count Kitchen rooms that aren't Blocked (left to right, top to bottom) and pick the 3rd. If fewer than 3 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“How are we fitting three giant Shabbat pots in here?!”',
+    frontImage: 'assets/cards/slowdown_47_fridge_tetris.webp',
+  },
+
+  // Downstairs (4)
+  {
+    id: 'SLOW_48',
+    number: 48,
+    kind: 'SINGLE_ZONE',
+    title: 'Fresh Toy Dump!',
+    zone: 'DOWNSTAIRS',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Downstairs room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“One entire bin just got flipped upside down.”',
+    frontImage: 'assets/cards/slowdown_48_fresh_toy_dump.webp',
+  },
+  {
+    id: 'SLOW_49',
+    number: 49,
+    kind: 'SINGLE_ZONE',
+    title: 'Mekimi Found Something!',
+    zone: 'DOWNSTAIRS',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Downstairs room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Fastest crawler in Givot Eden strikes again.”',
+    frontImage: 'assets/cards/slowdown_49_mekimi_found_something.webp',
+  },
+  {
+    id: 'SLOW_50',
+    number: 50,
+    kind: 'SINGLE_ZONE',
+    title: 'Surprise Sink Stack',
+    zone: 'DOWNSTAIRS',
+    ordinal: 2,
+    rulesText:
+      "Count Downstairs rooms that aren't Blocked (left to right, top to bottom) and pick the 2nd. If fewer than 2 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Where did four more pots just come from?!”',
+    frontImage: 'assets/cards/slowdown_50_surprise_sink_stack.webp',
+  },
+  {
+    id: 'SLOW_51',
+    number: 51,
+    kind: 'SINGLE_ZONE',
+    title: 'Dishwasher Still Running!',
+    zone: 'DOWNSTAIRS',
+    ordinal: 3,
+    rulesText:
+      "Count Downstairs rooms that aren't Blocked (left to right, top to bottom) and pick the 3rd. If fewer than 3 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“45 minutes left and the sink is already full again.”',
+    frontImage: 'assets/cards/slowdown_51_dishwasher_running.webp',
+  },
+
+  // Table (4)
+  {
+    id: 'SLOW_52',
+    number: 52,
+    kind: 'SINGLE_ZONE',
+    title: 'The Table Magnet Effect',
+    zone: 'TABLE',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Table room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Mail, keys, backpacks, and random stuff appear.”',
+    frontImage: 'assets/cards/slowdown_52_table_magnet.webp',
+  },
+  {
+    id: 'SLOW_53',
+    number: 53,
+    kind: 'SINGLE_ZONE',
+    title: 'Kiddush Cup Takeover!',
+    zone: 'TABLE',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Table room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Nael just emptied the entire kiddush cup shelf.”',
+    frontImage: 'assets/cards/slowdown_53_kiddush_cup_takeover.webp',
+  },
+  {
+    id: 'SLOW_54',
+    number: 54,
+    kind: 'SINGLE_ZONE',
+    title: 'Out of Shabbat Candles!',
+    zone: 'TABLE',
+    ordinal: 2,
+    rulesText:
+      "Count Table rooms that aren't Blocked (left to right, top to bottom) and pick the 2nd. If fewer than 2 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Empty box in the cabinet—emergency backup hunt!”',
+    frontImage: 'assets/cards/slowdown_54_out_of_candles.webp',
+  },
+  {
+    id: 'SLOW_55',
+    number: 55,
+    kind: 'SINGLE_ZONE',
+    title: 'Wrong Tablecloth Size!',
+    zone: 'TABLE',
+    ordinal: 3,
+    rulesText:
+      "Count Table rooms that aren't Blocked (left to right, top to bottom) and pick the 3rd. If fewer than 3 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Grabbed the giant chag tablecloth by mistake.”',
+    frontImage: 'assets/cards/slowdown_55_wrong_tablecloth.webp',
+  },
+
+  // Upstairs (4)
+  {
+    id: 'SLOW_56',
+    number: 56,
+    kind: 'SINGLE_ZONE',
+    title: 'Diaper Detour!',
+    zone: 'UPSTAIRS',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Upstairs room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Stop everything—we need wipes and a backup outfit.”',
+    frontImage: 'assets/cards/slowdown_56_diaper_detour.webp',
+  },
+  {
+    id: 'SLOW_57',
+    number: 57,
+    kind: 'SINGLE_ZONE',
+    title: 'Bath-Time Escape Artist!',
+    zone: 'UPSTAIRS',
+    ordinal: 1,
+    rulesText:
+      "Find the 1st Upstairs room that isn't Blocked (reading left to right, top to bottom). If Clear, turn it sideways (Cluttered). If Cluttered, flip it to Blocked!",
+    flavor: '“Fresh out of the tub and sprinting down the hallway.”',
+    frontImage: 'assets/cards/slowdown_57_bath_escape_artist.webp',
+  },
+  {
+    id: 'SLOW_58',
+    number: 58,
+    kind: 'SINGLE_ZONE',
+    title: '“Not THAT Shirt!”',
+    zone: 'UPSTAIRS',
+    ordinal: 2,
+    rulesText:
+      "Count Upstairs rooms that aren't Blocked (left to right, top to bottom) and pick the 2nd. If fewer than 2 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Last-minute Shabbat outfit negotiation.”',
+    frontImage: 'assets/cards/slowdown_58_not_that_shirt.webp',
+  },
+  {
+    id: 'SLOW_59',
+    number: 59,
+    kind: 'SINGLE_ZONE',
+    title: 'Surprise Book Pile',
+    zone: 'UPSTAIRS',
+    ordinal: 3,
+    rulesText:
+      "Count Upstairs rooms that aren't Blocked (left to right, top to bottom) and pick the 3rd. If fewer than 3 exist, pick the 1st Clear one (or 1st Cluttered if none are Clear).",
+    flavor: '“Twenty picture books just materialized on the bedroom floor.”',
+    frontImage: 'assets/cards/slowdown_59_surprise_book_pile.webp',
+  },
+
+  // Double Trouble (2)
+  {
+    id: 'SLOW_60',
+    number: 60,
+    kind: 'DOUBLE_TROUBLE',
+    title: 'Challah Flour Trail!',
+    zones: ['KITCHEN', 'DOWNSTAIRS'],
+    rulesText:
+      'Reading left to right, top to bottom, pick the 1st Clear Kitchen (or 1st Cluttered if none are Clear), then do the same for Downstairs. Clear turns sideways (Cluttered); Cluttered flips to Blocked!',
+    flavor: '“Started at the island, left tiny handprints on the couch.”',
+    frontImage: 'assets/cards/slowdown_60_bamba_trail.webp',
+  },
+  {
+    id: 'SLOW_61',
+    number: 61,
+    kind: 'DOUBLE_TROUBLE',
+    title: 'Upstairs-Downstairs Whirlwind!',
+    zones: ['TABLE', 'UPSTAIRS'],
+    rulesText:
+      'Reading left to right, top to bottom, pick the 1st Clear Table room (or 1st Cluttered if none are Clear), then do the same for Upstairs. Clear turns sideways (Cluttered); Cluttered flips to Blocked!',
+    flavor: '“Two zones hit in one sweep.”',
+    frontImage: 'assets/cards/slowdown_61_whirlwind.webp',
+  },
+
+  // Time Flies (1)
+  {
+    id: 'SLOW_62',
+    number: 62,
+    kind: 'TIME_FLIES',
+    title: '“Wait—Shabbat Is at WHAT Time?!”',
+    rulesText:
+      '1. Flip the next Clock card (unless Early Prep blocks it). 2. Pick the 1st Clear Kitchen (or 1st Cluttered if none are Clear): turn Clear sideways, or flip Cluttered to Blocked. 3. Return this card to the box.',
+    flavor: '“Winter Friday strikes again!”',
+    frontImage: 'assets/cards/slowdown_62_what_time.webp',
+  },
+];
+
+export const CLOCK_DECK: readonly ClockCard[] = [
+  ...([63, 64, 65, 66, 67, 68, 69, 70, 71] as const).map((n) => ({
+    id: `CLOCK_${n}`,
+    isShabbatBegins: false,
+    flipped: false,
+    title: 'Friday Afternoon',
+    frontImage: 'assets/cards/clock_63_71_friday_afternoon_QTY9.webp',
+  })),
+  {
+    id: 'CLOCK_72',
+    isShabbatBegins: true,
+    flipped: false,
+    title: 'Shabbat Begins!',
+    frontImage: 'assets/cards/clock_72_shabbat_begins_QTY1.webp',
+  },
+];
+
+// Unique card templates for the 72-Card Gallery viewer
+export interface GalleryItem {
+  id: string;
+  category: 'Helpers' | 'Rooms' | 'Chores' | 'Tools' | 'Slow-Downs' | 'Clock' | 'Card Backs';
+  title: string;
+  subtitle: string;
+  qty: number;
+  frontImage: string;
+  backImage?: string;
+}
+
+export const GALLERY_ITEMS: readonly GalleryItem[] = [
+  ...(['ABBA', 'MOMMY', 'NAEL', 'MEKIMI'] as const).map((id) => ({
+    id: `GAL_${id}`,
+    category: 'Helpers' as const,
+    title: HELPER_DEFS[id].name,
+    subtitle: `Carry ${HELPER_DEFS[id].carryLimit} · ${HELPER_DEFS[id].powers.map((p) => p.name).join(' & ')}`,
+    qty: 1,
+    frontImage: HELPER_DEFS[id].cardImage,
+    backImage: SHARED_BACKS.helpers,
+  })),
+  ...ROOM_DECK.map((r) => ({
+    id: `GAL_${r.id}`,
+    category: 'Rooms' as const,
+    title: r.subtitle ? `${r.name} (${r.subtitle})` : r.name,
+    subtitle: `${ZONE_META[r.zone].name} · Front & Red Blocked Back`,
+    qty: 1,
+    frontImage: r.frontImage,
+    backImage: r.blockedImage,
+  })),
+  ...CHORE_DECK.map((c) => ({
+    id: `GAL_${c.id}`,
+    category: 'Chores' as const,
+    title: c.title,
+    subtitle:
+      c.type === 'ERRAND' && c.endZone
+        ? `Errand · ${ZONE_META[c.zone].shortName} → ${ZONE_META[c.endZone].shortName}`
+        : `${c.type.replace('_', ' ')} · ${ZONE_META[c.zone].shortName}`,
+    qty: 1,
+    frontImage: c.frontImage,
+    backImage: SHARED_BACKS.chores,
+  })),
+  {
+    id: 'GAL_TOOL_ICE_COFFEE',
+    category: 'Tools',
+    title: 'Ice Coffee Boost',
+    subtitle: 'Reusable Tool · Clear 1–2 Cluttered rooms',
+    qty: 4,
+    frontImage: 'assets/cards/tool_35_38_ice_coffee_boost_QTY4.webp',
+    backImage: SHARED_BACKS.eventsAndTools,
+  },
+  {
+    id: 'GAL_TOOL_SNACK',
+    category: 'Tools',
+    title: 'Strategic Snack Summons',
+    subtitle: 'Reusable Tool · Move any teammate into your room',
+    qty: 3,
+    frontImage: 'assets/cards/tool_39_41_strategic_snack_summons_QTY3.webp',
+    backImage: SHARED_BACKS.eventsAndTools,
+  },
+  {
+    id: 'GAL_TOOL_EARLY_PREP',
+    category: 'Tools',
+    title: 'Early Prep Paid Off!',
+    subtitle: 'One-Time Shield · Block next Clock flip',
+    qty: 3,
+    frontImage: 'assets/cards/tool_42_44_early_prep_paid_off_QTY3.webp',
+    backImage: SHARED_BACKS.eventsAndTools,
+  },
+  ...SLOW_DOWN_DECK.map((s) => ({
+    id: `GAL_${s.id}`,
+    category: 'Slow-Downs' as const,
+    title: s.title,
+    subtitle:
+      s.kind === 'SINGLE_ZONE' && s.zone
+        ? `${ZONE_META[s.zone].shortName} · ${s.ordinal === 1 ? '1st' : s.ordinal === 2 ? '2nd' : '3rd'}`
+        : s.kind === 'DOUBLE_TROUBLE' && s.zones
+          ? `Double Trouble · ${ZONE_META[s.zones[0]].shortName} + ${ZONE_META[s.zones[1]].shortName}`
+          : 'Time Flies · +1 Clock Flip + Kitchen',
+    qty: 1,
+    frontImage: s.frontImage,
+    backImage: SHARED_BACKS.eventsAndTools,
+  })),
+  {
+    id: 'GAL_CLOCK_AFTERNOON',
+    category: 'Clock',
+    title: 'Friday Afternoon',
+    subtitle: 'End of round: Refresh Helpers & flip 1 Arrival Chore',
+    qty: 9,
+    frontImage: 'assets/cards/clock_63_71_friday_afternoon_QTY9.webp',
+    backImage: SHARED_BACKS.clock,
+  },
+  {
+    id: 'GAL_CLOCK_SHABBAT',
+    category: 'Clock',
+    title: 'Shabbat Begins!',
+    subtitle: 'Placed rightmost · Finish all Chores before this flips!',
+    qty: 1,
+    frontImage: 'assets/cards/clock_72_shabbat_begins_QTY1.webp',
+    backImage: SHARED_BACKS.clock,
+  },
+  {
+    id: 'GAL_BACK_CHORES',
+    category: 'Card Backs',
+    title: 'Chores Deck Back',
+    subtitle: 'Shared back for all 18 Chore cards',
+    qty: 18,
+    frontImage: SHARED_BACKS.chores,
+  },
+  {
+    id: 'GAL_BACK_EVENTS',
+    category: 'Card Backs',
+    title: 'Friday Events & Tools Back',
+    subtitle: 'Shared back for all 18 Slow-Downs + 10 Tools',
+    qty: 28,
+    frontImage: SHARED_BACKS.eventsAndTools,
+  },
+  {
+    id: 'GAL_BACK_HELPERS',
+    category: 'Card Backs',
+    title: 'Helper Cards Back',
+    subtitle: 'Shared back for all 4 Family Helper cards',
+    qty: 4,
+    frontImage: SHARED_BACKS.helpers,
+  },
+  {
+    id: 'GAL_BACK_CLOCK',
+    category: 'Card Backs',
+    title: 'Shabbat Clock Back',
+    subtitle: 'Identical back for all 10 Clock cards',
+    qty: 10,
+    frontImage: SHARED_BACKS.clock,
+  },
+];

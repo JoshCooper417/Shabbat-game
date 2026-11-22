@@ -1,0 +1,113 @@
+import { assetUrl, HELPER_DEFS, SEAT_ORDER, SHARED_BACKS, ZONE_META } from '../data/cards';
+import { GameState } from '../engine/types';
+import { InspectedCard } from './CardInspectModal';
+
+interface FigureBarProps {
+  state: GameState;
+  onInspectCard: (card: InspectedCard) => void;
+}
+
+export function FigureBar({ state, onInspectCard }: FigureBarProps) {
+  return (
+    <section className="helpers-bar-panel" aria-label="4 Family Helpers">
+      <div className="panel-header-row">
+        <h2 className="panel-title">Family Helpers (Turn Order)</h2>
+        <span className="panel-hint">Resting teammates still help with combos, relays &amp; powers!</span>
+      </div>
+
+      <div className="helpers-bar-grid">
+        {SEAT_ORDER.map((id) => {
+          const def = HELPER_DEFS[id];
+          const hs = state.helpers[id];
+          const room = state.rooms[hs.slotIndex];
+          const isActive = state.activeHelperId === id && state.phase !== 'WON' && state.phase !== 'LOST';
+
+          return (
+            <div
+              key={id}
+              className={`helper-seat-card ${isActive ? 'active' : ''} ${
+                hs.resting ? 'resting' : ''
+              }`}
+              style={
+                {
+                  '--helper-color': def.accent,
+                  '--helper-soft': def.softBg,
+                } as React.CSSProperties
+              }
+            >
+              <div className="helper-seat-top">
+                <img
+                  src={assetUrl(def.avatarImage)}
+                  alt={def.name}
+                  className="helper-seat-avatar"
+                />
+                <div className="helper-seat-meta">
+                  <div className="helper-seat-name-row">
+                    <span className="helper-seat-name">{def.name}</span>
+                    <span
+                      className={`seat-status-tag ${
+                        isActive ? 'active' : hs.resting ? 'resting' : 'ready'
+                      }`}
+                    >
+                      {isActive ? 'Active Turn' : hs.resting ? 'Resting' : 'Ready'}
+                    </span>
+                  </div>
+                  <div className="helper-seat-loc">
+                    In <strong>{room.card.name}</strong> ({ZONE_META[room.card.zone].shortName})
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() =>
+                    onInspectCard({
+                      title: `${def.name} — Helper Power Card`,
+                      subtitle: `Carry limit: ${def.carryLimit} Errand${def.carryLimit > 1 ? 's' : ''}`,
+                      frontImage: def.cardImage,
+                      backImage: SHARED_BACKS.helpers,
+                    })
+                  }
+                >
+                  Card
+                </button>
+              </div>
+
+              <div className="helper-seat-power">
+                {def.powers.map((p) => (
+                  <div key={p.name}>
+                    <strong>{p.name}</strong> ({p.timing}): {p.text}
+                  </div>
+                ))}
+              </div>
+
+              {hs.carriedErrands.length > 0 && (
+                <div className="helper-errands-row">
+                  {hs.carriedErrands.map((errand) => (
+                    <button
+                      key={errand.id}
+                      type="button"
+                      className="carried-errand-chip"
+                      onClick={() =>
+                        onInspectCard({
+                          title: `Carried Errand: ${errand.title}`,
+                          subtitle: `Deliver to ${ZONE_META[errand.endZone!].shortName}`,
+                          frontImage: errand.frontImage,
+                          backImage: SHARED_BACKS.chores,
+                        })
+                      }
+                    >
+                      <img src={assetUrl(errand.frontImage)} alt={errand.title} />
+                      <span>
+                        → {ZONE_META[errand.endZone!].shortName}: {errand.title}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
