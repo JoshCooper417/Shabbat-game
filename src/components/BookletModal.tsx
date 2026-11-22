@@ -8,7 +8,9 @@ interface BookletModalProps {
 }
 
 export function BookletModal({ open, initialPage = 1, onClose }: BookletModalProps) {
-  const [pageIdx, setPageIdx] = useState(Math.max(0, Math.min(BOOKLET_PAGES.length - 1, initialPage - 1)));
+  const [pageIdx, setPageIdx] = useState(
+    Math.max(0, Math.min(BOOKLET_PAGES.length - 1, initialPage - 1)),
+  );
 
   useEffect(() => {
     if (open) {
@@ -32,7 +34,13 @@ export function BookletModal({ open, initialPage = 1, onClose }: BookletModalPro
   const current = BOOKLET_PAGES[pageIdx];
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label="Official Family Rulebook">
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Official Family Rulebook"
+    >
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
@@ -47,6 +55,22 @@ export function BookletModal({ open, initialPage = 1, onClose }: BookletModalPro
         </div>
 
         <div className="modal-body">
+          {/* Mobile page jump dropdown so the full page + Next button stay above the fold */}
+          <label className="booklet-mobile-select-wrap">
+            <span>Jump to page:</span>
+            <select
+              className="booklet-mobile-select"
+              value={pageIdx}
+              onChange={(e) => setPageIdx(Number(e.target.value))}
+            >
+              {BOOKLET_PAGES.map((p, idx) => (
+                <option key={p.page} value={idx}>
+                  p.{p.page} — {p.title}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <div className="booklet-layout">
             <nav className="booklet-toc" aria-label="Rulebook pages">
               {BOOKLET_PAGES.map((p, idx) => (

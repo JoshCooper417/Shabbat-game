@@ -68,7 +68,7 @@ export function ActionPanel({
       : '';
 
   return (
-    <section className="action-panel" aria-label="Turn Actions">
+    <section className="action-panel area-actions" aria-label="Turn Actions">
       <div className="turn-banner">
         <div className="turn-helper-id">
           <div
@@ -104,7 +104,7 @@ export function ActionPanel({
             })
           }
         >
-          Power Card
+          🔍 Helper Card
         </button>
       </div>
 
@@ -140,12 +140,12 @@ export function ActionPanel({
                     <img
                       src={assetUrl(def.avatarImage)}
                       alt={def.name}
-                      className="helper-seat-avatar"
+                      className="pick-helper-avatar"
                       style={{ '--helper-color': def.accent } as React.CSSProperties}
                     />
                     <div className="action-btn-body">
                       <span className="action-btn-label">{def.name}</span>
-                      <span className="action-btn-detail">Currently in {loc}</span>
+                      <span className="action-btn-detail">In {loc}</span>
                     </div>
                   </button>
                 );
@@ -166,9 +166,13 @@ export function ActionPanel({
                 onClick={() => onMove(move.targetSlot)}
               >
                 <span className="action-btn-label">
-                  {move.kind === 'STAY' ? 'Stay Put' : state.rooms[move.targetSlot].card.name}
+                  {move.kind === 'STAY'
+                    ? `Stay in ${state.rooms[move.targetSlot].card.name}`
+                    : state.rooms[move.targetSlot].card.name}
                 </span>
-                <span className="action-btn-detail">{move.label}</span>
+                <span className="action-btn-detail">
+                  {move.kind === 'STAY' ? "Don't move this turn" : move.label}
+                </span>
               </button>
             ))}
           </div>
@@ -203,8 +207,14 @@ export function ActionPanel({
               </button>
             ))}
 
-            <button type="button" className="btn btn-secondary" onClick={onSkipAction}>
-              Skip Step 2 (Continue to Event)
+            <button
+              type="button"
+              className={legal.length === 0 ? 'btn btn-primary' : 'btn btn-secondary'}
+              onClick={onSkipAction}
+            >
+              {legal.length === 0
+                ? 'No Actions Here — Continue to Event'
+                : 'Skip Step 2 (Continue to Event)'}
             </button>
           </div>
 
@@ -310,7 +320,8 @@ export function ActionPanel({
                       <img
                         src={assetUrl(def.avatarImage)}
                         alt={def.name}
-                        className="helper-token-avatar"
+                        className="pick-helper-avatar"
+                        style={{ '--helper-color': def.accent } as React.CSSProperties}
                       />
                       <div className="action-btn-body">
                         <span className="action-btn-label">{def.name}</span>

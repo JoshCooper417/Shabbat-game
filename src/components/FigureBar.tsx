@@ -9,7 +9,10 @@ interface FigureBarProps {
 
 export function FigureBar({ state, onInspectCard }: FigureBarProps) {
   return (
-    <section className="player-seats-tray" aria-label="4 Family Helper Seats Around the Table">
+    <section
+      className="player-seats-tray area-helpers"
+      aria-label="4 Family Helper Seats Around the Table"
+    >
       <div className="panel-header-row">
         <h2 className="panel-title">Helper Cards Around the Table</h2>
         <span className="panel-hint">Sideways = Resting (still helps with combos, relays &amp; powers!)</span>

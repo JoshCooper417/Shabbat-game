@@ -2271,11 +2271,353 @@ img {
 }
 
 /* ============================================================================
+   AUDIT POLISH: NEWCOMER ONBOARDING, ZERO-CLIPPING, READABLE CARDS & CLARITY
+   ============================================================================ */
+.newcomer-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  background: #f4ecdb;
+  border: 1px solid #e2d4b7;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.newcomer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.77rem;
+  line-height: 1.35;
+  color: var(--ink-secondary);
+}
+
+.newcomer-num {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.67rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--bg-navy);
+  color: #ffe2a4;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.clock-strip-sub.urgent {
+  color: var(--crimson);
+  font-weight: 800;
+}
+
+/* Fix P0: Styled avatar inside 1-2P Choose Helper & Strategic Snack Summons buttons */
+.pick-helper-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2.5px solid var(--helper-color, var(--bg-navy));
+}
+
+.action-btn-card {
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Clearer Step 1 destination contrast: dim unreachable rooms, dashed Stay, crisp blue outline on legal moves */
+.room-tile.dimmed-non-target {
+  opacity: 0.66;
+  filter: saturate(0.8);
+}
+
+.room-tile.clickable-stay {
+  cursor: pointer;
+  border: 2px dashed #6c7a94;
+  box-shadow: var(--shadow-card);
+}
+
+.room-tile.clickable-stay:hover {
+  border-color: var(--bg-navy);
+  transform: translateY(-2px);
+}
+
+/* Make Event Hit pop unmistakably even on dark Red Blocked rooms */
+.room-tile.event-hit {
+  border-color: #fff;
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 6px var(--gold),
+    0 10px 22px rgba(185, 38, 38, 0.42);
+}
+
+/* Top-right badges on room art box (so Zone pill in room-top-bar NEVER gets squeezed!) */
+.room-art-right-badges {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.room-status-pill.just-hit {
+  background: var(--gold);
+  color: var(--bg-navy-deep);
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Slightly smaller figurine on Red Blocked rooms so Blocked card rules stay visible */
+.room-tile.blocked .figurine-sprite {
+  height: 66px;
+}
+
+.room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
+  height: 52px;
+}
+
+/* Zero-clipping room names & subtitles */
+.room-name {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.18;
+}
+
+.room-subtitle {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.15;
+}
+
+/* Zero-clipping tucked chore strip */
+.tucked-chore-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tucked-mini-tag {
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #8f5600;
+}
+
+.tucked-chore-text {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+/* Readable TableCardsPanel Chore & Tool Card Shells (zero icons covering artwork!) */
+.dock-cards-scroll {
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  gap: 10px;
+}
+
+.table-card-shell,
+.tool-card-shell {
+  background: #fffdf9;
+  border: 1.5px solid var(--border-warm);
+  border-radius: 12px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(34, 20, 6, 0.14);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  min-width: 0;
+}
+
+.table-card-shell.playable,
+.tool-card-shell.playable {
+  border-color: var(--teal);
+  background: #f2fbf8;
+  box-shadow:
+    0 0 0 2px rgba(14, 124, 102, 0.3),
+    0 8px 18px rgba(14, 124, 102, 0.22);
+  transform: translateY(-2px);
+}
+
+.table-card-shell .table-card-item {
+  box-shadow: none;
+  border-radius: 8px;
+}
+
+.table-card-shell .table-card-item:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.table-card-caption,
+.tool-card-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.table-card-title,
+.tool-card-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--ink-primary);
+  line-height: 1.2;
+}
+
+.table-card-meta {
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--bg-navy);
+  line-height: 1.2;
+}
+
+.table-card-howto {
+  font-size: 0.64rem;
+  color: var(--ink-secondary);
+  line-height: 1.22;
+}
+
+.table-card-caption-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.card-play-btn {
+  background: var(--teal);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 3px 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.card-play-btn:hover {
+  background: #0a6351;
+}
+
+.card-type-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.card-inspect-inline-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+  line-height: 1.25;
+}
+
+.card-inspect-inline-btn:hover {
+  border-color: var(--bg-navy);
+  background: #fff;
+}
+
+.tools-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.tool-card-shell .tool-mini-card {
+  width: 100%;
+  box-shadow: none;
+}
+
+.discard-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffdf8;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 4px 8px 4px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.discard-tool-chip img {
+  width: 24px;
+  aspect-ratio: 5 / 7;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/* Booklet Modal desktop polish + mobile dropdown */
+.booklet-toc-btn {
+  padding: 5px 10px;
+  font-size: 0.76rem;
+}
+
+.booklet-mobile-select-wrap {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--bg-navy);
+}
+
+.booklet-mobile-select {
+  flex: 1;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-strong);
+  background: #fff;
+  color: var(--ink-primary);
+}
+
+/* ============================================================================
    RESPONSIVE BREAKPOINTS
    ============================================================================ */
 @media (max-width: 1060px) {
   .game-main-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Dissolve column wrappers so mobile/tablet flows: Board -> Actions -> Cards -> Helpers! */
+  .board-column,
+  .control-column {
+    display: contents;
+  }
+
+  .area-board {
+    order: 1;
+  }
+
+  .area-actions {
+    order: 2;
+  }
+
+  .area-cards {
+    order: 3;
+  }
+
+  .area-helpers {
+    order: 4;
   }
 
   .start-hero {
@@ -2293,6 +2635,26 @@ img {
 }
 
 @media (max-width: 720px) {
+  .topbar {
+    position: static;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .stat-chip {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+  }
+
+  .nav-btn {
+    padding: 5px 8px;
+    font-size: 0.74rem;
+  }
+
+  .newcomer-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .game-container {
     padding: 10px 10px 28px;
   }
@@ -2338,57 +2700,93 @@ img {
     display: none;
   }
 
+  .room-art-box,
+  .room-blocked-cover {
+    aspect-ratio: 4 / 3;
+  }
+
   .room-footer {
-    padding: 5px 6px;
+    padding: 5px 5px 6px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
   }
 
   .room-name {
     font-size: 0.72rem;
   }
 
+  .room-subtitle {
+    font-size: 0.62rem;
+  }
+
+  .room-quick-act-btn {
+    width: 100%;
+    text-align: center;
+    padding: 4px 6px;
+    font-size: 0.68rem;
+  }
+
   .room-move-banner {
-    font-size: 0.55rem;
+    font-size: 0.56rem;
     padding: 2px 5px;
-    top: 4px;
-    left: 4px;
-    max-width: calc(100% - 8px);
+    top: 3px;
+    left: 3px;
+    max-width: calc(100% - 6px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
+  .room-art-right-badges {
+    top: 3px;
+    right: 3px;
+  }
+
   .room-status-pill {
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     padding: 1px 4px;
   }
 
   .zone-pill {
-    font-size: 0.58rem;
-    padding: 1px 5px;
+    font-size: 0.62rem;
+    padding: 2px 6px;
   }
 
   .figurines-stage {
-    bottom: 3px;
+    bottom: 2px;
     left: 2px;
     right: 2px;
   }
 
+  .figurine-piece.is-active {
+    transform: translateY(-2px) scale(1.03);
+  }
+
   .figurine-sprite {
-    height: 54px;
+    height: 38px;
   }
 
   .figurine-piece.is-mekimi .figurine-sprite {
-    height: 42px;
+    height: 30px;
+  }
+
+  .room-tile.blocked .figurine-sprite {
+    height: 34px;
+  }
+
+  .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
+    height: 28px;
   }
 
   .figurine-shadow {
-    width: 28px;
-    height: 7px;
-    bottom: 10px;
+    width: 22px;
+    height: 5px;
+    bottom: 8px;
   }
 
   .figurine-plate {
-    font-size: 0.54rem;
+    font-size: 0.52rem;
     padding: 1px 4px;
   }
 
@@ -2405,7 +2803,16 @@ img {
     max-width: 180px;
   }
 
+  .booklet-mobile-select-wrap {
+    display: flex;
+  }
+
   .booklet-toc {
-    max-height: 160px;
+    display: none;
+  }
+
+  .booklet-page-img {
+    max-height: 56vh;
   }
 }
+

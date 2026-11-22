@@ -55,9 +55,23 @@ export function StartScreen({
           <h1 className="start-heading">Preparing for Shabbat</h1>
           <p className="start-lead">
             Work together as <strong>Abba, Nael, Mommy, and Mekimi</strong> to finish every Friday
-            Chore before <strong>Shabbat Begins!</strong> flips on the Clock. Every card, room,
-            and rule matches the official 72-card print pack and 16-page booklet.
+            Chore before <strong>Shabbat Begins!</strong> flips on the Clock.
           </p>
+
+          <div className="newcomer-strip" aria-label="How to play in 15 seconds">
+            <div className="newcomer-item">
+              <span className="newcomer-num">Goal</span>
+              <span>Finish all Chores together before sunset!</span>
+            </div>
+            <div className="newcomer-item">
+              <span className="newcomer-num">Turn</span>
+              <span>1. Move piece → 2. Do 1 Action → 3. Flip 1 Event</span>
+            </div>
+            <div className="newcomer-item">
+              <span className="newcomer-num">Easy</span>
+              <span>Only legal moves work &amp; the Coach guides every step.</span>
+            </div>
+          </div>
 
           <div className="diff-grid" role="radiogroup" aria-label="Choose Difficulty">
             {DIFF_ORDER.map((id) => {
@@ -74,8 +88,8 @@ export function StartScreen({
                   <span className="diff-name">{cfg.name}</span>
                   <span className="diff-tagline">{cfg.tagline}</span>
                   <span className="diff-meta">
-                    {cfg.clockLength} Clock · {cfg.totalChores} Chores ({cfg.startingChoreRow}+
-                    {cfg.arrivalChores})
+                    {cfg.clockLength} Clock · {cfg.totalChores} Chores ({cfg.startingChoreRow} start +{' '}
+                    {cfg.arrivalChores} arriving)
                     <br />
                     {cfg.slowDownCount} Slow-Downs · {cfg.startingClutter} Clutter
                   </span>
@@ -98,7 +112,7 @@ export function StartScreen({
                 className={`mode-pill ${turnMode === 'TWO_GROUP' ? 'active' : ''}`}
                 onClick={() => onSelectTurnMode('TWO_GROUP')}
               >
-                1–2P Group Mode (Group A / Group B)
+                1–2P Group Mode (A: Abba &amp; Nael · B: Mommy &amp; Mekimi)
               </button>
             </div>
 

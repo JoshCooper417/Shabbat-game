@@ -13,6 +13,54 @@ interface BoardGridProps {
   onInspectCard: (card: InspectedCard) => void;
 }
 
+function getShortMoveLabel(move: LegalMove): string {
+  if (move.kind === 'STAY') return 'Stay';
+  if (move.kind === 'TURBO_CRAWL') return 'Diagonal ↗';
+  if (move.kind === 'BUDDY_HOP') {
+    const targetName = move.label.replace('Buddy-Hop to ', '');
+    return `Hop → ${targetName}`;
+  }
+  return move.label.includes('(2)') ? 'Slide 2' : 'Slide 1';
+}
+
+function getBoardPrompt(state: GameState): string {
+  const activeName = HELPER_DEFS[state.activeHelperId].name;
+  const activeRoomName = state.rooms[state.helpers[state.activeHelperId].slotIndex].card.name;
+  const sub = state.pendingSubstep;
+
+  if (state.phase === 'CHOOSE_HELPER') {
+    return `Choose which Helper in Group ${state.activeGroup} goes next`;
+  }
+  if (state.phase === 'MOVE') {
+    return `Select any blue-outlined room to move ${activeName} (or Stay)`;
+  }
+  if (state.phase === 'ACT') {
+    return 'Pick an action or click a green “Play / Use” card';
+  }
+  if (state.phase === 'SUBSTEP' && sub) {
+    switch (sub.kind) {
+      case 'ICE_COFFEE_PICK':
+        return 'Select 1 or 2 tilted Cluttered rooms to Clear';
+      case 'TIDY_NEIGHBOR_BONUS':
+        return 'Optional bonus: select a next-door room marked “+ Clear Bonus”';
+      case 'SNACK_SUMMONS_PICK':
+        return `Pick a teammate to summon into ${activeRoomName}`;
+      case 'RECHARGE_PICK':
+        return 'Pick used Tool(s) from Tool Discard to return to Ready';
+      case 'BACKUP_TOOL_PICK':
+        return 'Room flipped Blocked — unlock a Backup Tool!';
+    }
+  }
+  if (state.phase === 'EVENT_READY') {
+    return 'Click the Friday Events Deck to flip 1 card';
+  }
+  if (state.phase === 'EVENT_RESOLVED') {
+    return `Review the Event result, then Rest ${activeName}`;
+  }
+  if (state.phase === 'WON') return 'Shabbat Shalom — all Chores complete!';
+  return 'Shabbat Begins!';
+}
+
 export function BoardGrid({
   state,
   legalMoves,
@@ -39,8 +87,13 @@ export function BoardGrid({
         )
       : undefined;
 
+  const isBoardTargetStep =
+    state.phase === 'MOVE' ||
+    (state.phase === 'SUBSTEP' &&
+      (sub?.kind === 'ICE_COFFEE_PICK' || sub?.kind === 'TIDY_NEIGHBOR_BONUS'));
+
   return (
-    <section className="linen-playmat" aria-label="The 3 by 3 House on the Shabbat Table">
+    <section className="linen-playmat area-board" aria-label="The 3 by 3 House on the Shabbat Table">
       <div className="playmat-header">
         <div className="playmat-title-group">
           <h2 className="playmat-title">The 3×3 House</h2>
@@ -48,17 +101,7 @@ export function BoardGrid({
             Upright = Clear · Tilted = Cluttered · Red = Blocked
           </span>
         </div>
-        <span className="playmat-prompt">
-          {state.phase === 'MOVE'
-            ? `Tap any glowing room to move ${HELPER_DEFS[state.activeHelperId].name}`
-            : sub?.kind === 'ICE_COFFEE_PICK'
-              ? 'Tap 1 or 2 tilted Cluttered rooms to Clear'
-              : sub?.kind === 'TIDY_NEIGHBOR_BONUS'
-                ? 'Tap a glowing next-door Cluttered room to Clear it too'
-                : state.phase === 'ACT'
-                  ? 'Tap a highlighted card on the table or pick an action →'
-                  : 'Flip the Event Deck when ready'}
-        </span>
+        <span className="playmat-prompt">{getBoardPrompt(state)}</span>
       </div>
 
       <div className="house-grid">
@@ -83,6 +126,8 @@ export function BoardGrid({
             sub.selectedSlots.includes(room.slotIndex);
 
           const isClickable = Boolean(move || isTidyBonusTarget || isIceCoffeeTarget);
+          const isStayMove = Boolean(move && move.kind === 'STAY');
+          const isUnreachableDuringPick = isBoardTargetStep && !isClickable;
           const isEventHit = highlightedEventSlots.has(room.slotIndex);
           const isActiveRoom =
             room.slotIndex === activeSlot && state.phase !== 'WON' && state.phase !== 'LOST';
@@ -99,7 +144,9 @@ export function BoardGrid({
             'room-tile',
             room.state === 'CLUTTERED' ? 'cluttered' : '',
             room.state === 'BLOCKED' ? 'blocked' : '',
-            isClickable ? 'clickable' : '',
+            isClickable && !isStayMove ? 'clickable' : '',
+            isStayMove ? 'clickable-stay' : '',
+            isUnreachableDuringPick ? 'dimmed-non-target' : '',
             isIceCoffeeSelected ? 'selected-substep' : '',
             isEventHit ? 'event-hit' : '',
             !isClickable && isActiveRoom ? 'active-room' : '',
@@ -126,12 +173,6 @@ export function BoardGrid({
                     {zone.shortName}
                   </span>
                   <div className="room-top-right">
-                    {room.state === 'CLUTTERED' && (
-                      <span className="room-status-pill cluttered">Cluttered</span>
-                    )}
-                    {room.state === 'BLOCKED' && (
-                      <span className="room-status-pill blocked">Blocked</span>
-                    )}
                     <button
                       type="button"
                       className="room-inspect-btn"
@@ -154,7 +195,7 @@ export function BoardGrid({
                   </div>
                 </div>
 
-                {/* Room Surface Artwork + Standing 3D Figurines anchored cleanly above the footer */}
+                {/* Room Surface Artwork + Status Pill + Standing 3D Figurines */}
                 <div className="room-art-wrap">
                   <div className={room.state === 'BLOCKED' ? 'room-blocked-cover' : 'room-art-box'}>
                     <img
@@ -169,9 +210,10 @@ export function BoardGrid({
                       className="room-art-img"
                     />
 
+                    {/* Top-left action/move badge */}
                     {move && (
                       <span className={`room-move-banner ${move.kind === 'STAY' ? 'stay' : ''}`}>
-                        {move.kind === 'STAY' ? 'Stay Here' : move.label}
+                        {getShortMoveLabel(move)}
                       </span>
                     )}
                     {isTidyBonusTarget && (
@@ -179,9 +221,20 @@ export function BoardGrid({
                     )}
                     {isIceCoffeeTarget && (
                       <span className="room-move-banner substep">
-                        {isIceCoffeeSelected ? '✓ Selected' : 'Tap to Clear'}
+                        {isIceCoffeeSelected ? '✓ Selected' : 'Select'}
                       </span>
                     )}
+
+                    {/* Top-right room state / just-hit badge (never squeezes Zone pill!) */}
+                    <div className="room-art-right-badges">
+                      {isEventHit && <span className="room-status-pill just-hit">⚡ Hit</span>}
+                      {room.state === 'CLUTTERED' && (
+                        <span className="room-status-pill cluttered">Cluttered</span>
+                      )}
+                      {room.state === 'BLOCKED' && (
+                        <span className="room-status-pill blocked">Blocked</span>
+                      )}
+                    </div>
                   </div>
 
                   {occupants.length > 0 && (
@@ -197,6 +250,13 @@ export function BoardGrid({
                           state.phase !== 'WON' &&
                           state.phase !== 'LOST';
                         const isMekimi = hid === 'MEKIMI';
+                        const errandTooltip =
+                          hState.carriedErrands.length > 0
+                            ? `Carrying: ${hState.carriedErrands
+                                .map((e) => `${e.title} → ${ZONE_META[e.endZone!].shortName}`)
+                                .join('; ')}`
+                            : undefined;
+
                         return (
                           <div
                             key={hid}
@@ -204,6 +264,7 @@ export function BoardGrid({
                               hState.resting ? 'is-resting' : ''
                             } ${isMekimi ? 'is-mekimi' : ''}`}
                             style={{ '--helper-color': def.accent } as React.CSSProperties}
+                            title={errandTooltip}
                           >
                             <div className="figurine-shadow" />
                             <img
@@ -215,8 +276,11 @@ export function BoardGrid({
                               <span>{def.name}</span>
                               {hState.resting && <em className="figurine-rest-dot">Rest</em>}
                               {hState.carriedErrands.length > 0 && (
-                                <span className="figurine-errand-pip">
-                                  {hState.carriedErrands.length}E
+                                <span
+                                  className="figurine-errand-pip"
+                                  title={errandTooltip}
+                                >
+                                  📦{hState.carriedErrands.length}
                                 </span>
                               )}
                             </div>
@@ -245,10 +309,10 @@ export function BoardGrid({
                       }}
                     >
                       {directRoomAction.type === 'FINISH_TUCKED_CHORE'
-                        ? '✓ Finish'
+                        ? '✓ Finish Chore'
                         : directRoomAction.type === 'TIDY_BLOCKED'
-                          ? 'Unblock'
-                          : '✨ Tidy'}
+                          ? 'Unblock Room'
+                          : '✨ Tidy Room'}
                     </button>
                   )}
                 </div>
@@ -272,7 +336,10 @@ export function BoardGrid({
                       alt={room.tuckedChore.title}
                       className="tucked-chore-thumb"
                     />
-                    <span className="tucked-chore-text">Tucked: {room.tuckedChore.title}</span>
+                    <div className="tucked-chore-info">
+                      <span className="tucked-mini-tag">Tucked</span>
+                      <span className="tucked-chore-text">{room.tuckedChore.title}</span>
+                    </div>
                   </div>
                 )}
               </div>

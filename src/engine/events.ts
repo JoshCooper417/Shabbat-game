@@ -66,7 +66,7 @@ function applyRoomHit(
         slotIndex,
         roomName: room.card.name,
         kind: 'CLUTTERED',
-        text: `${room.card.name} turned sideways (Cluttered)!${room.tuckedChore ? ' Tucked Chore stays safe.' : ''}`,
+        text: `${room.card.name} became Cluttered (tilted)!${room.tuckedChore ? ' Tucked Chore stays safe.' : ''}`,
       },
       flippedBlocked: false,
     };
@@ -434,6 +434,7 @@ export function advanceAfterEvent(state: GameState): GameState {
   // 2) Refresh all 4 Helpers to Ready
   // 3) Flip 1 Arrival Chore into Chore Row (if any remain)
   // -------------------------------------------------------------------------
+  let clockNote = '';
   if (next.clockShield) {
     const shield = next.clockShield;
     next = {
@@ -441,6 +442,7 @@ export function advanceAfterEvent(state: GameState): GameState {
       clockShield: null,
       boxedTools: [...next.boxedTools, shield],
     };
+    clockNote = 'Early Prep blocked the Clock flip';
     next = appendLog(
       next,
       'ROUND',
@@ -469,6 +471,11 @@ export function advanceAfterEvent(state: GameState): GameState {
           lastEvent: null,
         };
       }
+      const remainingSafe = next.clockRow.filter((c) => !c.flipped).length - 1;
+      clockNote =
+        remainingSafe <= 0
+          ? 'Clock flipped (FINAL ROUND!)'
+          : `Clock flipped (${remainingSafe} safe round${remainingSafe === 1 ? '' : 's'} left)`;
       next = appendLog(
         next,
         'ROUND',
@@ -485,6 +492,7 @@ export function advanceAfterEvent(state: GameState): GameState {
   next = { ...next, helpers: refreshedHelpers };
 
   // Flip 1 Arrival Chore into Chore Row (if any remain)
+  let arrivalNote = '';
   if (next.arrivalPile.length > 0) {
     const [arrived, ...restArrival] = next.arrivalPile;
     next = {
@@ -492,6 +500,7 @@ export function advanceAfterEvent(state: GameState): GameState {
       choreRow: [...next.choreRow, arrived],
       arrivalPile: restArrival,
     };
+    arrivalNote = ` “${arrived.title}” arrived in Chore Row.`;
     next = appendLog(
       next,
       'ROUND',
@@ -506,6 +515,8 @@ export function advanceAfterEvent(state: GameState): GameState {
   }
 
   const nextRound = next.round + 1;
+  const starterLabel =
+    next.turnMode === 'TWO_GROUP' ? 'Group A starts.' : `${getHelperName('ABBA')} starts.`;
   return {
     ...next,
     round: nextRound,
@@ -516,9 +527,6 @@ export function advanceAfterEvent(state: GameState): GameState {
     phase: next.turnMode === 'TWO_GROUP' ? 'CHOOSE_HELPER' : 'MOVE',
     movedThisTurn: false,
     lastEvent: null,
-    lastActionNote:
-      next.turnMode === 'TWO_GROUP'
-        ? `Round ${nextRound} begins! Group A starts.`
-        : `Round ${nextRound} begins! ${getHelperName('ABBA')} starts.`,
+    lastActionNote: `Round ${nextRound} begins — ${clockNote}, all 4 Helpers refreshed.${arrivalNote} ${starterLabel}`,
   };
 }

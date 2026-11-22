@@ -10,14 +10,20 @@ interface ClockStripProps {
 export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
   const nextUnflippedIdx = state.clockRow.findIndex((c) => !c.flipped);
   const unflippedCount = state.clockRow.filter((c) => !c.flipped).length;
+  const safeFlipsLeft = Math.max(0, unflippedCount - 1);
 
   return (
     <section className="clock-strip" aria-label="Shabbat Clock">
       <div className="clock-strip-head">
         <span className="clock-strip-title">Shabbat Clock</span>
-        <span className="clock-strip-sub">
-          {unflippedCount} card{unflippedCount === 1 ? '' : 's'} left before Shabbat
-          {state.clockShield ? ' (+1 shielded!)' : ''}
+        <span className={`clock-strip-sub ${safeFlipsLeft === 0 ? 'urgent' : ''}`}>
+          {safeFlipsLeft === 0
+            ? state.clockShield
+              ? 'FINAL ROUND (Next flip shielded!)'
+              : 'FINAL ROUND — Next flip is Shabbat Begins!'
+            : `${safeFlipsLeft} round${safeFlipsLeft === 1 ? '' : 's'} left before Shabbat Begins!${
+                state.clockShield ? ' (+1 shielded)' : ''
+              }`}
         </span>
       </div>
 

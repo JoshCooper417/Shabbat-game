@@ -186,6 +186,9 @@ export default function App() {
               </button>
             </>
           )}
+          <button type="button" className="nav-btn" onClick={() => openBooklet(15)}>
+            How to Play
+          </button>
           <button type="button" className="nav-btn" onClick={() => openBooklet(1)}>
             Rulebook (16p)
           </button>
@@ -236,7 +239,6 @@ export default function App() {
               />
               <FigureBar state={gameState} onInspectCard={setInspectedCard} />
             </div>
-
             <div className="control-column">
               <ActionPanel
                 state={gameState}
