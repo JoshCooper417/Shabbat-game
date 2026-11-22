@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActionPanel } from './components/ActionPanel';
 import { BoardGrid } from './components/BoardGrid';
 import { BookletModal } from './components/BookletModal';
@@ -38,6 +38,18 @@ export default function App() {
   const [logOpen, setLogOpen] = useState(false);
   const [inspectedCard, setInspectedCard] = useState<InspectedCard | null>(null);
 
+  const screenKey = gameState ? `game-${gameState.seed}` : 'menu';
+  useEffect(() => {
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+    resetScroll();
+    const raf = window.requestAnimationFrame(resetScroll);
+    return () => window.cancelAnimationFrame(raf);
+  }, [screenKey]);
+
   const legalMoves = useMemo(() => {
     if (!gameState || gameState.phase !== 'MOVE') return [];
     return getLegalMoves(gameState);
@@ -47,6 +59,7 @@ export default function App() {
     const fresh = createInitialGameState({ difficulty: diff, turnMode: mode });
     setGameState(fresh);
     setUndoStack([]);
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
 
   const transition = (next: GameState) => {
