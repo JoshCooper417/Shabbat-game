@@ -1,4 +1,4 @@
-import { GROUP_HELPERS, SEAT_ORDER, ZONE_META } from '../data/cards';
+import { SEAT_ORDER, ZONE_META } from '../data/cards';
 import {
   appendLog,
   getHelperName,
@@ -7,51 +7,38 @@ import {
   shuffleWithRng,
 } from './helpers';
 import {
-  EventCard,
   EventEffectNote,
   GameState,
   RoomSlot,
   ZoneId,
 } from './types';
 
-function pickSingleZoneTarget(rooms: RoomSlot[], zone: ZoneId, ordinal: 1 | 2 | 3): number | null {
-  // Skip Blocked rooms; scan remaining Clear/Cluttered rooms of that zone in reading order (0..8)
-  // Abba's room still counts unless already Blocked.
+/**
+ * Universal Cluttered-First Slow-Down Targeting (D2*):
+ * Scan matching rooms left to right, top to bottom (skipping Blocked):
+ * 1) Flip the 1st Cluttered room to Blocked!
+ * 2) If none are Cluttered, turn the 1st Clear room sideways (Cluttered)!
+ * 3) If all are already Blocked, return null (harmless).
+ */
+function pickClutteredFirstTarget(rooms: RoomSlot[], zone: ZoneId): number | null {
   const nonBlocked = rooms.filter((r) => r.card.zone === zone && r.state !== 'BLOCKED');
   if (nonBlocked.length === 0) return null;
-  if (nonBlocked.length >= ordinal) {
-    return nonBlocked[ordinal - 1].slotIndex;
-  }
-  // Fallback when fewer than N non-Blocked rooms of that zone exist: 1st Clear, else 1st Cluttered
-  const firstClear = nonBlocked.find((r) => r.state === 'CLEAR');
-  return (firstClear ?? nonBlocked[0]).slotIndex;
-}
-
-function pickFirstClearElseCluttered(rooms: RoomSlot[], zone: ZoneId): number | null {
-  const nonBlocked = rooms.filter((r) => r.card.zone === zone && r.state !== 'BLOCKED');
-  if (nonBlocked.length === 0) return null;
-  const firstClear = nonBlocked.find((r) => r.state === 'CLEAR');
-  return (firstClear ?? nonBlocked[0]).slotIndex;
+  const firstCluttered = nonBlocked.find((r) => r.state === 'CLUTTERED');
+  return (firstCluttered ?? nonBlocked[0]).slotIndex;
 }
 
 function applyRoomHit(
   state: GameState,
   slotIndex: number | null,
   zone: ZoneId,
-): {
-  state: GameState;
-  note: EventEffectNote;
-  flippedBlocked: boolean;
-  blockedRoomName?: string;
-} {
+): { state: GameState; note: EventEffectNote } {
   if (slotIndex === null) {
     return {
       state,
       note: {
         kind: 'ALL_BLOCKED',
-        text: `All ${ZONE_META[zone].shortName} rooms are already Blocked — effect lost harmlessly!`,
+        text: `All ${ZONE_META[zone].shortName} rooms are already Blocked — nothing happens!`,
       },
-      flippedBlocked: false,
     };
   }
 
@@ -66,13 +53,12 @@ function applyRoomHit(
         slotIndex,
         roomName: room.card.name,
         kind: 'CLUTTERED',
-        text: `${room.card.name} became Cluttered (tilted)!${room.tuckedChore ? ' Tucked Chore stays safe.' : ''}`,
+        text: `${room.card.name} turned sideways (Cluttered)!`,
       },
-      flippedBlocked: false,
     };
   }
 
-  // Room is CLUTTERED -> check Abba's Balagan Barrier (Always On, Ready or Resting)
+  // Room is CLUTTERED -> check Abba's Balagan Barrier (Always On)
   if (isProtectedByAbba(state, slotIndex)) {
     return {
       state,
@@ -80,70 +66,50 @@ function applyRoomHit(
         slotIndex,
         roomName: room.card.name,
         kind: 'BARRIER',
-        text: `Abba’s Balagan Barrier protected ${room.card.name}! Flip to Blocked canceled (no Backup Tool unlocked).`,
+        text: `Abba’s Balagan Barrier protected ${room.card.name} — flip to Blocked canceled!`,
       },
-      flippedBlocked: false,
     };
   }
 
-  // Flip to Red BLOCKED! Return any tucked Chore to Chore Row
-  let nextChoreRow = state.choreRow;
-  let returnedChoreTitle: string | null = null;
-  if (room.tuckedChore) {
-    returnedChoreTitle = room.tuckedChore.title;
-    nextChoreRow = [...nextChoreRow, room.tuckedChore];
-  }
+  // Flip to Red BLOCKED!
   const nextRooms = state.rooms.map((r) =>
-    r.slotIndex === slotIndex
-      ? { ...r, state: 'BLOCKED' as const, tuckedChore: null }
-      : r,
+    r.slotIndex === slotIndex ? { ...r, state: 'BLOCKED' as const } : r,
   );
-  const nextState: GameState = {
-    ...state,
-    rooms: nextRooms,
-    choreRow: nextChoreRow,
-  };
   return {
-    state: nextState,
+    state: { ...state, rooms: nextRooms },
     note: {
       slotIndex,
       roomName: room.card.name,
       kind: 'BLOCKED',
-      text: `${room.card.name} flipped RED BLOCKED!${returnedChoreTitle ? ` “${returnedChoreTitle}” returned to Chore Row.` : ''}`,
+      text: `${room.card.name} flipped RED BLOCKED!`,
     },
-    flippedBlocked: true,
-    blockedRoomName: room.card.name,
   };
 }
 
 /**
- * Step 3.1: Flip 1 Event Card & resolve its effect (Small Booklet Pages 10–12).
+ * Step 2: Flip 1 Event Card & resolve its effect (RULES.md Section 5 / Booklet Page 11).
  */
 export function resolveEventFlip(state: GameState): GameState {
   if (state.phase !== 'EVENT_READY') return state;
 
   let next = { ...state };
-  let reshuffledSlowDowns = false;
+  let reshuffledDiscard = false;
 
-  // Empty Event Deck? Shuffle ONLY Slow-Down Discard (never Tool Discard, never boxed Time Flies)
+  // Empty Event Deck? Reshuffle the ENTIRE single Event Discard Pile (Slow-Downs + spent Reusable Tools!)
   if (next.eventDeck.length === 0) {
-    if (next.slowDownDiscard.length > 0) {
+    if (next.eventDiscard.length > 0) {
       const rng = mulberry32(next.seed + next.totalTurns * 7919 + next.round * 131);
-      const reshuffled = shuffleWithRng(next.slowDownDiscard, rng).map(
-        (card): EventCard => ({ category: 'SLOW_DOWN', card }),
-      );
       next = {
         ...next,
-        eventDeck: reshuffled,
-        slowDownDiscard: [],
+        eventDeck: shuffleWithRng(next.eventDiscard, rng),
+        eventDiscard: [],
       };
-      reshuffledSlowDowns = true;
+      reshuffledDiscard = true;
     } else {
-      // Both Event Deck and Slow-Down Discard empty -> skip flip, still Rest
       next = appendLog(
         next,
         'EVENT',
-        'Event Deck and Slow-Down Discard are both empty — Event flip skipped.',
+        'Event Deck and Event Discard are both empty — Event flip skipped.',
         next.activeHelperId,
       );
       return {
@@ -151,11 +117,11 @@ export function resolveEventFlip(state: GameState): GameState {
         phase: 'EVENT_RESOLVED',
         lastEvent: {
           drawnCard: null,
-          reshuffledSlowDowns: false,
+          reshuffledDiscard: false,
           notes: [
             {
               kind: 'DECK_EMPTY',
-              text: 'Both Event Deck and Slow-Down Discard are empty — no Event flipped!',
+              text: 'Both Event Deck and Event Discard are empty — no Event flipped!',
             },
           ],
           highlightedSlots: [],
@@ -170,68 +136,48 @@ export function resolveEventFlip(state: GameState): GameState {
   const notes: EventEffectNote[] = [];
   const highlightedSlots: number[] = [];
 
-  // Case A: Household Tool drawn from Event Deck
+  // Case A: Household Tool -> straight to Family Toolbox (no cap!)
   if (drawn.category === 'TOOL') {
-    if (next.readyTools.length < 3) {
-      next = {
-        ...next,
-        readyTools: [...next.readyTools, drawn.card],
-      };
-      notes.push({
-        kind: 'TOOL_READY',
-        text: `Good news! ${drawn.card.title} added to the Ready Tool Row.`,
-      });
-      next = appendLog(
-        next,
-        'EVENT',
-        `Event flipped Tool: ${drawn.card.title} → added to Ready Tool Row.`,
-        next.activeHelperId,
-      );
-    } else {
-      next = {
-        ...next,
-        toolDiscard: [...next.toolDiscard, drawn.card],
-      };
-      notes.push({
-        kind: 'TOOL_OVERFLOW',
-        text: `Ready Tool Row is full (3/3) — ${drawn.card.title} placed in Tool Discard (can be Recharged later!).`,
-      });
-      next = appendLog(
-        next,
-        'EVENT',
-        `Event flipped Tool: ${drawn.card.title} → Tool Discard (Ready Row full).`,
-        next.activeHelperId,
-      );
-    }
+    next = {
+      ...next,
+      readyTools: [...next.readyTools, drawn.card],
+    };
+    notes.push({
+      kind: 'TOOL_READY',
+      text: `Good news! ${drawn.card.title} added to the Family Toolbox.`,
+    });
+    next = appendLog(
+      next,
+      'EVENT',
+      `Event flipped Tool: ${drawn.card.title} → added to Family Toolbox.`,
+      next.activeHelperId,
+    );
 
     return {
       ...next,
       phase: 'EVENT_RESOLVED',
       lastEvent: {
         drawnCard: drawn,
-        reshuffledSlowDowns,
+        reshuffledDiscard,
         notes,
         highlightedSlots,
       },
     };
   }
 
-  // Case B: Slow-Down drawn from Event Deck
+  // Case B: Slow-Down
   const slow = drawn.card;
-  const blockedRoomNames: string[] = [];
 
-  if (slow.kind === 'SINGLE_ZONE' && slow.zone && slow.ordinal) {
-    const targetSlot = pickSingleZoneTarget(next.rooms, slow.zone, slow.ordinal);
+  if (slow.kind === 'SINGLE_ZONE' && slow.zone) {
+    const targetSlot = pickClutteredFirstTarget(next.rooms, slow.zone);
     const hit = applyRoomHit(next, targetSlot, slow.zone);
     next = hit.state;
     notes.push(hit.note);
     if (hit.note.slotIndex !== undefined) highlightedSlots.push(hit.note.slotIndex);
-    if (hit.flippedBlocked && hit.blockedRoomName) blockedRoomNames.push(hit.blockedRoomName);
 
-    // Put in Slow-Down Discard
     next = {
       ...next,
-      slowDownDiscard: [...next.slowDownDiscard, slow],
+      eventDiscard: [...next.eventDiscard, drawn],
     };
     next = appendLog(
       next,
@@ -241,18 +187,17 @@ export function resolveEventFlip(state: GameState): GameState {
     );
   } else if (slow.kind === 'DOUBLE_TROUBLE' && slow.zones) {
     for (const z of slow.zones) {
-      const targetSlot = pickFirstClearElseCluttered(next.rooms, z);
+      const targetSlot = pickClutteredFirstTarget(next.rooms, z);
       const hit = applyRoomHit(next, targetSlot, z);
       next = hit.state;
       notes.push(hit.note);
       if (hit.note.slotIndex !== undefined && !highlightedSlots.includes(hit.note.slotIndex)) {
         highlightedSlots.push(hit.note.slotIndex);
       }
-      if (hit.flippedBlocked && hit.blockedRoomName) blockedRoomNames.push(hit.blockedRoomName);
     }
     next = {
       ...next,
-      slowDownDiscard: [...next.slowDownDiscard, slow],
+      eventDiscard: [...next.eventDiscard, drawn],
     };
     next = appendLog(
       next,
@@ -261,18 +206,18 @@ export function resolveEventFlip(state: GameState): GameState {
       next.activeHelperId,
     );
   } else if (slow.kind === 'TIME_FLIES') {
-    // Always return Time Flies to the box (even if game ends right now, keep 72-card conservation!)
+    // Always return Time Flies to the box
     next = {
       ...next,
       boxedSlowDowns: [...next.boxedSlowDowns, slow],
     };
 
-    // 1) Flip next Clock card FIRST (skip round-end Refresh/Arrival!)
-    if (next.clockShield) {
-      const spentShield = next.clockShield;
+    // 1) Trigger 1 Clock flip FIRST
+    if (next.clockShields.length > 0) {
+      const [spentShield, ...restShields] = next.clockShields;
       next = {
         ...next,
-        clockShield: null,
+        clockShields: restShields,
         boxedTools: [...next.boxedTools, spentShield],
       };
       notes.push({
@@ -304,7 +249,7 @@ export function resolveEventFlip(state: GameState): GameState {
             lossReason: '“Wait—Shabbat Is at WHAT Time?!” flipped Shabbat Begins!',
             lastEvent: {
               drawnCard: drawn,
-              reshuffledSlowDowns,
+              reshuffledDiscard,
               notes,
               highlightedSlots,
             },
@@ -312,19 +257,18 @@ export function resolveEventFlip(state: GameState): GameState {
         } else {
           notes.push({
             kind: 'CLOCK_FLIP',
-            text: 'Friday Afternoon flipped early! (No Refresh or Arrival flip.)',
+            text: 'Friday Afternoon flipped early! (Keep playing the current round.)',
           });
         }
       }
     }
 
-    // 2) Hit 1st Clear Kitchen (else 1st Cluttered)
-    const kitchenSlot = pickFirstClearElseCluttered(next.rooms, 'KITCHEN');
+    // 2) Hit Kitchen (Cluttered-First)
+    const kitchenSlot = pickClutteredFirstTarget(next.rooms, 'KITCHEN');
     const hit = applyRoomHit(next, kitchenSlot, 'KITCHEN');
     next = hit.state;
     notes.push(hit.note);
     if (hit.note.slotIndex !== undefined) highlightedSlots.push(hit.note.slotIndex);
-    if (hit.flippedBlocked && hit.blockedRoomName) blockedRoomNames.push(hit.blockedRoomName);
 
     next = appendLog(
       next,
@@ -334,37 +278,12 @@ export function resolveEventFlip(state: GameState): GameState {
     );
   }
 
-  // Check if any room flipped Blocked -> Unlock 1 Backup Tool per flip (if Ready < 3 and Backup non-empty)
-  const possiblePicks = Math.min(
-    blockedRoomNames.length,
-    Math.max(0, 3 - next.readyTools.length),
-    next.backupTools.length,
-  );
-
-  if (possiblePicks > 0) {
-    return {
-      ...next,
-      phase: 'SUBSTEP',
-      pendingSubstep: {
-        kind: 'BACKUP_TOOL_PICK',
-        remainingPicks: possiblePicks,
-        triggeredByRoomNames: blockedRoomNames,
-      },
-      lastEvent: {
-        drawnCard: drawn,
-        reshuffledSlowDowns,
-        notes,
-        highlightedSlots,
-      },
-    };
-  }
-
   return {
     ...next,
     phase: 'EVENT_RESOLVED',
     lastEvent: {
       drawnCard: drawn,
-      reshuffledSlowDowns,
+      reshuffledDiscard,
       notes,
       highlightedSlots,
     },
@@ -372,77 +291,41 @@ export function resolveEventFlip(state: GameState): GameState {
 }
 
 /**
- * Step 3.2 & 3.3: Rest the active Helper; if all 4 Helpers are Resting, resolve End of Round
- * (Clock Flip / Early Prep check, Refresh all 4 Helpers, Flip 1 Arrival Chore).
+ * Advance clockwise to the next Helper (Abba -> Nael -> Mommy -> Mekimi).
+ * After Mekimi's turn, flip 1 Shabbat Clock card (or box a Cousin Aviel shield) and start next round with Abba!
  */
 export function advanceAfterEvent(state: GameState): GameState {
   if (state.phase !== 'EVENT_RESOLVED') return state;
 
-  const restingHelperId = state.activeHelperId;
-  const nextHelpers = {
-    ...state.helpers,
-    [restingHelperId]: {
-      ...state.helpers[restingHelperId],
-      resting: true,
-    },
-  };
-
   let next: GameState = {
     ...state,
-    helpers: nextHelpers,
     lastActionNote: null,
   };
 
-  const allResting = SEAT_ORDER.every((id) => next.helpers[id].resting);
-
-  if (!allResting) {
-    const nextTurnInRound = next.turnInRound + 1;
-    const nextTotalTurns = next.totalTurns + 1;
-
-    if (next.turnMode === 'TWO_GROUP') {
-      const nextGroup: 'A' | 'B' = next.activeGroup === 'A' ? 'B' : 'A';
-      const readyInGroup = GROUP_HELPERS[nextGroup].filter((id) => !next.helpers[id].resting);
-      const nextActiveHelper = readyInGroup[0];
-      return {
-        ...next,
-        turnInRound: nextTurnInRound,
-        totalTurns: nextTotalTurns,
-        activeGroup: nextGroup,
-        activeHelperId: nextActiveHelper,
-        phase: readyInGroup.length > 1 ? 'CHOOSE_HELPER' : 'MOVE',
-        movedThisTurn: false,
-        lastEvent: null,
-      };
-    }
-
-    const currentSeatIdx = SEAT_ORDER.indexOf(restingHelperId);
-    const nextHelperId = SEAT_ORDER[(currentSeatIdx + 1) % SEAT_ORDER.length];
+  if (next.turnInRound < 4) {
+    const nextHelperId = SEAT_ORDER[next.turnInRound];
     return {
       ...next,
-      turnInRound: nextTurnInRound,
-      totalTurns: nextTotalTurns,
+      turnInRound: next.turnInRound + 1,
+      totalTurns: next.totalTurns + 1,
       activeHelperId: nextHelperId,
-      phase: 'MOVE',
-      movedThisTurn: false,
+      actionsRemaining: 2,
+      mommyFreeErrandUsed: false,
+      phase: 'TURN',
       lastEvent: null,
     };
   }
 
-  // -------------------------------------------------------------------------
-  // End of Round (All 4 Helpers Resting):
-  // 1) Clock Flip (or Early Prep shield absorbs & boxes)
-  // 2) Refresh all 4 Helpers to Ready
-  // 3) Flip 1 Arrival Chore into Chore Row (if any remain)
-  // -------------------------------------------------------------------------
+  // End of Round (after Mekimi's turn): Clock flip (or Cousin Aviel shield)
   let clockNote = '';
-  if (next.clockShield) {
-    const shield = next.clockShield;
+  if (next.clockShields.length > 0) {
+    const [shield, ...restShields] = next.clockShields;
     next = {
       ...next,
-      clockShield: null,
+      clockShields: restShields,
       boxedTools: [...next.boxedTools, shield],
     };
-    clockNote = 'Cousin Aviel blocked the Clock flip';
+    clockNote = 'Cousin Aviel blocked the Clock flip!';
     next = appendLog(
       next,
       'ROUND',
@@ -484,49 +367,17 @@ export function advanceAfterEvent(state: GameState): GameState {
     }
   }
 
-  // Refresh all 4 Helpers upright (Ready)
-  const refreshedHelpers = { ...next.helpers };
-  for (const id of SEAT_ORDER) {
-    refreshedHelpers[id] = { ...refreshedHelpers[id], resting: false };
-  }
-  next = { ...next, helpers: refreshedHelpers };
-
-  // Flip 1 Arrival Chore into Chore Row (if any remain)
-  let arrivalNote = '';
-  if (next.arrivalPile.length > 0) {
-    const [arrived, ...restArrival] = next.arrivalPile;
-    next = {
-      ...next,
-      choreRow: [...next.choreRow, arrived],
-      arrivalPile: restArrival,
-    };
-    arrivalNote = ` “${arrived.title}” arrived in Chore Row.`;
-    next = appendLog(
-      next,
-      'ROUND',
-      `Arrival Chore flipped into Chore Row: “${arrived.title}”. All 4 Helpers are Ready for Round ${next.round + 1}!`,
-    );
-  } else {
-    next = appendLog(
-      next,
-      'ROUND',
-      `All 4 Helpers are Ready for Round ${next.round + 1}! (Arrival Pile empty.)`,
-    );
-  }
-
   const nextRound = next.round + 1;
-  const starterLabel =
-    next.turnMode === 'TWO_GROUP' ? 'Group A starts.' : `${getHelperName('ABBA')} starts.`;
   return {
     ...next,
     round: nextRound,
     turnInRound: 1,
     totalTurns: next.totalTurns + 1,
-    activeGroup: 'A',
     activeHelperId: 'ABBA',
-    phase: next.turnMode === 'TWO_GROUP' ? 'CHOOSE_HELPER' : 'MOVE',
-    movedThisTurn: false,
+    actionsRemaining: 2,
+    mommyFreeErrandUsed: false,
+    phase: 'TURN',
     lastEvent: null,
-    lastActionNote: `Round ${nextRound} begins — ${clockNote}, all 4 Helpers refreshed.${arrivalNote} ${starterLabel}`,
+    lastActionNote: `Round ${nextRound} begins — ${clockNote} ${getHelperName('ABBA')} starts with 2 Actions.`,
   };
 }

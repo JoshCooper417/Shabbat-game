@@ -985,6 +985,29 @@ img {
   padding: 0 4px;
 }
 
+.figurines-stage.crowd {
+  justify-content: space-evenly;
+  gap: 0;
+  padding: 0 1px;
+}
+
+.figurines-stage.crowd .figurine-piece {
+  margin: 0 -6px;
+}
+
+.figurines-stage.crowd .figurine-sprite {
+  height: 68px;
+}
+
+.figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
+  height: 54px;
+}
+
+.figurines-stage.crowd .figurine-plate {
+  font-size: 0.56rem;
+  padding: 1px 4px;
+}
+
 .figurine-piece {
   position: relative;
   display: flex;
@@ -1425,7 +1448,7 @@ img {
 
 .step-tracker {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 6px;
 }
 
@@ -1433,7 +1456,7 @@ img {
   text-align: center;
   padding: 6px 8px;
   border-radius: 9px;
-  font-size: 0.73rem;
+  font-size: 0.74rem;
   font-weight: 800;
   background: var(--bg-subtle);
   color: var(--ink-muted);
@@ -1449,6 +1472,101 @@ img {
   background: var(--teal-soft);
   color: var(--teal);
   border-color: #b4e2d7;
+}
+
+.action-pips-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #f6efe0;
+  border: 1px solid #e4d4b3;
+  border-radius: 10px;
+  padding: 7px 11px;
+}
+
+.action-pips-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.action-pips-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--bg-navy);
+}
+
+.action-pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.action-pip.ready {
+  background: var(--gold);
+  border: 2px solid #9d5f00;
+  box-shadow: 0 0 0 2px rgba(229, 151, 11, 0.28);
+}
+
+.action-pip.spent {
+  background: #e2d8c5;
+  border: 2px solid #bfb29b;
+}
+
+.action-pips-count {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--bg-navy);
+}
+
+.action-bonus-tag.free {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.action-bonus-tag.used {
+  background: var(--bg-subtle);
+  color: var(--ink-muted);
+  border-color: var(--border-warm);
+}
+
+.free-action-card {
+  border-color: #86efac;
+  background: #f5fff8;
+}
+
+.free-action-card:hover {
+  border-color: #15803d;
+  background: #ebfdf1;
+}
+
+.move-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.move-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.move-section-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--bg-navy);
+}
+
+.toolbox-full {
+  width: 100%;
 }
 
 .coach-card {
@@ -2738,6 +2856,12 @@ img {
     text-overflow: ellipsis;
   }
 
+  .room-tile.cluttered .room-move-banner,
+  .room-tile.blocked .room-move-banner,
+  .room-tile.event-hit .room-move-banner {
+    top: 21px;
+  }
+
   .room-art-right-badges {
     top: 3px;
     right: 3px;
@@ -2788,6 +2912,23 @@ img {
   .figurine-plate {
     font-size: 0.52rem;
     padding: 1px 4px;
+  }
+
+  .figurines-stage.crowd .figurine-piece {
+    margin: 0 -8px;
+  }
+
+  .figurines-stage.crowd .figurine-sprite {
+    height: 30px;
+  }
+
+  .figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
+    height: 24px;
+  }
+
+  .figurines-stage.crowd .figurine-plate {
+    font-size: 0.45rem;
+    padding: 1px 3px;
   }
 
   .chore-table-row {

@@ -15,18 +15,16 @@ import { getLegalMoves } from './engine/movement';
 import {
   applyAction,
   applyAdvanceTurn,
-  applyChooseHelper,
+  applyEndTurnActions,
   applyEventFlip,
   applyMove,
-  applySkipAction,
   applySubstepChoice,
 } from './engine/reducer';
 import { createInitialGameState } from './engine/setup';
-import { DifficultyId, GameState, HelperId, TurnMode } from './engine/types';
+import { DifficultyId, GameState } from './engine/types';
 
 export default function App() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyId>('BEGINNER');
-  const [selectedTurnMode, setSelectedTurnMode] = useState<TurnMode>('FOUR_SEAT');
   const [coachEnabled, setCoachEnabled] = useState(true);
 
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -51,12 +49,12 @@ export default function App() {
   }, [screenKey]);
 
   const legalMoves = useMemo(() => {
-    if (!gameState || gameState.phase !== 'MOVE') return [];
+    if (!gameState || gameState.phase !== 'TURN' || gameState.actionsRemaining <= 0) return [];
     return getLegalMoves(gameState);
   }, [gameState]);
 
-  const startNewGame = (diff = selectedDifficulty, mode = selectedTurnMode) => {
-    const fresh = createInitialGameState({ difficulty: diff, turnMode: mode });
+  const startNewGame = (diff = selectedDifficulty) => {
+    const fresh = createInitialGameState({ difficulty: diff });
     setGameState(fresh);
     setUndoStack([]);
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -75,11 +73,6 @@ export default function App() {
     setGameState(prev);
   };
 
-  const handleChooseHelper = (helperId: HelperId) => {
-    if (!gameState) return;
-    transition(applyChooseHelper(gameState, helperId));
-  };
-
   const handleMove = (targetSlot: number) => {
     if (!gameState) return;
     transition(applyMove(gameState, targetSlot));
@@ -90,9 +83,9 @@ export default function App() {
     transition(applyAction(gameState, actionId));
   };
 
-  const handleSkipAction = () => {
+  const handleEndActions = () => {
     if (!gameState) return;
-    transition(applySkipAction(gameState));
+    transition(applyEndTurnActions(gameState));
   };
 
   const handleSubstepChoice = (payload: Parameters<typeof applySubstepChoice>[1]) => {
@@ -100,14 +93,14 @@ export default function App() {
     if (payload.type === 'CANCEL_SUBSTEP') {
       const canceled = applySubstepChoice(gameState, payload);
       if (canceled !== gameState) {
-        // Pop the prior ACT snapshot cleanly if it matches
-        setUndoStack((stack) => (stack.length > 0 && stack[stack.length - 1].phase === 'ACT' ? stack.slice(0, -1) : stack));
+        setUndoStack((stack) =>
+          stack.length > 0 && stack[stack.length - 1].phase === 'TURN' ? stack.slice(0, -1) : stack,
+        );
         setGameState(canceled);
       }
       return;
     }
-    // Toggling picks inside Ice Coffee / Recharge updates in-place without flooding undo stack
-    if (payload.type === 'TOGGLE_ICE_COFFEE_SLOT' || payload.type === 'TOGGLE_RECHARGE_TOOL') {
+    if (payload.type === 'TOGGLE_ICE_COFFEE_SLOT') {
       setGameState(applySubstepChoice(gameState, payload));
       return;
     }
@@ -116,9 +109,7 @@ export default function App() {
 
   const handleBoardSubstepClick = (slotIndex: number) => {
     if (!gameState || gameState.phase !== 'SUBSTEP' || !gameState.pendingSubstep) return;
-    if (gameState.pendingSubstep.kind === 'TIDY_NEIGHBOR_BONUS') {
-      handleSubstepChoice({ type: 'PICK_TIDY_NEIGHBOR', slotIndex });
-    } else if (gameState.pendingSubstep.kind === 'ICE_COFFEE_PICK') {
+    if (gameState.pendingSubstep.kind === 'ICE_COFFEE_PICK') {
       handleSubstepChoice({ type: 'TOGGLE_ICE_COFFEE_SLOT', slotIndex });
     }
   };
@@ -226,12 +217,10 @@ export default function App() {
       {!gameState ? (
         <StartScreen
           difficulty={selectedDifficulty}
-          turnMode={selectedTurnMode}
           coachEnabled={coachEnabled}
           onSelectDifficulty={setSelectedDifficulty}
-          onSelectTurnMode={setSelectedTurnMode}
           onToggleCoach={setCoachEnabled}
-          onStartGame={() => startNewGame(selectedDifficulty, selectedTurnMode)}
+          onStartGame={() => startNewGame(selectedDifficulty)}
           onOpenBooklet={openBooklet}
           onOpenGallery={() => setGalleryOpen(true)}
           onInspectCard={setInspectedCard}
@@ -257,10 +246,9 @@ export default function App() {
                 state={gameState}
                 legalMoves={legalMoves}
                 coachEnabled={coachEnabled}
-                onChooseHelper={handleChooseHelper}
                 onMove={handleMove}
                 onAction={handleAction}
-                onSkipAction={handleSkipAction}
+                onEndActions={handleEndActions}
                 onSubstepChoice={handleSubstepChoice}
                 onFlipEvent={handleFlipEvent}
                 onAdvanceTurn={handleAdvanceTurn}
@@ -288,7 +276,7 @@ export default function App() {
           <HistoryLogModal open={logOpen} log={gameState.log} onClose={() => setLogOpen(false)} />
           <EndGameModal
             state={gameState}
-            onPlayAgain={() => startNewGame(gameState.difficulty, gameState.turnMode)}
+            onPlayAgain={() => startNewGame(gameState.difficulty)}
             onBackToMenu={() => {
               setGameState(null);
               setUndoStack([]);

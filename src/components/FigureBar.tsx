@@ -15,23 +15,24 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
     >
       <div className="panel-header-row">
         <h2 className="panel-title">Helper Cards Around the Table</h2>
-        <span className="panel-hint">Sideways = Resting (still helps with combos, relays &amp; powers!)</span>
+        <span className="panel-hint">
+          Clockwise order: Abba → Nael → Mommy → Mekimi · No carry limit on Errands!
+        </span>
       </div>
 
       <div className="helpers-bar-grid">
-        {SEAT_ORDER.map((id) => {
+        {SEAT_ORDER.map((id, idx) => {
           const def = HELPER_DEFS[id];
           const hs = state.helpers[id];
           const room = state.rooms[hs.slotIndex];
           const isActive =
             state.activeHelperId === id && state.phase !== 'WON' && state.phase !== 'LOST';
+          const wentThisRound = idx + 1 < state.turnInRound;
 
           return (
             <div
               key={id}
-              className={`helper-seat-card ${isActive ? 'active' : ''} ${
-                hs.resting ? 'resting' : ''
-              }`}
+              className={`helper-seat-card ${isActive ? 'active' : ''}`}
               style={
                 {
                   '--helper-color': def.accent,
@@ -48,12 +49,12 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
                   />
                   <button
                     type="button"
-                    className={`seat-mini-card-btn ${hs.resting ? 'sideways' : ''}`}
-                    title={`Inspect ${def.name}'s Helper Card (${hs.resting ? 'Resting / Sideways' : 'Ready / Upright'})`}
+                    className="seat-mini-card-btn"
+                    title={`Inspect ${def.name}'s Helper Card`}
                     onClick={() =>
                       onInspectCard({
                         title: `${def.name} — Helper Power Card`,
-                        subtitle: `Carry limit: ${def.carryLimit} Errand${def.carryLimit > 1 ? 's' : ''}`,
+                        subtitle: `2 Actions/Turn · ${def.powers.map((p) => p.name).join(' & ')}`,
                         frontImage: def.cardImage,
                         backImage: SHARED_BACKS.helpers,
                       })
@@ -65,13 +66,19 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
 
                 <div className="helper-seat-meta">
                   <div className="helper-seat-name-row">
-                    <span className="helper-seat-name">{def.name}</span>
+                    <span className="helper-seat-name">
+                      {idx + 1}. {def.name}
+                    </span>
                     <span
                       className={`seat-status-tag ${
-                        isActive ? 'active' : hs.resting ? 'resting' : 'ready'
+                        isActive ? 'active' : wentThisRound ? 'resting' : 'ready'
                       }`}
                     >
-                      {isActive ? 'Active Turn' : hs.resting ? 'Resting' : 'Ready'}
+                      {isActive
+                        ? `Acting (${state.actionsRemaining} left)`
+                        : wentThisRound
+                          ? 'Done This Rd'
+                          : 'Up Next'}
                     </span>
                   </div>
                   <div className="helper-seat-loc">

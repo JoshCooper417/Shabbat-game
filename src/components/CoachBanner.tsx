@@ -10,135 +10,137 @@ interface CoachBannerProps {
 export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
   const active = HELPER_DEFS[state.activeHelperId];
   const isFinalTurnOfRound = state.turnInRound === 4;
+  const isFirstActionEver =
+    state.round === 1 && state.turnInRound === 1 && state.actionsRemaining === 2;
 
   let heading = 'Live Turn Coach';
   let summary = '';
   const tips: string[] = [];
 
-  const isFirstTurnEver = state.round === 1 && state.turnInRound === 1;
+  if (state.phase === 'TURN') {
+    const { legal } = getActionEvaluation(state);
 
-  if (state.phase === 'CHOOSE_HELPER') {
-    heading = `Group ${state.activeGroup} — Pick Your Helper`;
-    summary = `Choose which Ready Helper in Group ${state.activeGroup} goes next. Both Helpers in each group act once per round.`;
-  } else if (state.phase === 'MOVE') {
-    heading = isFirstTurnEver
-      ? `Welcome! Step 1: Move ${active.name}`
-      : `Step 1: Where should ${active.name} move?`;
-    summary = isFirstTurnEver
-      ? `Work together to finish all Chores before Shabbat Begins! flips on the Clock above. Select any blue-outlined room to move ${active.name} (slide 1–2 straight or Buddy-Hop to a teammate), or Stay.`
-      : `Select any blue-outlined room on the House board (or Stay in ${state.rooms[state.helpers[state.activeHelperId].slotIndex].card.name}), or use a move button below.`;
+    if (state.actionsRemaining === 0) {
+      heading = `Free Bonus Window for ${active.name}`;
+      summary =
+        'You used both Actions, and you still have a FREE action right here! Take it now or click Done to flip 1 Event card.';
+    } else if (isFirstActionEver) {
+      heading = `Welcome! Take 2 Actions for ${active.name}`;
+      summary =
+        'Finish all Chores together before Shabbat Begins! flips on the Clock above. Every turn: take 2 Actions (Walk, Tidy, Do a Chore, or Use a Tool — any order, repeats allowed!), then flip 1 Event card.';
+    } else {
+      const actionNum = 3 - state.actionsRemaining;
+      heading = `Step 1 — Action ${actionNum} of 2 for ${active.name}`;
+      summary =
+        legal.length > 0
+          ? 'Pick an action below, click a green “Play / Use” card on the table, or click a blue room on the board to move.'
+          : 'Click any blue-outlined room on the board (or a Move button below) to walk closer to a Chore or teammate.';
+    }
 
-    const opportunities: string[] = [];
-    for (const move of legalMoves) {
-      const simulated: GameState = {
-        ...state,
-        phase: 'ACT',
-        helpers: {
-          ...state.helpers,
-          [state.activeHelperId]: {
-            ...state.helpers[state.activeHelperId],
-            slotIndex: move.targetSlot,
-          },
-        },
-      };
-      const { legal } = getActionEvaluation(simulated);
-      const bigHit = legal.find(
+    // Lookahead 1-move opportunities when player still has actions left
+    if (state.actionsRemaining > 0) {
+      const immediateWins = legal.filter(
         (a) =>
           a.type === 'DELIVER_ERRAND' ||
-          a.type === 'TEAM_PAIR' ||
-          a.type === 'RESTORE_ORDER' ||
-          a.type === 'FINISH_TUCKED_CHORE' ||
-          a.type === 'COMBO_ROOM_CHORE_ROW' ||
-          a.type === 'TIDY_BLOCKED',
+          a.type === 'TEAM_CHORE' ||
+          a.type === 'TIDY_BLOCKED' ||
+          a.type === 'PICK_UP_ERRAND',
       );
-      if (bigHit) {
-        const roomName = state.rooms[move.targetSlot].card.name;
-        opportunities.push(
-          `${move.kind === 'STAY' ? `Stay in ${roomName}` : `${move.label} → ${roomName}`}: ${bigHit.label}`,
-        );
+      if (immediateWins.length > 0) {
+        tips.push(`Right here: ${immediateWins[0].label}`);
       }
-      if (opportunities.length >= 3) break;
+
+      if (state.actionsRemaining >= 2 || (state.activeHelperId === 'MOMMY' && !state.mommyFreeErrandUsed)) {
+        const oneMoveHits: string[] = [];
+        for (const move of legalMoves) {
+          const simulated: GameState = {
+            ...state,
+            actionsRemaining: Math.max(0, state.actionsRemaining - 1),
+            helpers: {
+              ...state.helpers,
+              [state.activeHelperId]: {
+                ...state.helpers[state.activeHelperId],
+                slotIndex: move.targetSlot,
+              },
+            },
+          };
+          const simEval = getActionEvaluation(simulated);
+          const hit = simEval.legal.find(
+            (a) =>
+              a.type === 'DELIVER_ERRAND' ||
+              a.type === 'TEAM_CHORE' ||
+              a.type === 'TIDY_BLOCKED' ||
+              a.type === 'PICK_UP_ERRAND',
+          );
+          if (hit) {
+            const roomName = state.rooms[move.targetSlot].card.name;
+            oneMoveHits.push(`Move → ${roomName}: then ${hit.label}`);
+          }
+          if (oneMoveHits.length >= 2) break;
+        }
+        tips.push(...oneMoveHits);
+      }
     }
 
-    if (opportunities.length > 0) {
-      tips.push(...opportunities);
-    } else {
+    // Superpower reminders
+    if (state.activeHelperId === 'MOMMY' && !state.mommyFreeErrandUsed) {
       tips.push(
-        'No immediate Chore finish in range — move toward a matching Chore zone, a tilted Cluttered room to Tidy, or a teammate for a Team Combo.',
+        'Mommy’s Errand Express: your first Pick Up or Deliver this turn is FREE (0 Actions) and works even in tilted Cluttered rooms!',
+      );
+    } else if (state.activeHelperId === 'MEKIMI' && state.actionsRemaining > 0) {
+      tips.push('Mekimi’s Turbo Crawl: 1 Move crawls straight to ANY room on the 3×3 board!');
+    } else if (state.activeHelperId === 'NAEL') {
+      tips.push(
+        'Nael’s Learning Tower Power!: with any teammate in a Cluttered room, either of you can still finish a Team Chore!',
+      );
+    } else if (state.activeHelperId === 'ABBA') {
+      tips.push(
+        'Abba’s Powers: Abba unblocks Red Blocked rooms alone (1 Action), and his room can’t flip Blocked while Cluttered.',
       );
     }
 
-    if (state.activeHelperId === 'MOMMY') {
-      tips.push(
-        'Mommy’s Errand Express: she can Pick Up or Deliver Errands even in tilted Cluttered rooms!',
-      );
-    } else if (state.activeHelperId === 'MEKIMI') {
-      tips.push('Mekimi’s Turbo Crawl: Mekimi can also jump 1 room diagonally!');
-    }
-  } else if (state.phase === 'ACT') {
-    const { legal } = getActionEvaluation(state);
-    heading = `Step 2: Choose 1 Action for ${active.name} (Optional)`;
-    summary =
-      legal.length > 0
-        ? 'Pick 1 action below, or click any green-outlined “Play / Use” card on the table.'
-        : 'No legal actions available in this room — click Continue to Event below.';
-
-    if (isFinalTurnOfRound && state.clockShield === null) {
-      const hasEarlyPrep = state.readyTools.some((t) => t.kind === 'EARLY_PREP');
-      if (hasEarlyPrep) {
+    // End-of-round Clock reminder
+    if (isFinalTurnOfRound && state.clockShields.length === 0) {
+      const hasShieldTool = state.readyTools.some((t) => t.kind === 'EARLY_PREP');
+      if (hasShieldTool) {
         tips.push(
-          'Turn 4 of 4! Playing Cousin Aviel Drops By! right now will block tonight’s Clock flip!',
+          'Turn 4 of 4! Playing Cousin Aviel Drops By! from the Toolbox will shield tonight’s Clock flip!',
         );
       } else {
-        tips.push('Turn 4 of 4: After this turn’s Event flip, the Shabbat Clock will flip 1 card.');
+        tips.push('Turn 4 of 4: After this turn’s Event flip, 1 Shabbat Clock card will flip.');
       }
-    }
-    if (state.choreRow.length === 1 && state.arrivalPile.length > 0) {
-      tips.push(
-        'Tip: Emptying the last card from the Chore Row immediately flips a new Arrival Chore face-up!',
-      );
     }
   } else if (state.phase === 'SUBSTEP' && state.pendingSubstep) {
     const sub = state.pendingSubstep;
-    if (sub.kind === 'BACKUP_TOOL_PICK') {
-      heading = 'Step 3: Unlock a Backup Tool!';
-      summary = `A room flipped Red Blocked — pick ${sub.remainingPicks} Backup Tool${
-        sub.remainingPicks > 1 ? 's' : ''
-      } below to add to your Ready Tools!`;
-    } else if (sub.kind === 'ICE_COFFEE_PICK') {
+    if (sub.kind === 'ICE_COFFEE_PICK') {
       heading = 'Ice Coffee Boost — Select 1 or 2 Cluttered Rooms';
-      summary = 'Select 1 or 2 tilted Cluttered rooms on the board (or buttons below), then confirm.';
+      summary =
+        'Click 1 or 2 tilted Cluttered rooms on the board (or buttons below), then confirm to Clear them!';
     } else if (sub.kind === 'SNACK_SUMMONS_PICK') {
       heading = 'Strategic Snack Summons — Pick a Teammate';
-      summary = `Choose any teammate below to move straight into ${
+      summary = `Choose any teammate below to pull straight into ${
         state.rooms[state.helpers[state.activeHelperId].slotIndex].card.name
-      }.`;
-    } else if (sub.kind === 'TIDY_NEIGHBOR_BONUS') {
-      heading = 'Team Tidy Bonus (Optional)';
-      summary =
-        'Because a teammate is in your room, you may also Clear 1 next-door Cluttered room marked “+ Clear Bonus”.';
-    } else if (sub.kind === 'RECHARGE_PICK') {
-      heading =
-        sub.source === 'RECHARGE_ACTION'
-          ? 'Recharge Used Tool'
-          : 'Bonus: Return 1 Used Tool to Ready!';
-      summary = `Select up to ${sub.maxCount} Tool${sub.maxCount > 1 ? 's' : ''} from Tool Discard below and confirm.`;
+      } for an instant Team Chore or Free Handoff!`;
     }
   } else if (state.phase === 'EVENT_READY') {
-    heading = 'Step 3: Flip 1 Friday Event Card';
-    summary = `Every turn ends with 1 Event card (either a bonus Tool or a Slow-Down that clutters a room). Click the stacked Friday Events Deck below (${state.eventDeck.length} left).`;
+    heading = 'Step 2: Flip 1 Friday Event Card';
+    summary = `Every turn ends by flipping 1 card from the Friday Events Deck (${state.eventDeck.length} left) — either a helpful Tool for the Family Toolbox or a Friday Slow-Down!`;
     if (isFinalTurnOfRound) {
       tips.push(
-        state.clockShield
-          ? 'End of Round next — Cousin Aviel Drops By! is ready to block the Clock flip!'
-          : 'End of Round next: after this Event, all 4 Helpers will refresh and 1 Clock card will flip.',
+        state.clockShields.length > 0
+          ? `End of Round ${state.round} next — Cousin Aviel Drops By! is shielding the Clock flip!`
+          : `End of Round ${state.round} next: after this Event, 1 Shabbat Clock card will flip.`,
       );
     }
   } else if (state.phase === 'EVENT_RESOLVED') {
-    heading = isFinalTurnOfRound ? 'End of Round Ready' : `Rest ${active.name} & Next Turn`;
+    heading = isFinalTurnOfRound
+      ? `End of Round ${state.round} Ready`
+      : `Event Complete — Next Helper Ready`;
     summary = isFinalTurnOfRound
-      ? 'Review the Event result below, then click to Rest, flip the Shabbat Clock, refresh all 4 Helpers, and reveal 1 Arrival Chore.'
-      : `Review the Event result below, then Rest ${active.name}. (Resting just means ${active.name} already went this round — Resting teammates still help with combos & powers!)`;
+      ? state.clockShields.length > 0
+        ? 'Review the Event result below, then end the round — Cousin Aviel’s shield will block the Clock flip!'
+        : 'Review the Event result below, then end the round to flip 1 Shabbat Clock card and start the next round with Abba!'
+      : 'Review the Event result below, then click to pass the turn clockwise to the next Helper.';
   }
 
   return (

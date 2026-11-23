@@ -4,11 +4,9 @@ export type HelperId = 'ABBA' | 'NAEL' | 'MOMMY' | 'MEKIMI';
 
 export type DifficultyId = 'BEGINNER' | 'STANDARD' | 'HARD';
 
-export type TurnMode = 'FOUR_SEAT' | 'TWO_GROUP';
-
 export type RoomState = 'CLEAR' | 'CLUTTERED' | 'BLOCKED';
 
-export type ChoreType = 'ROOM_CHORE' | 'ERRAND' | 'TEAM_PAIR' | 'RESTORE_ORDER';
+export type ChoreType = 'TEAM_CHORE' | 'ERRAND';
 
 export type ToolKind = 'ICE_COFFEE' | 'SNACK_SUMMONS' | 'EARLY_PREP';
 
@@ -27,8 +25,6 @@ export interface HelperDef {
   id: HelperId;
   name: string;
   startSlot: number;
-  carryLimit: number;
-  group: 'A' | 'B';
   accent: string;
   softBg: string;
   cardImage: string;
@@ -81,7 +77,6 @@ export interface SlowDownCardDef {
   kind: SlowDownKind;
   title: string;
   zone?: ZoneId; // SINGLE_ZONE
-  ordinal?: 1 | 2 | 3; // SINGLE_ZONE
   zones?: [ZoneId, ZoneId]; // DOUBLE_TROUBLE
   rulesText: string;
   flavor: string;
@@ -104,13 +99,11 @@ export interface RoomSlot {
   slotIndex: number; // 0..8 in reading order
   card: RoomCardDef;
   state: RoomState;
-  tuckedChore: ChoreCardDef | null;
 }
 
 export interface HelperState {
   id: HelperId;
   slotIndex: number;
-  resting: boolean;
   carriedErrands: ChoreCardDef[];
 }
 
@@ -121,15 +114,16 @@ export interface DifficultyConfig {
   clockLength: number; // Total clock cards including Shabbat Begins!
   afternoonCards: number;
   totalChores: number;
-  startingChoreRow: number;
-  arrivalChores: number;
-  slowDownCount: number;
-  startingClutter: number;
+  choreRowTarget: number; // Always 4
+  choreDeckStart: number;
+  slowDownCount: number; // 17 on Beginner (box Time Flies), 18 on Standard/Hard
+  boxTimeFlies: boolean;
+  startingClutterSlots: readonly number[]; // [4] Center on Beginner; [1, 7] Top-Center & Bottom-Center on Standard/Hard
 }
 
 export interface LegalMove {
   targetSlot: number;
-  kind: 'STAY' | 'HALLWAY_SLIDE' | 'BUDDY_HOP' | 'TURBO_CRAWL';
+  kind: 'WALK' | 'TURBO_CRAWL';
   label: string;
   reason: string;
 }
@@ -137,25 +131,22 @@ export interface LegalMove {
 export type ActionType =
   | 'TIDY_CLUTTERED'
   | 'TIDY_BLOCKED'
-  | 'START_ROOM_CHORE'
-  | 'FINISH_TUCKED_CHORE'
-  | 'RESTORE_ORDER'
+  | 'TEAM_CHORE'
   | 'PICK_UP_ERRAND'
   | 'DELIVER_ERRAND'
-  | 'PASS_ERRAND'
-  | 'TEAM_PAIR'
-  | 'COMBO_ROOM_CHORE_ROW'
+  | 'GIVE_ERRAND'
+  | 'TAKE_ERRAND'
   | 'USE_ICE_COFFEE'
   | 'USE_SNACK_SUMMONS'
-  | 'USE_EARLY_PREP'
-  | 'RECHARGE_TOOL';
+  | 'USE_EARLY_PREP';
 
 export interface ActionCandidate {
   id: string;
   type: ActionType;
   label: string;
   detail: string;
-  category: 'TIDY' | 'CHORE' | 'ERRAND' | 'COMBO' | 'TOOL';
+  category: 'TIDY' | 'CHORE' | 'ERRAND' | 'HANDOFF' | 'TOOL';
+  isFree?: boolean;
   choreId?: string;
   toolId?: string;
   targetHelperId?: HelperId;
@@ -170,10 +161,6 @@ export interface DisabledActionHint {
 
 export type PendingSubstep =
   | {
-      kind: 'TIDY_NEIGHBOR_BONUS';
-      eligibleSlots: number[];
-    }
-  | {
       kind: 'ICE_COFFEE_PICK';
       toolId: string;
       selectedSlots: number[];
@@ -183,30 +170,26 @@ export type PendingSubstep =
       kind: 'SNACK_SUMMONS_PICK';
       toolId: string;
       eligibleHelpers: HelperId[];
-    }
-  | {
-      kind: 'RECHARGE_PICK';
-      source: 'RECHARGE_ACTION' | 'ERRAND_BONUS' | 'TEAM_PAIR_BONUS';
-      maxCount: number;
-      selectedToolIds: string[];
-      canCancel: boolean; // True only for RECHARGE_ACTION before completing
-    }
-  | {
-      kind: 'BACKUP_TOOL_PICK';
-      remainingPicks: number;
-      triggeredByRoomNames: string[];
     };
 
 export interface EventEffectNote {
   slotIndex?: number;
   roomName?: string;
-  kind: 'CLUTTERED' | 'BLOCKED' | 'BARRIER' | 'ALL_BLOCKED' | 'CLOCK_FLIP' | 'CLOCK_SHIELDED' | 'TOOL_READY' | 'TOOL_OVERFLOW' | 'DECK_EMPTY';
+  kind:
+    | 'CLUTTERED'
+    | 'BLOCKED'
+    | 'BARRIER'
+    | 'ALL_BLOCKED'
+    | 'CLOCK_FLIP'
+    | 'CLOCK_SHIELDED'
+    | 'TOOL_READY'
+    | 'DECK_EMPTY';
   text: string;
 }
 
 export interface EventResolutionSummary {
   drawnCard: EventCard | null;
-  reshuffledSlowDowns: boolean;
+  reshuffledDiscard: boolean;
   notes: EventEffectNote[];
   highlightedSlots: number[];
 }
@@ -221,9 +204,7 @@ export interface LogEntry {
 }
 
 export type GamePhase =
-  | 'CHOOSE_HELPER' // Used in 1-2P Group Mode when both Helpers in current group are Ready
-  | 'MOVE'
-  | 'ACT'
+  | 'TURN'
   | 'SUBSTEP'
   | 'EVENT_READY'
   | 'EVENT_RESOLVED'
@@ -233,31 +214,28 @@ export type GamePhase =
 export interface GameState {
   seed: number;
   difficulty: DifficultyId;
-  turnMode: TurnMode;
   round: number;
-  turnInRound: number; // 1..4
+  turnInRound: number; // 1..4 (Abba -> Nael -> Mommy -> Mekimi)
   totalTurns: number;
-  activeGroup: 'A' | 'B'; // Used in TWO_GROUP mode
   activeHelperId: HelperId;
+  actionsRemaining: number; // Starts at 2 each turn
+  mommyFreeErrandUsed: boolean; // Mommy gets 1 FREE Pick Up or Deliver per turn
   phase: GamePhase;
-  movedThisTurn: boolean;
   rooms: RoomSlot[]; // length 9
   boxedRooms: RoomCardDef[]; // length 3
   helpers: Record<HelperId, HelperState>;
-  choreRow: ChoreCardDef[];
-  arrivalPile: ChoreCardDef[];
+  choreRow: ChoreCardDef[]; // Auto-refills to 4 face-up
+  choreDeck: ChoreCardDef[];
   doneChores: ChoreCardDef[];
   boxedChores: ChoreCardDef[];
   clockRow: ClockCard[];
   boxedClockCards: ClockCard[];
-  clockShield: ToolCardDef | null; // Early Prep Paid Off! on next face-down Clock card
-  boxedTools: ToolCardDef[]; // Unused at setup + boxed Early Prep shields
-  readyTools: ToolCardDef[]; // max 3
-  backupTools: ToolCardDef[]; // starts with 2, never refills
-  toolDiscard: ToolCardDef[]; // never reshuffled into Event Deck
+  clockShields: ToolCardDef[]; // Cousin Aviel shields on consecutive leftmost unflipped Clock cards
+  boxedTools: ToolCardDef[]; // 4 unused at setup + spent Cousin Aviel shields
+  readyTools: ToolCardDef[]; // Family Toolbox (no cap!)
   eventDeck: EventCard[];
-  slowDownDiscard: SlowDownCardDef[];
-  boxedSlowDowns: SlowDownCardDef[]; // Unused at setup + boxed Time Flies
+  eventDiscard: EventCard[]; // Single shared Event Discard (Slow-Downs + spent Reusable Tools)
+  boxedSlowDowns: SlowDownCardDef[]; // Time Flies on Beginner + boxed Time Flies after resolving
   pendingSubstep: PendingSubstep | null;
   lastEvent: EventResolutionSummary | null;
   lastActionNote: string | null;

@@ -9,7 +9,6 @@ import {
 } from '../data/cards';
 import { mulberry32, shuffleWithRng } from './helpers';
 import {
-  ChoreCardDef,
   DifficultyId,
   EventCard,
   GameState,
@@ -17,7 +16,6 @@ import {
   HelperState,
   RoomCardDef,
   RoomSlot,
-  TurnMode,
   ZoneId,
 } from './types';
 
@@ -25,21 +23,26 @@ const ALL_ZONES: readonly ZoneId[] = ['KITCHEN', 'DOWNSTAIRS', 'TABLE', 'UPSTAIR
 
 export interface SetupOptions {
   difficulty?: DifficultyId;
-  turnMode?: TurnMode;
   seed?: number;
 }
 
 /**
- * Exact Setup Steps A–G from Preparing for Shabbat: Cooper Family Edition Small Booklet (Pages 4–5 & 14).
+ * Exact v3 Simplified (D2*) Setup — 100% synced to RULES.md & Small Booklet Pages 5 & 13:
+ * - 9 Rooms in 3x3 House (guarantee all 4 zone icons; swap bottom-right if missing; box 3)
+ * - Fixed Starting Clutter: Center (Beginner) or Top-Center & Bottom-Center (Standard/Hard)
+ * - 4 Helpers in Clear corners (Abba TL, Nael TR, Mekimi BL, Mommy BR)
+ * - Single-shuffle Chore deal: 10 (Beg) / 13 (Std) / 15 (Hard) -> 4 face-up Chore Row + rest Chore Deck
+ * - Shabbat Clock: 6+1 (Beg) / 5+1 (Std) / 4+1 (Hard)
+ * - Tools: 2 face-up Family Toolbox (no cap) + 4 shuffled into Event Deck + 4 boxed
+ * - Slow-Downs: all 18 (Beginner boxes Time Flies -> 17)
  */
 export function createInitialGameState(options: SetupOptions = {}): GameState {
   const difficulty: DifficultyId = options.difficulty ?? 'BEGINNER';
-  const turnMode: TurnMode = options.turnMode ?? 'FOUR_SEAT';
   const seed = options.seed ?? Math.floor(Math.random() * 1_000_000) + 1;
   const rng = mulberry32(seed);
   const cfg = DIFFICULTY_CONFIGS[difficulty];
 
-  // Step A: Build the 3x3 House (9 rooms, guarantee all 4 zone icons; swap bottom-right if missing)
+  // 1. Build 3x3 House
   const shuffledRooms = shuffleWithRng(ROOM_DECK, rng);
   const gridCards: RoomCardDef[] = shuffledRooms.slice(0, 9);
   const boxedRooms: RoomCardDef[] = shuffledRooms.slice(9);
@@ -55,78 +58,47 @@ export function createInitialGameState(options: SetupOptions = {}): GameState {
     }
   }
 
-  // Step C: Starting Clutter (Beginner: 1, Standard/Hard: 2 random rooms)
-  const clutterSlotIndices = new Set(
-    shuffleWithRng([0, 1, 2, 3, 4, 5, 6, 7, 8], rng).slice(0, cfg.startingClutter),
-  );
-
+  // 2. Fixed Starting Clutter (corners always Clear!)
+  const clutterSet = new Set(cfg.startingClutterSlots);
   const rooms: RoomSlot[] = gridCards.map((card, slotIndex) => ({
     slotIndex,
     card,
-    state: clutterSlotIndices.has(slotIndex) ? 'CLUTTERED' : 'CLEAR',
-    tuckedChore: null,
+    state: clutterSet.has(slotIndex) ? 'CLUTTERED' : 'CLEAR',
   }));
 
-  // Step B: Place the 4 Helpers in corners
+  // 3. Place 4 Helpers in corners
   const helpers: Record<HelperId, HelperState> = {
-    ABBA: { id: 'ABBA', slotIndex: HELPER_DEFS.ABBA.startSlot, resting: false, carriedErrands: [] },
-    NAEL: { id: 'NAEL', slotIndex: HELPER_DEFS.NAEL.startSlot, resting: false, carriedErrands: [] },
-    MOMMY: { id: 'MOMMY', slotIndex: HELPER_DEFS.MOMMY.startSlot, resting: false, carriedErrands: [] },
-    MEKIMI: { id: 'MEKIMI', slotIndex: HELPER_DEFS.MEKIMI.startSlot, resting: false, carriedErrands: [] },
+    ABBA: { id: 'ABBA', slotIndex: HELPER_DEFS.ABBA.startSlot, carriedErrands: [] },
+    NAEL: { id: 'NAEL', slotIndex: HELPER_DEFS.NAEL.startSlot, carriedErrands: [] },
+    MOMMY: { id: 'MOMMY', slotIndex: HELPER_DEFS.MOMMY.startSlot, carriedErrands: [] },
+    MEKIMI: { id: 'MEKIMI', slotIndex: HELPER_DEFS.MEKIMI.startSlot, carriedErrands: [] },
   };
 
-  // Step E: Deal Chores (1 guaranteed of each of the 4 types + remainder from the other 14)
-  const byType: Record<ChoreCardDef['type'], ChoreCardDef[]> = {
-    ROOM_CHORE: shuffleWithRng(CHORE_DECK.filter((c) => c.type === 'ROOM_CHORE'), rng),
-    ERRAND: shuffleWithRng(CHORE_DECK.filter((c) => c.type === 'ERRAND'), rng),
-    TEAM_PAIR: shuffleWithRng(CHORE_DECK.filter((c) => c.type === 'TEAM_PAIR'), rng),
-    RESTORE_ORDER: shuffleWithRng(CHORE_DECK.filter((c) => c.type === 'RESTORE_ORDER'), rng),
-  };
+  // 4. Single-shuffle Chore deal -> 4 face-up Chore Row + Chore Deck
+  const shuffledChores = shuffleWithRng(CHORE_DECK, rng);
+  const activeChores = shuffledChores.slice(0, cfg.totalChores);
+  const boxedChores = shuffledChores.slice(cfg.totalChores);
+  const choreRow = activeChores.slice(0, cfg.choreRowTarget);
+  const choreDeck = activeChores.slice(cfg.choreRowTarget);
 
-  const guaranteed: ChoreCardDef[] = [
-    byType.ROOM_CHORE[0],
-    byType.ERRAND[0],
-    byType.TEAM_PAIR[0],
-    byType.RESTORE_ORDER[0],
-  ];
-  const remainingPool = shuffleWithRng(
-    [
-      ...byType.ROOM_CHORE.slice(1),
-      ...byType.ERRAND.slice(1),
-      ...byType.TEAM_PAIR.slice(1),
-      ...byType.RESTORE_ORDER.slice(1),
-    ],
-    rng,
-  );
-  const extraCount = cfg.totalChores - guaranteed.length;
-  const activeChores = shuffleWithRng(
-    [...guaranteed, ...remainingPool.slice(0, extraCount)],
-    rng,
-  );
-  const boxedChores = remainingPool.slice(extraCount);
-
-  const choreRow = activeChores.slice(0, cfg.startingChoreRow);
-  const arrivalPile = activeChores.slice(cfg.startingChoreRow);
-
-  // Step F: Build Shabbat Clock (N Friday Afternoon + Shabbat Begins! at far right)
+  // 5. Build Shabbat Clock (N Friday Afternoon + Shabbat Begins! on far right)
   const afternoonPool = CLOCK_DECK.filter((c) => !c.isShabbatBegins).map((c) => ({ ...c }));
   const shabbatBegins = CLOCK_DECK.find((c) => c.isShabbatBegins)!;
-  const clockRow = [
-    ...afternoonPool.slice(0, cfg.afternoonCards),
-    { ...shabbatBegins },
-  ];
+  const clockRow = [...afternoonPool.slice(0, cfg.afternoonCards), { ...shabbatBegins }];
   const boxedClockCards = afternoonPool.slice(cfg.afternoonCards);
 
-  // Step G: Tools (2 Ready + 2 Backup + 2 Event Deck + 4 boxed) & Slow-Downs (N active + rest boxed)
+  // 6. Tools (2 Family Toolbox + 4 Event Deck + 4 boxed) & Slow-Downs (17 Beg / 18 Std & Hard)
   const shuffledTools = shuffleWithRng(TOOL_DECK, rng);
   const readyTools = shuffledTools.slice(0, 2);
-  const backupTools = shuffledTools.slice(2, 4);
-  const eventTools = shuffledTools.slice(4, 6);
+  const eventTools = shuffledTools.slice(2, 6);
   const boxedTools = shuffledTools.slice(6);
 
-  const shuffledSlowDowns = shuffleWithRng(SLOW_DOWN_DECK, rng);
-  const activeSlowDowns = shuffledSlowDowns.slice(0, cfg.slowDownCount);
-  const boxedSlowDowns = shuffledSlowDowns.slice(cfg.slowDownCount);
+  const activeSlowDowns = cfg.boxTimeFlies
+    ? SLOW_DOWN_DECK.filter((s) => s.kind !== 'TIME_FLIES')
+    : [...SLOW_DOWN_DECK];
+  const boxedSlowDowns = cfg.boxTimeFlies
+    ? SLOW_DOWN_DECK.filter((s) => s.kind === 'TIME_FLIES')
+    : [];
 
   const eventDeck: EventCard[] = shuffleWithRng(
     [
@@ -139,35 +111,32 @@ export function createInitialGameState(options: SetupOptions = {}): GameState {
   const clutteredNames = rooms
     .filter((r) => r.state === 'CLUTTERED')
     .map((r) => r.card.name)
-    .join(', ');
+    .join(' & ');
 
   return {
     seed,
     difficulty,
-    turnMode,
     round: 1,
     turnInRound: 1,
     totalTurns: 1,
-    activeGroup: 'A',
     activeHelperId: 'ABBA',
-    phase: turnMode === 'TWO_GROUP' ? 'CHOOSE_HELPER' : 'MOVE',
-    movedThisTurn: false,
+    actionsRemaining: 2,
+    mommyFreeErrandUsed: false,
+    phase: 'TURN',
     rooms,
     boxedRooms,
     helpers,
     choreRow,
-    arrivalPile,
+    choreDeck,
     doneChores: [],
     boxedChores,
     clockRow,
     boxedClockCards,
-    clockShield: null,
+    clockShields: [],
     boxedTools,
     readyTools,
-    backupTools,
-    toolDiscard: [],
     eventDeck,
-    slowDownDiscard: [],
+    eventDiscard: [],
     boxedSlowDowns,
     pendingSubstep: null,
     lastEvent: null,

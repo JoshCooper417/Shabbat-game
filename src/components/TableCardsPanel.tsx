@@ -11,19 +11,18 @@ interface TableCardsPanelProps {
 
 export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCardsPanelProps) {
   const cfg = DIFFICULTY_CONFIGS[state.difficulty];
-  const { legal } = state.phase === 'ACT' ? getActionEvaluation(state) : { legal: [] };
+  const { legal } = state.phase === 'TURN' ? getActionEvaluation(state) : { legal: [] };
 
-  // Pick best direct-play action for each Chore card (prefer 1-Step Combo over Start Room Chore)
+  // Direct-play action for each Chore card in Chore Row
   const choreActionMap = new Map<string, ActionCandidate>();
   for (const act of legal) {
     if (!act.choreId) continue;
-    const existing = choreActionMap.get(act.choreId);
-    if (!existing || act.type === 'COMBO_ROOM_CHORE_ROW') {
+    if (act.type === 'TEAM_CHORE' || act.type === 'PICK_UP_ERRAND') {
       choreActionMap.set(act.choreId, act);
     }
   }
 
-  // Key Ready Tool playability by tool.kind so duplicate Ready Tools ALL highlight as playable!
+  // Key Toolbox playability by tool.kind so duplicate Tools in the Family Toolbox ALL highlight
   const toolKindActionMap = new Map<ToolKind, ActionCandidate>();
   for (const act of legal) {
     if (!act.toolId) continue;
@@ -36,39 +35,39 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
   return (
     <section
       className="table-cards-dock area-cards"
-      aria-label="Chore Row and Household Tools on the Table"
+      aria-label="Chore Row and Family Toolbox on the Table"
     >
-      {/* CHORE ROW + PHYSICAL ARRIVAL DECK STACK */}
+      {/* CHORE ROW (AUTO-REFILLS TO 4) + PHYSICAL CHORE DECK STACK */}
       <div className="dock-section">
         <div className="panel-header-row">
-          <h2 className="panel-title">Chore Row ({state.choreRow.length})</h2>
+          <h2 className="panel-title">Chore Row ({state.choreRow.length}/4)</h2>
           <div className="pile-summary-row">
             <span className="pile-pill done">
               ✓ Done <strong>{state.doneChores.length}/{cfg.totalChores}</strong>
             </span>
             <span className="pile-pill">
-              Arrival Stack: <strong>{state.arrivalPile.length}</strong>
+              Chore Deck: <strong>{state.choreDeck.length}</strong>
             </span>
           </div>
         </div>
 
         <div className="chore-table-row">
-          {state.arrivalPile.length > 0 && (
+          {state.choreDeck.length > 0 && (
             <div
               className="deck-stack-slot"
-              title={`${state.arrivalPile.length} face-down Chores in Arrival Pile`}
+              title={`${state.choreDeck.length} face-down Chores in Chore Deck (auto-refills Chore Row to 4)`}
             >
               <div className="physical-deck-stack">
-                <img src={assetUrl(SHARED_BACKS.chores)} alt="Arrival Pile" />
-                <span className="deck-count-badge">{state.arrivalPile.length}</span>
+                <img src={assetUrl(SHARED_BACKS.chores)} alt="Chore Deck" />
+                <span className="deck-count-badge">{state.choreDeck.length}</span>
               </div>
-              <span className="deck-caption">Arrival</span>
+              <span className="deck-caption">Chore Deck</span>
             </div>
           )}
 
           {state.choreRow.length === 0 ? (
             <div className="panel-hint" style={{ alignSelf: 'center' }}>
-              Chore Row is empty! Finish remaining tucked or carried Chores to win!
+              Chore Row is empty! Deliver remaining carried Errands to win!
             </div>
           ) : (
             <div className="dock-cards-scroll">
@@ -77,19 +76,13 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
                 const zoneLabel =
                   chore.type === 'ERRAND' && chore.endZone
                     ? `${ZONE_META[chore.zone].shortName} → ${ZONE_META[chore.endZone].shortName}`
-                    : `${ZONE_META[chore.zone].shortName}${
-                        chore.type === 'TEAM_PAIR'
-                          ? ' · 2 Helpers'
-                          : chore.type === 'RESTORE_ORDER'
-                            ? ' · All Clear'
-                            : ''
-                      }`;
+                    : `${ZONE_META[chore.zone].shortName} · 2+ Helpers`;
                 const inspectObj: InspectedCard = {
                   title: chore.title,
                   subtitle:
                     chore.type === 'ERRAND' && chore.endZone
                       ? `Errand · ${ZONE_META[chore.zone].shortName} → ${ZONE_META[chore.endZone].shortName}`
-                      : `${chore.type.replace('_', ' ')} · ${ZONE_META[chore.zone].shortName}`,
+                      : `Team Chore · ${ZONE_META[chore.zone].shortName}`,
                   frontImage: chore.frontImage,
                   backImage: SHARED_BACKS.chores,
                 };
@@ -122,13 +115,9 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
                       <span className="table-card-title">{chore.title}</span>
                       <span className="table-card-meta">{zoneLabel}</span>
                       <span className="table-card-howto">
-                        {chore.type === 'ROOM_CHORE'
-                          ? 'Tuck solo, or finish in 1 step w/ 2 Helpers'
-                          : chore.type === 'ERRAND'
-                            ? 'Pick up at Start → Deliver to End (+1 Tool)'
-                            : chore.type === 'TEAM_PAIR'
-                              ? '2 Helpers together here (+1 Tool)'
-                              : 'Room + all next-door rooms Clear'}
+                        {chore.type === 'TEAM_CHORE'
+                          ? '2+ Helpers in matching Clear room (1 Action)'
+                          : 'Pick Up at Start → Deliver to End (1 Action)'}
                       </span>
                       <div className="table-card-caption-actions">
                         {playableAction ? (
@@ -139,20 +128,14 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
                           >
                             ▶{' '}
                             {playableAction.type === 'PICK_UP_ERRAND'
-                              ? 'Pick Up'
-                              : playableAction.type === 'START_ROOM_CHORE'
-                                ? 'Start'
-                                : 'Play'}
+                              ? playableAction.isFree
+                                ? 'Free Pick Up'
+                                : 'Pick Up'
+                              : 'Finish'}
                           </button>
                         ) : (
                           <span className="card-type-label">
-                            {chore.type === 'ROOM_CHORE'
-                              ? 'Room Chore'
-                              : chore.type === 'ERRAND'
-                                ? 'Errand'
-                                : chore.type === 'TEAM_PAIR'
-                                  ? 'Team Pair'
-                                  : 'Restore Order'}
+                            {chore.type === 'TEAM_CHORE' ? 'Team Chore' : 'Errand'}
                           </span>
                         )}
                         <button
@@ -173,148 +156,92 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
         </div>
       </div>
 
-      {/* READY TOOLS & BACKUP TOOLS */}
-      <div className="tools-split-grid">
-        <div className="tools-subbox">
-          <div className="panel-header-row">
-            <strong className="subbox-title">Ready Tools ({state.readyTools.length}/3)</strong>
-            <span className="panel-hint">Step 2 only</span>
-          </div>
-          {state.readyTools.length === 0 ? (
-            <span className="panel-hint">No Ready Tools — Recharge or deliver an Errand!</span>
-          ) : (
-            <div className="tools-mini-grid">
-              {state.readyTools.map((tool) => {
-                const playableAction = toolKindActionMap.get(tool.kind);
-                const inspectObj: InspectedCard = {
-                  title: tool.title,
-                  subtitle: tool.badge,
-                  frontImage: tool.frontImage,
-                  backImage: SHARED_BACKS.eventsAndTools,
-                };
-                return (
-                  <div
-                    key={tool.id}
-                    className={`tool-card-shell ${playableAction ? 'playable' : ''}`}
-                  >
-                    <button
-                      type="button"
-                      className="tool-mini-card"
-                      title={
-                        playableAction
-                          ? `Click to use ${tool.title}`
-                          : `${tool.title} — click to inspect`
-                      }
-                      onClick={() => {
-                        if (playableAction) {
-                          onPlayAction(playableAction.id);
-                        } else {
-                          onInspectCard(inspectObj);
-                        }
-                      }}
-                    >
-                      <img src={assetUrl(tool.frontImage)} alt={tool.title} />
-                    </button>
-                    <div className="tool-card-caption">
-                      <span className="tool-card-title">{tool.title}</span>
-                      <div className="table-card-caption-actions">
-                        {playableAction ? (
-                          <button
-                            type="button"
-                            className="card-play-btn"
-                            onClick={() => onPlayAction(playableAction.id)}
-                          >
-                            ▶ Use
-                          </button>
-                        ) : (
-                          <span className="card-type-label">{tool.badge.split(' ')[0]}</span>
-                        )}
-                        <button
-                          type="button"
-                          className="card-inspect-inline-btn"
-                          title={`Inspect ${tool.title}`}
-                          onClick={() => onInspectCard(inspectObj)}
-                        >
-                          🔍
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      {/* FAMILY TOOLBOX (SHARED, NO LIMIT!) */}
+      <div className="tools-subbox toolbox-full">
+        <div className="panel-header-row">
+          <strong className="subbox-title">
+            Family Toolbox ({state.readyTools.length} Ready · No Limit)
+          </strong>
+          <span className="panel-hint">1 Action · Reusable tools return to Event Discard</span>
         </div>
-
-        <div className="tools-subbox">
-          <div className="panel-header-row">
-            <strong className="subbox-title">Backup Tools ({state.backupTools.length})</strong>
-            <span className="panel-hint">Unlocks if a room is Blocked</span>
-          </div>
-          {state.backupTools.length === 0 ? (
-            <span className="panel-hint">All Backup Tools unlocked! (They never refill.)</span>
-          ) : (
-            <div className="tools-mini-grid">
-              {state.backupTools.map((tool) => (
-                <div key={tool.id} className="tool-card-shell">
+        {state.readyTools.length === 0 ? (
+          <span className="panel-hint">
+            Toolbox is empty — flip more Tools from the Friday Events Deck!
+          </span>
+        ) : (
+          <div className="tools-mini-grid">
+            {state.readyTools.map((tool) => {
+              const playableAction = toolKindActionMap.get(tool.kind);
+              const inspectObj: InspectedCard = {
+                title: tool.title,
+                subtitle: tool.badge,
+                frontImage: tool.frontImage,
+                backImage: SHARED_BACKS.eventsAndTools,
+              };
+              return (
+                <div
+                  key={tool.id}
+                  className={`tool-card-shell ${playableAction ? 'playable' : ''}`}
+                >
                   <button
                     type="button"
                     className="tool-mini-card"
-                    onClick={() =>
-                      onInspectCard({
-                        title: `${tool.title} (Backup Tool)`,
-                        subtitle: 'Moves to Ready when a room flips Red Blocked (if Ready < 3)',
-                        frontImage: tool.frontImage,
-                        backImage: SHARED_BACKS.eventsAndTools,
-                      })
+                    title={
+                      playableAction
+                        ? `Click to use ${tool.title}`
+                        : `${tool.title} — click to inspect`
                     }
+                    onClick={() => {
+                      if (playableAction) {
+                        onPlayAction(playableAction.id);
+                      } else {
+                        onInspectCard(inspectObj);
+                      }
+                    }}
                   >
                     <img src={assetUrl(tool.frontImage)} alt={tool.title} />
                   </button>
                   <div className="tool-card-caption">
                     <span className="tool-card-title">{tool.title}</span>
+                    <div className="table-card-caption-actions">
+                      {playableAction ? (
+                        <button
+                          type="button"
+                          className="card-play-btn"
+                          onClick={() => onPlayAction(playableAction.id)}
+                        >
+                          ▶ Use
+                        </button>
+                      ) : (
+                        <span className="card-type-label">{tool.badge.split(' ')[0]}</span>
+                      )}
+                      <button
+                        type="button"
+                        className="card-inspect-inline-btn"
+                        title={`Inspect ${tool.title}`}
+                        onClick={() => onInspectCard(inspectObj)}
+                      >
+                        🔍
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* TOOL DISCARD & DECK COUNTS */}
+      {/* SHARED EVENT DECK & EVENT DISCARD PILE SUMMARY */}
       <div className="pile-summary-row">
         <span className="pile-pill">
-          Tool Discard (Rechargeable): <strong>{state.toolDiscard.length}</strong>
+          Event Deck: <strong>{state.eventDeck.length}</strong>
         </span>
         <span className="pile-pill">
-          Event Deck: <strong>{state.eventDeck.length}</strong> · Slow-Down Discard:{' '}
-          <strong>{state.slowDownDiscard.length}</strong>
+          Event Discard: <strong>{state.eventDiscard.length}</strong>{' '}
+          <span style={{ fontWeight: 500, opacity: 0.8 }}>(reshuffles when deck empties)</span>
         </span>
       </div>
-
-      {state.toolDiscard.length > 0 && (
-        <div className="tools-mini-row">
-          {state.toolDiscard.map((tool) => (
-            <button
-              key={tool.id}
-              type="button"
-              className="discard-tool-chip"
-              title={`Used Tool: ${tool.title} (can be Recharged)`}
-              onClick={() =>
-                onInspectCard({
-                  title: `${tool.title} (In Tool Discard)`,
-                  subtitle: 'Can be returned to Ready via Recharge, Errand delivery, or Team Pair!',
-                  frontImage: tool.frontImage,
-                  backImage: SHARED_BACKS.eventsAndTools,
-                })
-              }
-            >
-              <img src={assetUrl(tool.frontImage)} alt={tool.title} />
-              <span>{tool.title}</span>
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

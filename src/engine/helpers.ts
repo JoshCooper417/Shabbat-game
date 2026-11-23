@@ -1,4 +1,4 @@
-import { GROUP_HELPERS, HELPER_DEFS, SEAT_ORDER } from '../data/cards';
+import { HELPER_DEFS, SEAT_ORDER } from '../data/cards';
 import { GameState, HelperId, LogEntry, RoomSlot } from './types';
 
 export function mulberry32(seed: number): () => number {
@@ -48,25 +48,6 @@ export function getOrthogonalNeighbors(slot: number): number[] {
   return res;
 }
 
-export function getDiagonalNeighbors(slot: number): number[] {
-  const { row, col } = slotToRowCol(slot);
-  const dirs = [
-    [-1, -1],
-    [-1, 1],
-    [1, -1],
-    [1, 1],
-  ];
-  const res: number[] = [];
-  for (const [dr, dc] of dirs) {
-    const r = row + dr;
-    const c = col + dc;
-    if (r >= 0 && r < 3 && c >= 0 && c < 3) {
-      res.push(rowColToSlot(r, c));
-    }
-  }
-  return res;
-}
-
 export function getHelpersInSlot(state: GameState, slot: number): HelperId[] {
   return SEAT_ORDER.filter((id) => state.helpers[id].slotIndex === slot);
 }
@@ -81,23 +62,9 @@ export function getTeammatesInSlot(
   );
 }
 
-export function hasTeammateInRowColOrRoom(
-  state: GameState,
-  slot: number,
-  activeHelperId: HelperId,
-): boolean {
-  const { row, col } = slotToRowCol(slot);
-  return SEAT_ORDER.some((id) => {
-    if (id === activeHelperId) return false;
-    const pos = slotToRowCol(state.helpers[id].slotIndex);
-    return pos.row === row || pos.col === col;
-  });
-}
-
 /**
- * Nael's "Learning Tower Power!" (Always On — Ready or Resting):
- * When Nael and at least 1 teammate share a Cluttered room, either may finish
- * a tucked Chore or do a Team Combo there.
+ * Nael's "Learning Tower Power!" (Always On):
+ * While Nael and at least 1 teammate share a Cluttered room, either one may finish a Team Chore there.
  */
 export function hasNaelClutteredBoost(state: GameState, slot: number): boolean {
   const room = state.rooms[slot];
@@ -107,15 +74,11 @@ export function hasNaelClutteredBoost(state: GameState, slot: number): boolean {
 }
 
 /**
- * Abba's "Balagan Barrier" (Always On — Ready or Resting):
+ * Abba's "Balagan Barrier" (Always On):
  * While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked.
  */
 export function isProtectedByAbba(state: GameState, slot: number): boolean {
   return state.rooms[slot].state === 'CLUTTERED' && state.helpers.ABBA.slotIndex === slot;
-}
-
-export function getReadyHelpersInGroup(state: GameState, group: 'A' | 'B'): HelperId[] {
-  return GROUP_HELPERS[group].filter((id) => !state.helpers[id].resting);
 }
 
 export function appendLog(
@@ -137,21 +100,6 @@ export function appendLog(
     log: [...state.log, entry],
     nextLogId: state.nextLogId + 1,
   };
-}
-
-export function formatSlotCoord(slot: number): string {
-  const labels = [
-    'Top-Left',
-    'Top-Center',
-    'Top-Right',
-    'Mid-Left',
-    'Center',
-    'Mid-Right',
-    'Bottom-Left',
-    'Bottom-Center',
-    'Bottom-Right',
-  ];
-  return labels[slot] ?? `Slot ${slot + 1}`;
 }
 
 export function getHelperName(id: HelperId): string {
@@ -176,30 +124,28 @@ export function countAllPhysicalCards(state: GameState): {
 } {
   const rooms = state.rooms.length + state.boxedRooms.length;
   const helpers = Object.keys(state.helpers).length;
-  const tuckedChores = state.rooms.filter((r) => r.tuckedChore !== null).length;
   const carriedChores = SEAT_ORDER.reduce(
     (sum, id) => sum + state.helpers[id].carriedErrands.length,
     0,
   );
   const chores =
     state.choreRow.length +
-    state.arrivalPile.length +
+    state.choreDeck.length +
     state.doneChores.length +
     state.boxedChores.length +
-    tuckedChores +
     carriedChores;
   const clock = state.clockRow.length + state.boxedClockCards.length;
   const eventTools = state.eventDeck.filter((e) => e.category === 'TOOL').length;
-  const eventSlowDowns = state.eventDeck.filter((e) => e.category === 'SLOW_DOWN').length;
+  const discardTools = state.eventDiscard.filter((e) => e.category === 'TOOL').length;
   const tools =
     state.readyTools.length +
-    state.backupTools.length +
-    state.toolDiscard.length +
     state.boxedTools.length +
+    state.clockShields.length +
     eventTools +
-    (state.clockShield ? 1 : 0);
-  const slowDowns =
-    eventSlowDowns + state.slowDownDiscard.length + state.boxedSlowDowns.length;
+    discardTools;
+  const eventSlowDowns = state.eventDeck.filter((e) => e.category === 'SLOW_DOWN').length;
+  const discardSlowDowns = state.eventDiscard.filter((e) => e.category === 'SLOW_DOWN').length;
+  const slowDowns = eventSlowDowns + discardSlowDowns + state.boxedSlowDowns.length;
   const total = rooms + helpers + chores + clock + tools + slowDowns;
   return { rooms, helpers, chores, clock, tools, slowDowns, total };
 }

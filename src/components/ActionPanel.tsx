@@ -1,4 +1,4 @@
-import { assetUrl, GROUP_HELPERS, HELPER_DEFS, SHARED_BACKS } from '../data/cards';
+import { assetUrl, HELPER_DEFS, SEAT_ORDER, SHARED_BACKS } from '../data/cards';
 import { getActionEvaluation } from '../engine/actions';
 import { GameState, HelperId, LegalMove } from '../engine/types';
 import { InspectedCard } from './CardInspectModal';
@@ -8,19 +8,14 @@ interface ActionPanelProps {
   state: GameState;
   legalMoves: LegalMove[];
   coachEnabled: boolean;
-  onChooseHelper: (helperId: HelperId) => void;
   onMove: (targetSlot: number) => void;
   onAction: (actionId: string) => void;
-  onSkipAction: () => void;
+  onEndActions: () => void;
   onSubstepChoice: (
     payload:
-      | { type: 'PICK_TIDY_NEIGHBOR'; slotIndex: number | null }
       | { type: 'TOGGLE_ICE_COFFEE_SLOT'; slotIndex: number }
       | { type: 'CONFIRM_ICE_COFFEE' }
       | { type: 'PICK_SNACK_HELPER'; helperId: HelperId }
-      | { type: 'TOGGLE_RECHARGE_TOOL'; toolId: string }
-      | { type: 'CONFIRM_RECHARGE' }
-      | { type: 'PICK_BACKUP_TOOL'; toolId: string }
       | { type: 'CANCEL_SUBSTEP' },
   ) => void;
   onFlipEvent: () => void;
@@ -32,10 +27,9 @@ export function ActionPanel({
   state,
   legalMoves,
   coachEnabled,
-  onChooseHelper,
   onMove,
   onAction,
-  onSkipAction,
+  onEndActions,
   onSubstepChoice,
   onFlipEvent,
   onAdvanceTurn,
@@ -48,24 +42,17 @@ export function ActionPanel({
   const sub = state.pendingSubstep;
   const isFinalTurn = state.turnInRound === 4;
 
+  const nextIdx = (SEAT_ORDER.indexOf(state.activeHelperId) + 1) % SEAT_ORDER.length;
+  const nextHelperName = HELPER_DEFS[SEAT_ORDER[nextIdx]].name;
+
   const step1State =
-    state.phase === 'MOVE' || state.phase === 'CHOOSE_HELPER' ? 'current' : 'done';
+    state.phase === 'TURN' || state.phase === 'SUBSTEP' ? 'current' : 'done';
   const step2State =
-    state.phase === 'ACT' || (state.phase === 'SUBSTEP' && sub?.kind !== 'BACKUP_TOOL_PICK')
+    state.phase === 'EVENT_READY' || state.phase === 'EVENT_RESOLVED'
       ? 'current'
-      : state.phase === 'EVENT_READY' ||
-          state.phase === 'EVENT_RESOLVED' ||
-          (state.phase === 'SUBSTEP' && sub?.kind === 'BACKUP_TOOL_PICK') ||
-          state.phase === 'WON' ||
-          state.phase === 'LOST'
+      : state.phase === 'WON' || state.phase === 'LOST'
         ? 'done'
         : '';
-  const step3State =
-    state.phase === 'EVENT_READY' ||
-    state.phase === 'EVENT_RESOLVED' ||
-    (state.phase === 'SUBSTEP' && sub?.kind === 'BACKUP_TOOL_PICK')
-      ? 'current'
-      : '';
 
   return (
     <section className="action-panel area-actions" aria-label="Turn Actions">
@@ -82,11 +69,7 @@ export function ActionPanel({
             />
           </div>
           <div>
-            <h2 className="turn-helper-title">
-              {state.phase === 'CHOOSE_HELPER'
-                ? `Group ${state.activeGroup}'s Turn`
-                : `${activeDef.name}'s Turn`}
-            </h2>
+            <h2 className="turn-helper-title">{activeDef.name}’s Turn</h2>
             <div className="turn-helper-sub">
               Round {state.round} · Turn {state.turnInRound} of 4 · In {activeRoom.card.name}
             </div>
@@ -98,7 +81,7 @@ export function ActionPanel({
           onClick={() =>
             onInspectCard({
               title: `${activeDef.name} — Helper Power Card`,
-              subtitle: `Carry ${activeDef.carryLimit} Errand${activeDef.carryLimit > 1 ? 's' : ''}`,
+              subtitle: 'Turn Order: Abba → Nael → Mommy → Mekimi',
               frontImage: activeDef.cardImage,
               backImage: SHARED_BACKS.helpers,
             })
@@ -108,11 +91,39 @@ export function ActionPanel({
         </button>
       </div>
 
+      {/* 2-STEP TURN TRACKER */}
       <div className="step-tracker">
-        <div className={`step-pill ${step1State}`}>1. Move Piece</div>
-        <div className={`step-pill ${step2State}`}>2. Act / Play</div>
-        <div className={`step-pill ${step3State}`}>3. Flip Event</div>
+        <div className={`step-pill ${step1State}`}>1. Take 2 Actions</div>
+        <div className={`step-pill ${step2State}`}>2. Flip 1 Event</div>
       </div>
+
+      {/* ACTION PIPS + ACTIVE POWER BADGE */}
+      {(state.phase === 'TURN' || state.phase === 'SUBSTEP') && (
+        <div className="action-pips-row">
+          <div className="action-pips-group" aria-label={`${state.actionsRemaining} of 2 Actions remaining`}>
+            <span className="action-pips-label">Actions Left:</span>
+            <span className={`action-pip ${state.actionsRemaining >= 1 ? 'ready' : 'spent'}`} />
+            <span className={`action-pip ${state.actionsRemaining >= 2 ? 'ready' : 'spent'}`} />
+            <strong className="action-pips-count">{state.actionsRemaining}/2</strong>
+          </div>
+          {state.activeHelperId === 'MOMMY' && (
+            <span
+              className={`action-bonus-tag ${!state.mommyFreeErrandUsed ? 'free' : 'used'}`}
+            >
+              {!state.mommyFreeErrandUsed ? '✨ FREE Errand Ready' : '✓ Free Errand Used'}
+            </span>
+          )}
+          {state.activeHelperId === 'MEKIMI' && (
+            <span className="action-bonus-tag">Turbo Crawl: Any Room</span>
+          )}
+          {state.activeHelperId === 'ABBA' && (
+            <span className="action-bonus-tag">Solo Unblock &amp; Barrier</span>
+          )}
+          {state.activeHelperId === 'NAEL' && (
+            <span className="action-bonus-tag">Cluttered Team Chores</span>
+          )}
+        </div>
+      )}
 
       {coachEnabled && <CoachBanner state={state} legalMoves={legalMoves} />}
 
@@ -120,74 +131,15 @@ export function ActionPanel({
         <div className="action-note-banner">{state.lastActionNote}</div>
       )}
 
-      {/* 1-2P GROUP MODE: CHOOSE HELPER */}
-      {state.phase === 'CHOOSE_HELPER' && (
-        <div className="substep-box">
-          <strong>Choose a Ready Helper in Group {state.activeGroup}:</strong>
-          <div className="move-quick-grid">
-            {GROUP_HELPERS[state.activeGroup]
-              .filter((id) => !state.helpers[id].resting)
-              .map((id) => {
-                const def = HELPER_DEFS[id];
-                const loc = state.rooms[state.helpers[id].slotIndex].card.name;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    className="action-btn-card"
-                    onClick={() => onChooseHelper(id)}
-                  >
-                    <img
-                      src={assetUrl(def.avatarImage)}
-                      alt={def.name}
-                      className="pick-helper-avatar"
-                      style={{ '--helper-color': def.accent } as React.CSSProperties}
-                    />
-                    <div className="action-btn-body">
-                      <span className="action-btn-label">{def.name}</span>
-                      <span className="action-btn-detail">In {loc}</span>
-                    </div>
-                  </button>
-                );
-              })}
-          </div>
-        </div>
-      )}
-
-      {/* STEP 1: MOVE */}
-      {state.phase === 'MOVE' && (
-        <div className="action-list">
-          <div className="move-quick-grid">
-            {legalMoves.map((move) => (
-              <button
-                key={move.targetSlot}
-                type="button"
-                className={`move-quick-btn ${move.kind === 'STAY' ? 'stay' : ''}`}
-                onClick={() => onMove(move.targetSlot)}
-              >
-                <span className="action-btn-label">
-                  {move.kind === 'STAY'
-                    ? `Stay in ${state.rooms[move.targetSlot].card.name}`
-                    : state.rooms[move.targetSlot].card.name}
-                </span>
-                <span className="action-btn-detail">
-                  {move.kind === 'STAY' ? "Don't move this turn" : move.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* STEP 2: ACT */}
-      {state.phase === 'ACT' && (
+      {/* STEP 1: TAKE 2 ACTIONS (ANY ORDER, REPEATS ALLOWED + FREE HANDOFF / MOMMY FREE ERRAND) */}
+      {state.phase === 'TURN' && (
         <>
           <div className="action-list">
             {legal.map((action) => (
               <button
                 key={action.id}
                 type="button"
-                className="action-btn-card"
+                className={`action-btn-card ${action.isFree ? 'free-action-card' : ''}`}
                 onClick={() => onAction(action.id)}
               >
                 {action.cardImage && (
@@ -200,21 +152,54 @@ export function ActionPanel({
                 <div className="action-btn-body">
                   <div className="action-btn-title-row">
                     <span className="action-btn-label">{action.label}</span>
-                    {action.bonusTag && <span className="action-bonus-tag">{action.bonusTag}</span>}
+                    {action.bonusTag && (
+                      <span className={`action-bonus-tag ${action.isFree ? 'free' : ''}`}>
+                        {action.bonusTag}
+                      </span>
+                    )}
                   </div>
                   <span className="action-btn-detail">{action.detail}</span>
                 </div>
               </button>
             ))}
 
+            {/* QUICK MOVE BUTTONS (mirrors clicking any blue-outlined room on the board) */}
+            {state.actionsRemaining > 0 && legalMoves.length > 0 && (
+              <div className="move-section-block">
+                <div className="move-section-header">
+                  <span className="move-section-title">
+                    {state.activeHelperId === 'MEKIMI'
+                      ? 'Turbo Crawl to Any Room (1 Action)'
+                      : 'Walk 1 Room (1 Action · not diagonal)'}
+                  </span>
+                  <span className="panel-hint">or click room on board</span>
+                </div>
+                <div className="move-quick-grid">
+                  {legalMoves.map((move) => (
+                    <button
+                      key={move.targetSlot}
+                      type="button"
+                      className="move-quick-btn"
+                      onClick={() => onMove(move.targetSlot)}
+                    >
+                      <span className="action-btn-label">
+                        {state.rooms[move.targetSlot].card.name}
+                      </span>
+                      <span className="action-btn-detail">{move.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
-              className={legal.length === 0 ? 'btn btn-primary' : 'btn btn-secondary'}
-              onClick={onSkipAction}
+              className={state.actionsRemaining === 0 ? 'btn btn-gold' : 'btn btn-secondary'}
+              onClick={onEndActions}
             >
-              {legal.length === 0
-                ? 'No Actions Here — Continue to Event'
-                : 'Skip Step 2 (Continue to Event)'}
+              {state.actionsRemaining === 0
+                ? 'Done With Free Actions → Flip 1 Event'
+                : `End Actions Early (${state.actionsRemaining} left) → Flip 1 Event`}
             </button>
           </div>
 
@@ -233,34 +218,9 @@ export function ActionPanel({
         </>
       )}
 
-      {/* SUBSTEPS */}
+      {/* TOOL SUBSTEPS */}
       {state.phase === 'SUBSTEP' && sub && (
         <div className="substep-box">
-          {sub.kind === 'TIDY_NEIGHBOR_BONUS' && (
-            <>
-              <strong>Team Tidy Bonus — Clear 1 Next-Door Cluttered Room (Optional):</strong>
-              <div className="move-quick-grid">
-                {sub.eligibleSlots.map((slotIdx) => (
-                  <button
-                    key={slotIdx}
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => onSubstepChoice({ type: 'PICK_TIDY_NEIGHBOR', slotIndex: slotIdx })}
-                  >
-                    Clear {state.rooms[slotIdx].card.name}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => onSubstepChoice({ type: 'PICK_TIDY_NEIGHBOR', slotIndex: null })}
-              >
-                Skip Next-Door Bonus
-              </button>
-            </>
-          )}
-
           {sub.kind === 'ICE_COFFEE_PICK' && (
             <>
               <strong>
@@ -306,7 +266,9 @@ export function ActionPanel({
 
           {sub.kind === 'SNACK_SUMMONS_PICK' && (
             <>
-              <strong>Strategic Snack Summons — Choose a Teammate to Join {activeRoom.card.name}:</strong>
+              <strong>
+                Strategic Snack Summons — Choose a Teammate to Join {activeRoom.card.name}:
+              </strong>
               <div className="move-quick-grid">
                 {sub.eligibleHelpers.map((hid) => {
                   const def = HELPER_DEFS[hid];
@@ -342,110 +304,10 @@ export function ActionPanel({
               </button>
             </>
           )}
-
-          {sub.kind === 'RECHARGE_PICK' && (
-            <>
-              <strong>
-                {sub.source === 'RECHARGE_ACTION'
-                  ? `Recharge: Pick up to ${sub.maxCount} Used Tool${sub.maxCount > 1 ? 's' : ''} (${sub.selectedToolIds.length}/${sub.maxCount})`
-                  : 'Bonus Tool Recharge: Pick 1 Used Tool to Return to Ready!'}
-              </strong>
-              <div className="substep-card-grid">
-                {state.toolDiscard.map((tool) => {
-                  const selected = sub.selectedToolIds.includes(tool.id);
-                  return (
-                    <button
-                      key={tool.id}
-                      type="button"
-                      className={`pick-card-btn ${selected ? 'selected' : ''}`}
-                      onClick={() =>
-                        onSubstepChoice({ type: 'TOGGLE_RECHARGE_TOOL', toolId: tool.id })
-                      }
-                    >
-                      <img src={assetUrl(tool.frontImage)} alt={tool.title} />
-                      <span className="pick-card-label">
-                        {selected ? '✓ ' : ''}
-                        {tool.title}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="start-cta-row">
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  disabled={sub.selectedToolIds.length === 0}
-                  onClick={() => onSubstepChoice({ type: 'CONFIRM_RECHARGE' })}
-                >
-                  Return to Ready ({sub.selectedToolIds.length})
-                </button>
-                {sub.canCancel && (
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => onSubstepChoice({ type: 'CANCEL_SUBSTEP' })}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-
-          {sub.kind === 'BACKUP_TOOL_PICK' && (
-            <>
-              {state.lastEvent && state.lastEvent.drawnCard && (
-                <div className="event-reveal-box">
-                  <button
-                    type="button"
-                    className="event-reveal-card-btn"
-                    onClick={() =>
-                      onInspectCard({
-                        title: state.lastEvent!.drawnCard!.card.title,
-                        frontImage: state.lastEvent!.drawnCard!.card.frontImage,
-                        backImage: SHARED_BACKS.eventsAndTools,
-                      })
-                    }
-                  >
-                    <img
-                      src={assetUrl(state.lastEvent.drawnCard.card.frontImage)}
-                      alt={state.lastEvent.drawnCard.card.title}
-                    />
-                  </button>
-                  <div className="event-notes-list">
-                    {state.lastEvent.notes.map((n, i) => (
-                      <div key={i} className={`event-note-pill ${n.kind}`}>
-                        {n.text}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <strong>
-                Room Flipped Blocked! Unlock {sub.remainingPicks} Backup Tool
-                {sub.remainingPicks > 1 ? 's' : ''} to Ready:
-              </strong>
-              <div className="substep-card-grid">
-                {state.backupTools.map((tool) => (
-                  <button
-                    key={tool.id}
-                    type="button"
-                    className="pick-card-btn"
-                    onClick={() => onSubstepChoice({ type: 'PICK_BACKUP_TOOL', toolId: tool.id })}
-                  >
-                    <img src={assetUrl(tool.frontImage)} alt={tool.title} />
-                    <span className="pick-card-label">Unlock {tool.title}</span>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
         </div>
       )}
 
-      {/* STEP 3A: READY TO FLIP EVENT */}
+      {/* STEP 2A: READY TO FLIP EVENT */}
       {state.phase === 'EVENT_READY' && (
         <div className="event-deck-box ready-glow">
           <button
@@ -464,8 +326,8 @@ export function ActionPanel({
             <div>
               <strong>Friday Events Deck</strong>
               <div className="action-btn-detail">
-                {state.eventDeck.length} card{state.eventDeck.length === 1 ? '' : 's'} remaining ·{' '}
-                {state.slowDownDiscard.length} in Slow-Down Discard
+                {state.eventDeck.length} card{state.eventDeck.length === 1 ? '' : 's'} left ·{' '}
+                {state.eventDiscard.length} in Event Discard
               </div>
             </div>
             <button type="button" className="btn btn-gold" onClick={onFlipEvent}>
@@ -475,12 +337,13 @@ export function ActionPanel({
         </div>
       )}
 
-      {/* STEP 3B: EVENT RESOLVED -> REST & NEXT TURN / END ROUND */}
+      {/* STEP 2B: EVENT RESOLVED -> NEXT HELPER / END OF ROUND CLOCK FLIP */}
       {state.phase === 'EVENT_RESOLVED' && state.lastEvent && (
         <div className="action-list">
-          {state.lastEvent.reshuffledSlowDowns && (
+          {state.lastEvent.reshuffledDiscard && (
             <div className="action-note-banner">
-              Event Deck was empty — reshuffled only the Slow-Down Discard Pile to form a fresh deck!
+              Event Deck was empty — reshuffled the Event Discard Pile (Slow-Downs + spent Reusable
+              Tools) into a fresh deck!
             </div>
           )}
 
@@ -528,10 +391,10 @@ export function ActionPanel({
 
           <button type="button" className="btn btn-primary" onClick={onAdvanceTurn}>
             {isFinalTurn
-              ? state.clockShield
-                ? `Rest ${activeDef.name} & End Round (Cousin Aviel Shields Clock!)`
-                : `Rest ${activeDef.name} & End Round (Flip Shabbat Clock)`
-              : `Rest ${activeDef.name} & Next Helper`}
+              ? state.clockShields.length > 0
+                ? `End Round ${state.round} (Cousin Aviel Shields Clock! · ${state.clockShields.length} Shield${state.clockShields.length > 1 ? 's' : ''})`
+                : `End Round ${state.round} & Flip Shabbat Clock`
+              : `Next Helper: ${nextHelperName} →`}
           </button>
         </div>
       )}

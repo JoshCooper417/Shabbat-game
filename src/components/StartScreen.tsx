@@ -6,15 +6,13 @@ import {
   SEAT_ORDER,
   SHARED_BACKS,
 } from '../data/cards';
-import { DifficultyId, TurnMode } from '../engine/types';
+import { DifficultyId } from '../engine/types';
 import { InspectedCard } from './CardInspectModal';
 
 interface StartScreenProps {
   difficulty: DifficultyId;
-  turnMode: TurnMode;
   coachEnabled: boolean;
   onSelectDifficulty: (d: DifficultyId) => void;
-  onSelectTurnMode: (m: TurnMode) => void;
   onToggleCoach: (enabled: boolean) => void;
   onStartGame: () => void;
   onOpenBooklet: (page?: number) => void;
@@ -26,10 +24,8 @@ const DIFF_ORDER: DifficultyId[] = ['BEGINNER', 'STANDARD', 'HARD'];
 
 export function StartScreen({
   difficulty,
-  turnMode,
   coachEnabled,
   onSelectDifficulty,
-  onSelectTurnMode,
   onToggleCoach,
   onStartGame,
   onOpenBooklet,
@@ -51,25 +47,26 @@ export function StartScreen({
         </div>
 
         <div className="start-config">
-          <span className="start-kicker">Cooper Family Edition · Givot Eden</span>
+          <span className="start-kicker">Cooper Family Edition · v3 Simplified</span>
           <h1 className="start-heading">Preparing for Shabbat</h1>
           <p className="start-lead">
-            Work together as <strong>Abba, Nael, Mommy, and Mekimi</strong> to finish every Friday
-            Chore before <strong>Shabbat Begins!</strong> flips on the Clock.
+            Work together as <strong>Abba, Nael, Mommy, and Mekimi</strong> to finish every{' '}
+            <strong>Team Chore</strong> and <strong>Errand</strong> before{' '}
+            <strong>Shabbat Begins!</strong> flips on the Clock.
           </p>
 
           <div className="newcomer-strip" aria-label="How to play in 15 seconds">
             <div className="newcomer-item">
               <span className="newcomer-num">Goal</span>
-              <span>Finish all Chores together before sunset!</span>
+              <span>Finish all Team Chores &amp; Errands before sunset!</span>
             </div>
             <div className="newcomer-item">
               <span className="newcomer-num">Turn</span>
-              <span>1. Move piece → 2. Do 1 Action → 3. Flip 1 Event</span>
+              <span>Take any 2 Actions (Walk, Tidy, Chore, Tool) → Flip 1 Event</span>
             </div>
             <div className="newcomer-item">
               <span className="newcomer-num">Easy</span>
-              <span>Only legal moves work &amp; the Coach guides every step.</span>
+              <span>Only legal moves work &amp; the Coach guides every turn.</span>
             </div>
           </div>
 
@@ -88,10 +85,10 @@ export function StartScreen({
                   <span className="diff-name">{cfg.name}</span>
                   <span className="diff-tagline">{cfg.tagline}</span>
                   <span className="diff-meta">
-                    {cfg.clockLength} Clock · {cfg.totalChores} Chores ({cfg.startingChoreRow} start +{' '}
-                    {cfg.arrivalChores} arriving)
+                    {cfg.totalChores} Chores (4 face-up + {cfg.choreDeckStart} deck)
                     <br />
-                    {cfg.slowDownCount} Slow-Downs · {cfg.startingClutter} Clutter
+                    {cfg.clockLength} Clock · {cfg.startingClutterSlots.length} Clutter
+                    {cfg.boxTimeFlies ? ' · No Time Flies' : ''}
                   </span>
                 </button>
               );
@@ -99,22 +96,10 @@ export function StartScreen({
           </div>
 
           <div className="start-options-row">
-            <div className="mode-toggle-group" role="group" aria-label="Turn Order">
-              <button
-                type="button"
-                className={`mode-pill ${turnMode === 'FOUR_SEAT' ? 'active' : ''}`}
-                onClick={() => onSelectTurnMode('FOUR_SEAT')}
-              >
-                4-Seat Clockwise (Abba → Nael → Mommy → Mekimi)
-              </button>
-              <button
-                type="button"
-                className={`mode-pill ${turnMode === 'TWO_GROUP' ? 'active' : ''}`}
-                onClick={() => onSelectTurnMode('TWO_GROUP')}
-              >
-                1–2P Group Mode (A: Abba &amp; Nael · B: Mommy &amp; Mekimi)
-              </button>
-            </div>
+            <span className="panel-hint">
+              <strong>Turn Order (1–4 Players):</strong> Always clockwise{' '}
+              <strong>Abba → Nael → Mommy → Mekimi</strong> (flip 1 Clock card after Mekimi!).
+            </span>
 
             <label className="coach-checkbox">
               <input
@@ -144,8 +129,8 @@ export function StartScreen({
         <div className="start-helpers-head">
           <h2 className="section-heading">Meet Your 4 3D Family Figurines &amp; Helper Cards</h2>
           <p className="section-sub">
-            Click any Helper card to inspect full-size. Clockwise turn order: Abba → Nael → Mommy →
-            Mekimi.
+            Click any Helper card to inspect full-size. Every Helper gets 2 Actions per turn plus
+            their own superpower!
           </p>
         </div>
 
@@ -168,7 +153,7 @@ export function StartScreen({
                   onClick={() =>
                     onInspectCard({
                       title: `${h.name} — Helper Power Card`,
-                      subtitle: `Carry ${h.carryLimit} Errand${h.carryLimit > 1 ? 's' : ''}`,
+                      subtitle: `2 Actions/Turn · ${h.powers.map((p) => p.name).join(' & ')}`,
                       frontImage: h.cardImage,
                       backImage: SHARED_BACKS.helpers,
                     })

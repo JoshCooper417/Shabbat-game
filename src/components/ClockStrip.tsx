@@ -11,6 +11,7 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
   const nextUnflippedIdx = state.clockRow.findIndex((c) => !c.flipped);
   const unflippedCount = state.clockRow.filter((c) => !c.flipped).length;
   const safeFlipsLeft = Math.max(0, unflippedCount - 1);
+  const shieldCount = state.clockShields.length;
 
   return (
     <section className="clock-strip" aria-label="Shabbat Clock">
@@ -18,11 +19,11 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
         <span className="clock-strip-title">Shabbat Clock</span>
         <span className={`clock-strip-sub ${safeFlipsLeft === 0 ? 'urgent' : ''}`}>
           {safeFlipsLeft === 0
-            ? state.clockShield
-              ? 'FINAL ROUND (Next flip shielded!)'
+            ? shieldCount > 0
+              ? `FINAL ROUND (+${shieldCount} shielded by Cousin Aviel!)`
               : 'FINAL ROUND — Next flip is Shabbat Begins!'
             : `${safeFlipsLeft} round${safeFlipsLeft === 1 ? '' : 's'} left before Shabbat Begins!${
-                state.clockShield ? ' (+1 shielded)' : ''
+                shieldCount > 0 ? ` (+${shieldCount} shielded)` : ''
               }`}
         </span>
       </div>
@@ -30,7 +31,11 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
       <div className="clock-cards-row">
         {state.clockRow.map((card, idx) => {
           const isNext = idx === nextUnflippedIdx;
-          const isShielded = isNext && state.clockShield !== null;
+          const isShielded =
+            !card.flipped &&
+            nextUnflippedIdx >= 0 &&
+            idx >= nextUnflippedIdx &&
+            idx < nextUnflippedIdx + shieldCount;
           const img = card.flipped ? card.frontImage : SHARED_BACKS.clock;
 
           return (
@@ -44,7 +49,7 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
                 card.flipped
                   ? `${card.title} (Flipped)`
                   : isShielded
-                    ? 'Next Clock card — shielded by Cousin Aviel Drops By!'
+                    ? 'Shielded by Cousin Aviel Drops By!'
                     : idx === state.clockRow.length - 1
                       ? 'Rightmost Clock card: Shabbat Begins! (face-down)'
                       : `Clock card #${idx + 1} (face-down)`
@@ -54,38 +59,43 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
                   title: card.flipped ? card.title : `Shabbat Clock Card #${idx + 1}`,
                   subtitle: card.flipped
                     ? 'Already flipped'
-                    : idx === state.clockRow.length - 1
-                      ? 'Shabbat Begins! sits face-down at the far right'
-                      : 'Face-down until flipped at Round End (or Time Flies)',
+                    : isShielded
+                      ? 'Guarded by Cousin Aviel Drops By! (absorbs 1 Clock flip)'
+                      : idx === state.clockRow.length - 1
+                        ? 'Shabbat Begins! sits face-down at the far right'
+                        : "Flips after Mekimi's turn (or Time Flies)",
                   frontImage: card.flipped ? card.frontImage : SHARED_BACKS.clock,
                 })
               }
             >
-              <img src={assetUrl(img)} alt={card.flipped ? card.title : 'Face-down Shabbat Clock card'} />
+              <img
+                src={assetUrl(img)}
+                alt={card.flipped ? card.title : 'Face-down Shabbat Clock card'}
+              />
             </button>
           );
         })}
       </div>
 
-      {state.clockShield && (
+      {shieldCount > 0 && (
         <button
           type="button"
           className="clock-shield-badge"
           onClick={() =>
             onInspectCard({
-              title: state.clockShield!.title,
-              subtitle: 'Shielding the next Clock flip (will return to box once triggered)',
-              frontImage: state.clockShield!.frontImage,
+              title: state.clockShields[0].title,
+              subtitle: `${shieldCount} active shield${shieldCount > 1 ? 's' : ''} guarding upcoming Clock flips (boxed once triggered)`,
+              frontImage: state.clockShields[0].frontImage,
               backImage: SHARED_BACKS.eventsAndTools,
             })
           }
         >
           <img
-            src={assetUrl(state.clockShield.frontImage)}
+            src={assetUrl(state.clockShields[0].frontImage)}
             alt="Cousin Aviel Drops By! shield"
             className="clock-shield-thumb"
           />
-          Shield Active: Cousin Aviel Drops By!
+          Shield Active: Cousin Aviel Drops By!{shieldCount > 1 ? ` ×${shieldCount}` : ''}
         </button>
       )}
     </section>

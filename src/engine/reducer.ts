@@ -1,42 +1,41 @@
-import { GROUP_HELPERS, HELPER_DEFS, SEAT_ORDER } from '../data/cards';
+import { DIFFICULTY_CONFIGS, HELPER_DEFS, SEAT_ORDER } from '../data/cards';
 import { getActionEvaluation } from './actions';
 import { advanceAfterEvent, resolveEventFlip } from './events';
-import {
-  appendLog,
-  getHelperName,
-  getOrthogonalNeighbors,
-  getTeammatesInSlot,
-} from './helpers';
+import { appendLog, getHelperName } from './helpers';
 import { getLegalMoves } from './movement';
 import { ActionCandidate, GameState, HelperId } from './types';
 
-function checkImmediateArrivalFlip(state: GameState): GameState {
-  if (state.choreRow.length === 0 && state.arrivalPile.length > 0) {
-    const [arrived, ...rest] = state.arrivalPile;
-    const next: GameState = {
-      ...state,
-      choreRow: [arrived],
-      arrivalPile: rest,
-    };
-    return appendLog(
-      next,
-      'ACTION',
-      `Chore Row hit 0 — immediately flipped Arrival Chore: “${arrived.title}”!`,
-      next.activeHelperId,
-    );
-  }
-  return state;
+function refillChoreRow(state: GameState): GameState {
+  const target = DIFFICULTY_CONFIGS[state.difficulty].choreRowTarget;
+  if (state.choreRow.length >= target || state.choreDeck.length === 0) return state;
+
+  const needed = Math.min(target - state.choreRow.length, state.choreDeck.length);
+  const drawn = state.choreDeck.slice(0, needed);
+  const restDeck = state.choreDeck.slice(needed);
+  return {
+    ...state,
+    choreRow: [...state.choreRow, ...drawn],
+    choreDeck: restDeck,
+  };
 }
 
 function isAllChoresDone(state: GameState): boolean {
-  if (state.choreRow.length > 0 || state.arrivalPile.length > 0) return false;
-  if (state.rooms.some((r) => r.tuckedChore !== null)) return false;
+  if (state.choreRow.length > 0 || state.choreDeck.length > 0) return false;
   if (SEAT_ORDER.some((id) => state.helpers[id].carriedErrands.length > 0)) return false;
   return true;
 }
 
-function finalizeStep2(state: GameState, actionNote: string): GameState {
-  let next = checkImmediateArrivalFlip(state);
+/**
+ * After any Move, Action, or Substep resolves:
+ * 1) Refill Chore Row back to 4 immediately.
+ * 2) Check immediate win (skip Event & Clock flip!).
+ * 3) If actionsRemaining > 0, stay in TURN.
+ * 4) If actionsRemaining === 0, stay in TURN ONLY if a free action (Mommy's unused Free Errand
+ *    or Free Handoff) is currently available; otherwise advance smoothly to EVENT_READY!
+ */
+function finalizeActionStep(state: GameState, actionNote: string): GameState {
+  let next = refillChoreRow(state);
+
   if (isAllChoresDone(next)) {
     next = appendLog(
       next,
@@ -51,36 +50,36 @@ function finalizeStep2(state: GameState, actionNote: string): GameState {
       lastActionNote: actionNote,
     };
   }
-  return {
+
+  const candidateState: GameState = {
     ...next,
-    phase: 'EVENT_READY',
+    phase: 'TURN',
     pendingSubstep: null,
     lastActionNote: actionNote,
   };
-}
 
-/**
- * In 1-2P Group Mode, choose which Ready Helper in the active group acts next.
- */
-export function applyChooseHelper(state: GameState, helperId: HelperId): GameState {
-  if (state.phase !== 'CHOOSE_HELPER') return state;
-  if (!GROUP_HELPERS[state.activeGroup].includes(helperId)) return state;
-  if (state.helpers[helperId].resting) return state;
+  if (candidateState.actionsRemaining > 0) {
+    return candidateState;
+  }
+
+  // 0 Actions remaining — check if a FREE action (Mommy's Free Errand or Free Handoff) is still legal!
+  const { legal } = getActionEvaluation(candidateState);
+  const hasUsefulFree = legal.some((a) => a.isFree);
+  if (hasUsefulFree) {
+    return candidateState;
+  }
 
   return {
-    ...state,
-    activeHelperId: helperId,
-    phase: 'MOVE',
-    movedThisTurn: false,
-    lastActionNote: `Group ${state.activeGroup} chose ${getHelperName(helperId)} to act.`,
+    ...candidateState,
+    phase: 'EVENT_READY',
   };
 }
 
 /**
- * Step 1: Move active Helper to a legal target slot (or Stay).
+ * Move Action (costs 1 Action): Walk 1 room orthogonally, or Mekimi crawls to ANY room.
  */
 export function applyMove(state: GameState, targetSlot: number): GameState {
-  if (state.phase !== 'MOVE') return state;
+  if (state.phase !== 'TURN' || state.actionsRemaining <= 0) return state;
   const legal = getLegalMoves(state);
   const move = legal.find((m) => m.targetSlot === targetSlot);
   if (!move) return state;
@@ -94,41 +93,44 @@ export function applyMove(state: GameState, targetSlot: number): GameState {
     },
   };
 
+  const note =
+    move.kind === 'TURBO_CRAWL'
+      ? `${getHelperName(activeId)} Turbo Crawled to ${state.rooms[targetSlot].card.name}!`
+      : `${getHelperName(activeId)} walked to ${state.rooms[targetSlot].card.name}.`;
+
   let next: GameState = {
     ...state,
     helpers: nextHelpers,
-    phase: 'ACT',
-    movedThisTurn: move.kind !== 'STAY',
-    lastActionNote:
-      move.kind === 'STAY'
-        ? `${getHelperName(activeId)} stayed in ${state.rooms[targetSlot].card.name}.`
-        : `${getHelperName(activeId)} moved to ${state.rooms[targetSlot].card.name} (${move.label}).`,
+    actionsRemaining: state.actionsRemaining - 1,
   };
-
-  next = appendLog(next, 'MOVE', next.lastActionNote!, activeId);
-  return next;
+  next = appendLog(next, 'MOVE', note, activeId);
+  return finalizeActionStep(next, note);
 }
 
 /**
- * Step 2: Skip optional Step 2 action freely.
+ * End Step 1 early (or finish after using Free Handoff / Mommy Free Errand) -> Flip 1 Event Card.
  */
-export function applySkipAction(state: GameState): GameState {
-  if (state.phase !== 'ACT') return state;
+export function applyEndTurnActions(state: GameState): GameState {
+  if (state.phase !== 'TURN') return state;
   const activeId = state.activeHelperId;
-  const note = `${getHelperName(activeId)} skipped Step 2.`;
+  const note =
+    state.actionsRemaining > 0
+      ? `${getHelperName(activeId)} ended actions early (${state.actionsRemaining} unused) — ready to flip Event.`
+      : `${getHelperName(activeId)} finished turn actions — ready to flip Event.`;
   const next = appendLog(state, 'ACTION', note, activeId);
   return {
     ...next,
+    actionsRemaining: 0,
     phase: 'EVENT_READY',
     lastActionNote: note,
   };
 }
 
 /**
- * Step 2: Execute a legal ActionCandidate.
+ * Execute any legal non-Move action (Tidy, Team Chore, Pick Up/Deliver Errand, Free Handoff, Use Tool).
  */
 export function applyAction(state: GameState, actionId: string): GameState {
-  if (state.phase !== 'ACT') return state;
+  if (state.phase !== 'TURN') return state;
   const { legal } = getActionEvaluation(state);
   const candidate: ActionCandidate | undefined = legal.find((a) => a.id === actionId);
   if (!candidate) return state;
@@ -137,32 +139,20 @@ export function applyAction(state: GameState, actionId: string): GameState {
   const activeHelper = state.helpers[activeId];
   const slot = activeHelper.slotIndex;
   const room = state.rooms[slot];
-  const teammatesHere = getTeammatesInSlot(state, slot, activeId);
 
   switch (candidate.type) {
     case 'TIDY_CLUTTERED': {
       const nextRooms = state.rooms.map((r) =>
         r.slotIndex === slot ? { ...r, state: 'CLEAR' as const } : r,
       );
-      const clutteredNeighbors =
-        teammatesHere.length > 0
-          ? getOrthogonalNeighbors(slot).filter((n) => nextRooms[n].state === 'CLUTTERED')
-          : [];
       const note = `${getHelperName(activeId)} tidied ${room.card.name} → Clear!`;
-      const next = appendLog({ ...state, rooms: nextRooms }, 'ACTION', note, activeId);
-
-      if (clutteredNeighbors.length > 0) {
-        return {
-          ...next,
-          phase: 'SUBSTEP',
-          pendingSubstep: {
-            kind: 'TIDY_NEIGHBOR_BONUS',
-            eligibleSlots: clutteredNeighbors,
-          },
-          lastActionNote: `${note} Choose up to 1 next-door Cluttered room to Clear too!`,
-        };
-      }
-      return finalizeStep2(next, note);
+      const next = appendLog(
+        { ...state, rooms: nextRooms, actionsRemaining: state.actionsRemaining - 1 },
+        'ACTION',
+        note,
+        activeId,
+      );
+      return finalizeActionStep(next, note);
     }
 
     case 'TIDY_BLOCKED': {
@@ -170,62 +160,39 @@ export function applyAction(state: GameState, actionId: string): GameState {
         r.slotIndex === slot ? { ...r, state: 'CLEAR' as const } : r,
       );
       const note = `${getHelperName(activeId)} unblocked ${room.card.name} → Clear!`;
-      const next = appendLog({ ...state, rooms: nextRooms }, 'ACTION', note, activeId);
-      return finalizeStep2(next, note);
-    }
-
-    case 'START_ROOM_CHORE': {
-      const chore = state.choreRow.find((c) => c.id === candidate.choreId);
-      if (!chore) return state;
-      const nextChoreRow = state.choreRow.filter((c) => c.id !== chore.id);
-      const nextRooms = state.rooms.map((r) =>
-        r.slotIndex === slot ? { ...r, tuckedChore: chore } : r,
-      );
-      const note = `${getHelperName(activeId)} started “${chore.title}” (tucked under ${room.card.name}).`;
       const next = appendLog(
-        { ...state, rooms: nextRooms, choreRow: nextChoreRow },
+        { ...state, rooms: nextRooms, actionsRemaining: state.actionsRemaining - 1 },
         'ACTION',
         note,
         activeId,
       );
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
 
-    case 'FINISH_TUCKED_CHORE': {
-      const chore = room.tuckedChore;
-      if (!chore) return state;
-      const nextRooms = state.rooms.map((r) =>
-        r.slotIndex === slot ? { ...r, tuckedChore: null } : r,
-      );
-      const nextDone = [...state.doneChores, chore];
-      const note = `${getHelperName(activeId)} finished tucked Chore “${chore.title}”!`;
-      const next = appendLog(
-        { ...state, rooms: nextRooms, doneChores: nextDone },
-        'ACTION',
-        note,
-        activeId,
-      );
-      return finalizeStep2(next, note);
-    }
-
-    case 'RESTORE_ORDER': {
+    case 'TEAM_CHORE': {
       const chore = state.choreRow.find((c) => c.id === candidate.choreId);
       if (!chore) return state;
       const nextChoreRow = state.choreRow.filter((c) => c.id !== chore.id);
       const nextDone = [...state.doneChores, chore];
-      const note = `${getHelperName(activeId)} completed Restore Order “${chore.title}”!`;
+      const note = `${getHelperName(activeId)} & teammate finished Team Chore “${chore.title}”!`;
       const next = appendLog(
-        { ...state, choreRow: nextChoreRow, doneChores: nextDone },
+        {
+          ...state,
+          choreRow: nextChoreRow,
+          doneChores: nextDone,
+          actionsRemaining: state.actionsRemaining - 1,
+        },
         'ACTION',
         note,
         activeId,
       );
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
 
     case 'PICK_UP_ERRAND': {
       const errand = state.choreRow.find((c) => c.id === candidate.choreId);
       if (!errand) return state;
+      const isFree = Boolean(candidate.isFree);
       const nextChoreRow = state.choreRow.filter((c) => c.id !== errand.id);
       const nextHelpers = {
         ...state.helpers,
@@ -234,19 +201,28 @@ export function applyAction(state: GameState, actionId: string): GameState {
           carriedErrands: [...activeHelper.carriedErrands, errand],
         },
       };
-      const note = `${getHelperName(activeId)} picked up Errand “${errand.title}”.`;
+      const note = isFree
+        ? `${getHelperName(activeId)} picked up Errand “${errand.title}” for FREE (Errand Express)!`
+        : `${getHelperName(activeId)} picked up Errand “${errand.title}”.`;
       const next = appendLog(
-        { ...state, choreRow: nextChoreRow, helpers: nextHelpers },
+        {
+          ...state,
+          choreRow: nextChoreRow,
+          helpers: nextHelpers,
+          actionsRemaining: isFree ? state.actionsRemaining : state.actionsRemaining - 1,
+          mommyFreeErrandUsed: isFree ? true : state.mommyFreeErrandUsed,
+        },
         'ACTION',
         note,
         activeId,
       );
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
 
     case 'DELIVER_ERRAND': {
       const errand = activeHelper.carriedErrands.find((c) => c.id === candidate.choreId);
       if (!errand) return state;
+      const isFree = Boolean(candidate.isFree);
       const nextHelpers = {
         ...state.helpers,
         [activeId]: {
@@ -255,37 +231,25 @@ export function applyAction(state: GameState, actionId: string): GameState {
         },
       };
       const nextDone = [...state.doneChores, errand];
-      const note = `${getHelperName(activeId)} delivered Errand “${errand.title}”!`;
-      let next = appendLog(
-        { ...state, helpers: nextHelpers, doneChores: nextDone },
+      const note = isFree
+        ? `${getHelperName(activeId)} delivered Errand “${errand.title}” for FREE (Errand Express)!`
+        : `${getHelperName(activeId)} delivered Errand “${errand.title}”!`;
+      const next = appendLog(
+        {
+          ...state,
+          helpers: nextHelpers,
+          doneChores: nextDone,
+          actionsRemaining: isFree ? state.actionsRemaining : state.actionsRemaining - 1,
+          mommyFreeErrandUsed: isFree ? true : state.mommyFreeErrandUsed,
+        },
         'ACTION',
         note,
         activeId,
       );
-      next = checkImmediateArrivalFlip(next);
-
-      if (isAllChoresDone(next)) {
-        return finalizeStep2(next, note);
-      }
-
-      if (next.readyTools.length < 3 && next.toolDiscard.length > 0) {
-        return {
-          ...next,
-          phase: 'SUBSTEP',
-          pendingSubstep: {
-            kind: 'RECHARGE_PICK',
-            source: 'ERRAND_BONUS',
-            maxCount: 1,
-            selectedToolIds: [],
-            canCancel: false,
-          },
-          lastActionNote: `${note} Bonus: Pick 1 used Tool to return to Ready!`,
-        };
-      }
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
 
-    case 'PASS_ERRAND': {
+    case 'GIVE_ERRAND': {
       const targetId = candidate.targetHelperId;
       if (!targetId) return state;
       const errand = activeHelper.carriedErrands.find((c) => c.id === candidate.choreId);
@@ -302,59 +266,31 @@ export function applyAction(state: GameState, actionId: string): GameState {
           carriedErrands: [...targetHelper.carriedErrands, errand],
         },
       };
-      const note = `${getHelperName(activeId)} passed “${errand.title}” to ${getHelperName(targetId)}.`;
+      const note = `Free Handoff: ${getHelperName(activeId)} gave “${errand.title}” to ${getHelperName(targetId)}.`;
       const next = appendLog({ ...state, helpers: nextHelpers }, 'ACTION', note, activeId);
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
 
-    case 'TEAM_PAIR': {
-      const chore = state.choreRow.find((c) => c.id === candidate.choreId);
-      if (!chore) return state;
-      const nextChoreRow = state.choreRow.filter((c) => c.id !== chore.id);
-      const nextDone = [...state.doneChores, chore];
-      const note = `${getHelperName(activeId)} & teammate finished Team Pair “${chore.title}”!`;
-      let next = appendLog(
-        { ...state, choreRow: nextChoreRow, doneChores: nextDone },
-        'ACTION',
-        note,
-        activeId,
-      );
-      next = checkImmediateArrivalFlip(next);
-
-      if (isAllChoresDone(next)) {
-        return finalizeStep2(next, note);
-      }
-
-      if (next.readyTools.length < 3 && next.toolDiscard.length > 0) {
-        return {
-          ...next,
-          phase: 'SUBSTEP',
-          pendingSubstep: {
-            kind: 'RECHARGE_PICK',
-            source: 'TEAM_PAIR_BONUS',
-            maxCount: 1,
-            selectedToolIds: [],
-            canCancel: false,
-          },
-          lastActionNote: `${note} Bonus: Pick 1 used Tool to return to Ready!`,
-        };
-      }
-      return finalizeStep2(next, note);
-    }
-
-    case 'COMBO_ROOM_CHORE_ROW': {
-      const chore = state.choreRow.find((c) => c.id === candidate.choreId);
-      if (!chore) return state;
-      const nextChoreRow = state.choreRow.filter((c) => c.id !== chore.id);
-      const nextDone = [...state.doneChores, chore];
-      const note = `${getHelperName(activeId)} & teammate finished “${chore.title}” in 1 step!`;
-      const next = appendLog(
-        { ...state, choreRow: nextChoreRow, doneChores: nextDone },
-        'ACTION',
-        note,
-        activeId,
-      );
-      return finalizeStep2(next, note);
+    case 'TAKE_ERRAND': {
+      const targetId = candidate.targetHelperId;
+      if (!targetId) return state;
+      const targetHelper = state.helpers[targetId];
+      const errand = targetHelper.carriedErrands.find((c) => c.id === candidate.choreId);
+      if (!errand) return state;
+      const nextHelpers = {
+        ...state.helpers,
+        [targetId]: {
+          ...targetHelper,
+          carriedErrands: targetHelper.carriedErrands.filter((c) => c.id !== errand.id),
+        },
+        [activeId]: {
+          ...activeHelper,
+          carriedErrands: [...activeHelper.carriedErrands, errand],
+        },
+      };
+      const note = `Free Handoff: ${getHelperName(activeId)} took “${errand.title}” from ${getHelperName(targetId)}.`;
+      const next = appendLog({ ...state, helpers: nextHelpers }, 'ACTION', note, activeId);
+      return finalizeActionStep(next, note);
     }
 
     case 'USE_ICE_COFFEE': {
@@ -396,40 +332,21 @@ export function applyAction(state: GameState, actionId: string): GameState {
 
     case 'USE_EARLY_PREP': {
       const tool = state.readyTools.find((t) => t.id === candidate.toolId);
-      if (!tool || state.clockShield !== null) return state;
+      if (!tool) return state;
       const nextReady = state.readyTools.filter((t) => t.id !== tool.id);
-      const note = `${getHelperName(activeId)} played Cousin Aviel Drops By! — next Clock flip is shielded!`;
+      const note = `${getHelperName(activeId)} played Cousin Aviel Drops By! — Clock flip shielded!`;
       const next = appendLog(
-        { ...state, readyTools: nextReady, clockShield: tool },
+        {
+          ...state,
+          readyTools: nextReady,
+          clockShields: [...state.clockShields, tool],
+          actionsRemaining: state.actionsRemaining - 1,
+        },
         'ACTION',
         note,
         activeId,
       );
-      return finalizeStep2(next, note);
-    }
-
-    case 'RECHARGE_TOOL': {
-      const maxCount = Math.min(
-        activeId === 'MEKIMI' ? 2 : 1,
-        3 - state.readyTools.length,
-        state.toolDiscard.length,
-      );
-      if (maxCount <= 0) return state;
-      return {
-        ...state,
-        phase: 'SUBSTEP',
-        pendingSubstep: {
-          kind: 'RECHARGE_PICK',
-          source: 'RECHARGE_ACTION',
-          maxCount,
-          selectedToolIds: [],
-          canCancel: true,
-        },
-        lastActionNote:
-          activeId === 'MEKIMI' && maxCount === 2
-            ? 'Big Smile Reset: Pick 1 or 2 used Tools to return to Ready!'
-            : 'Recharge: Pick 1 used Tool from Tool Discard to return to Ready!',
-      };
+      return finalizeActionStep(next, note);
     }
 
     default:
@@ -438,18 +355,14 @@ export function applyAction(state: GameState, actionId: string): GameState {
 }
 
 /**
- * Resolve or interact with an active PendingSubstep.
+ * Resolve an active Tool substep (Ice Coffee Boost or Strategic Snack Summons).
  */
 export function applySubstepChoice(
   state: GameState,
   payload:
-    | { type: 'PICK_TIDY_NEIGHBOR'; slotIndex: number | null }
     | { type: 'TOGGLE_ICE_COFFEE_SLOT'; slotIndex: number }
     | { type: 'CONFIRM_ICE_COFFEE' }
     | { type: 'PICK_SNACK_HELPER'; helperId: HelperId }
-    | { type: 'TOGGLE_RECHARGE_TOOL'; toolId: string }
-    | { type: 'CONFIRM_RECHARGE' }
-    | { type: 'PICK_BACKUP_TOOL'; toolId: string }
     | { type: 'CANCEL_SUBSTEP' },
 ): GameState {
   if (state.phase !== 'SUBSTEP' || !state.pendingSubstep) return state;
@@ -457,37 +370,15 @@ export function applySubstepChoice(
   const activeId = state.activeHelperId;
 
   if (payload.type === 'CANCEL_SUBSTEP') {
-    if (
-      sub.kind === 'ICE_COFFEE_PICK' ||
-      sub.kind === 'SNACK_SUMMONS_PICK' ||
-      (sub.kind === 'RECHARGE_PICK' && sub.canCancel)
-    ) {
-      return {
-        ...state,
-        phase: 'ACT',
-        pendingSubstep: null,
-        lastActionNote: null,
-      };
-    }
-    return state;
+    return {
+      ...state,
+      phase: 'TURN',
+      pendingSubstep: null,
+      lastActionNote: null,
+    };
   }
 
-  // 1. Tidy Neighbor Bonus
-  if (sub.kind === 'TIDY_NEIGHBOR_BONUS' && payload.type === 'PICK_TIDY_NEIGHBOR') {
-    if (payload.slotIndex === null) {
-      return finalizeStep2(state, 'Skipped optional next-door Tidy bonus.');
-    }
-    if (!sub.eligibleSlots.includes(payload.slotIndex)) return state;
-    const targetRoom = state.rooms[payload.slotIndex];
-    const nextRooms = state.rooms.map((r) =>
-      r.slotIndex === payload.slotIndex ? { ...r, state: 'CLEAR' as const } : r,
-    );
-    const note = `Team Tidy bonus: also cleared next-door ${targetRoom.card.name}!`;
-    const next = appendLog({ ...state, rooms: nextRooms }, 'ACTION', note, activeId);
-    return finalizeStep2(next, note);
-  }
-
-  // 2. Ice Coffee Boost: toggle 1–2 Cluttered rooms, then confirm
+  // 1. Ice Coffee Boost: pick 1-2 Cluttered rooms -> Event Discard
   if (sub.kind === 'ICE_COFFEE_PICK') {
     if (payload.type === 'TOGGLE_ICE_COFFEE_SLOT') {
       if (!sub.eligibleSlots.includes(payload.slotIndex)) return state;
@@ -498,7 +389,6 @@ export function applySubstepChoice(
       } else if (sub.selectedSlots.length < 2) {
         nextSelected = [...sub.selectedSlots, payload.slotIndex];
       } else {
-        // Replace oldest selection so picking feels effortless
         nextSelected = [sub.selectedSlots[1], payload.slotIndex];
       }
       return {
@@ -506,6 +396,7 @@ export function applySubstepChoice(
         pendingSubstep: { ...sub, selectedSlots: nextSelected },
       };
     }
+
     if (payload.type === 'CONFIRM_ICE_COFFEE') {
       if (sub.selectedSlots.length === 0) return state;
       const tool = state.readyTools.find((t) => t.id === sub.toolId);
@@ -516,24 +407,25 @@ export function applySubstepChoice(
         selectedSet.has(r.slotIndex) ? { ...r, state: 'CLEAR' as const } : r,
       );
       const nextReady = state.readyTools.filter((t) => t.id !== tool.id);
-      const nextDiscard = [...state.toolDiscard, tool];
+      const nextEventDiscard = [...state.eventDiscard, { category: 'TOOL' as const, card: tool }];
       const note = `${getHelperName(activeId)} used Ice Coffee Boost → cleared ${clearedNames.join(' & ')}!`;
       const next = appendLog(
         {
           ...state,
           rooms: nextRooms,
           readyTools: nextReady,
-          toolDiscard: nextDiscard,
+          eventDiscard: nextEventDiscard,
+          actionsRemaining: state.actionsRemaining - 1,
         },
         'ACTION',
         note,
         activeId,
       );
-      return finalizeStep2(next, note);
+      return finalizeActionStep(next, note);
     }
   }
 
-  // 3. Strategic Snack Summons: pick teammate
+  // 2. Strategic Snack Summons: pull teammate into room -> Event Discard
   if (sub.kind === 'SNACK_SUMMONS_PICK' && payload.type === 'PICK_SNACK_HELPER') {
     if (!sub.eligibleHelpers.includes(payload.helperId)) return state;
     const tool = state.readyTools.find((t) => t.id === sub.toolId);
@@ -547,100 +439,21 @@ export function applySubstepChoice(
       },
     };
     const nextReady = state.readyTools.filter((t) => t.id !== tool.id);
-    const nextDiscard = [...state.toolDiscard, tool];
+    const nextEventDiscard = [...state.eventDiscard, { category: 'TOOL' as const, card: tool }];
     const note = `${getHelperName(activeId)} used Strategic Snack Summons → ${getHelperName(payload.helperId)} joined ${state.rooms[targetSlot].card.name}!`;
     const next = appendLog(
       {
         ...state,
         helpers: nextHelpers,
         readyTools: nextReady,
-        toolDiscard: nextDiscard,
+        eventDiscard: nextEventDiscard,
+        actionsRemaining: state.actionsRemaining - 1,
       },
       'ACTION',
       note,
       activeId,
     );
-    return finalizeStep2(next, note);
-  }
-
-  // 4. Recharge Tool (action OR Errand/Team Pair bonus)
-  if (sub.kind === 'RECHARGE_PICK') {
-    if (payload.type === 'TOGGLE_RECHARGE_TOOL') {
-      const exists = state.toolDiscard.some((t) => t.id === payload.toolId);
-      if (!exists) return state;
-      const already = sub.selectedToolIds.includes(payload.toolId);
-      let nextIds: string[];
-      if (already) {
-        nextIds = sub.selectedToolIds.filter((id) => id !== payload.toolId);
-      } else if (sub.selectedToolIds.length < sub.maxCount) {
-        nextIds = [...sub.selectedToolIds, payload.toolId];
-      } else if (sub.maxCount === 1) {
-        nextIds = [payload.toolId];
-      } else {
-        nextIds = [sub.selectedToolIds[sub.selectedToolIds.length - 1], payload.toolId];
-      }
-      return {
-        ...state,
-        pendingSubstep: { ...sub, selectedToolIds: nextIds },
-      };
-    }
-
-    if (payload.type === 'CONFIRM_RECHARGE') {
-      if (sub.selectedToolIds.length === 0) return state;
-      const pickedSet = new Set(sub.selectedToolIds);
-      const pickedTools = state.toolDiscard.filter((t) => pickedSet.has(t.id));
-      const nextDiscard = state.toolDiscard.filter((t) => !pickedSet.has(t.id));
-      const nextReady = [...state.readyTools, ...pickedTools];
-      const names = pickedTools.map((t) => t.title).join(' & ');
-      const note =
-        sub.source === 'RECHARGE_ACTION'
-          ? `${getHelperName(activeId)} recharged ${names} → Ready Tool Row!`
-          : `Bonus Tool Recharge: returned ${names} → Ready Tool Row!`;
-      const next = appendLog(
-        { ...state, readyTools: nextReady, toolDiscard: nextDiscard },
-        'ACTION',
-        note,
-        activeId,
-      );
-      return finalizeStep2(next, note);
-    }
-  }
-
-  // 5. Backup Tool Unlock (when a room flips Red Blocked during Event resolution)
-  if (sub.kind === 'BACKUP_TOOL_PICK' && payload.type === 'PICK_BACKUP_TOOL') {
-    const picked = state.backupTools.find((t) => t.id === payload.toolId);
-    if (!picked) return state;
-    const nextBackup = state.backupTools.filter((t) => t.id !== picked.id);
-    const nextReady = [...state.readyTools, picked];
-    const remaining = Math.min(
-      sub.remainingPicks - 1,
-      Math.max(0, 3 - nextReady.length),
-      nextBackup.length,
-    );
-    const note = `Unlocked Backup Tool: ${picked.title} moved to Ready Tool Row!`;
-    let next = appendLog(
-      { ...state, readyTools: nextReady, backupTools: nextBackup },
-      'EVENT',
-      note,
-      activeId,
-    );
-    if (remaining > 0) {
-      return {
-        ...next,
-        phase: 'SUBSTEP',
-        pendingSubstep: {
-          ...sub,
-          remainingPicks: remaining,
-        },
-        lastActionNote: `${note} Pick 1 more Backup Tool.`,
-      };
-    }
-    return {
-      ...next,
-      phase: 'EVENT_RESOLVED',
-      pendingSubstep: null,
-      lastActionNote: note,
-    };
+    return finalizeActionStep(next, note);
   }
 
   return state;

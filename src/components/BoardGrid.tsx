@@ -1,4 +1,4 @@
-import { assetUrl, HELPER_DEFS, SHARED_BACKS, ZONE_META } from '../data/cards';
+import { assetUrl, HELPER_DEFS, ZONE_META } from '../data/cards';
 import { getActionEvaluation } from '../engine/actions';
 import { getHelpersInSlot } from '../engine/helpers';
 import { GameState, LegalMove } from '../engine/types';
@@ -14,13 +14,7 @@ interface BoardGridProps {
 }
 
 function getShortMoveLabel(move: LegalMove): string {
-  if (move.kind === 'STAY') return 'Stay';
-  if (move.kind === 'TURBO_CRAWL') return 'Diagonal ↗';
-  if (move.kind === 'BUDDY_HOP') {
-    const targetName = move.label.replace('Buddy-Hop to ', '');
-    return `Hop → ${targetName}`;
-  }
-  return move.label.includes('(2)') ? 'Slide 2' : 'Slide 1';
+  return move.kind === 'TURBO_CRAWL' ? 'Turbo Crawl' : 'Walk (1)';
 }
 
 function getBoardPrompt(state: GameState): string {
@@ -28,34 +22,30 @@ function getBoardPrompt(state: GameState): string {
   const activeRoomName = state.rooms[state.helpers[state.activeHelperId].slotIndex].card.name;
   const sub = state.pendingSubstep;
 
-  if (state.phase === 'CHOOSE_HELPER') {
-    return `Choose which Helper in Group ${state.activeGroup} goes next`;
-  }
-  if (state.phase === 'MOVE') {
-    return `Select any blue-outlined room to move ${activeName} (or Stay)`;
-  }
-  if (state.phase === 'ACT') {
-    return 'Pick an action or click a green “Play / Use” card';
+  if (state.phase === 'TURN') {
+    if (state.actionsRemaining > 0) {
+      const actionNum = 3 - state.actionsRemaining;
+      return state.activeHelperId === 'MEKIMI'
+        ? `Action ${actionNum}/2: Click any room to Turbo Crawl, or pick an action`
+        : `Action ${actionNum}/2: Click a blue room to Walk, or pick an action`;
+    }
+    return `0 Actions left — take a FREE bonus action or flip 1 Event`;
   }
   if (state.phase === 'SUBSTEP' && sub) {
     switch (sub.kind) {
       case 'ICE_COFFEE_PICK':
         return 'Select 1 or 2 tilted Cluttered rooms to Clear';
-      case 'TIDY_NEIGHBOR_BONUS':
-        return 'Optional bonus: select a next-door room marked “+ Clear Bonus”';
       case 'SNACK_SUMMONS_PICK':
         return `Pick a teammate to summon into ${activeRoomName}`;
-      case 'RECHARGE_PICK':
-        return 'Pick used Tool(s) from Tool Discard to return to Ready';
-      case 'BACKUP_TOOL_PICK':
-        return 'Room flipped Blocked — unlock a Backup Tool!';
     }
   }
   if (state.phase === 'EVENT_READY') {
     return 'Click the Friday Events Deck to flip 1 card';
   }
   if (state.phase === 'EVENT_RESOLVED') {
-    return `Review the Event result, then Rest ${activeName}`;
+    return state.turnInRound === 4
+      ? `Review the Event, then end Round ${state.round} & flip the Clock`
+      : `Review the Event, then pass the turn after ${activeName}`;
   }
   if (state.phase === 'WON') return 'Shabbat Shalom — all Chores complete!';
   return 'Shabbat Begins!';
@@ -74,23 +64,16 @@ export function BoardGrid({
   const activeSlot = state.helpers[state.activeHelperId].slotIndex;
   const highlightedEventSlots = new Set(state.lastEvent?.highlightedSlots ?? []);
 
-  // Direct on-board quick actions during Step 2 (Tidy, Unblock, Finish Tucked)
+  // Direct on-board quick Tidy/Unblock action in active room during TURN phase
   const { legal: legalActions } =
-    state.phase === 'ACT' ? getActionEvaluation(state) : { legal: [] };
-  const directRoomAction =
-    state.phase === 'ACT'
-      ? legalActions.find(
-          (a) =>
-            a.type === 'FINISH_TUCKED_CHORE' ||
-            a.type === 'TIDY_BLOCKED' ||
-            a.type === 'TIDY_CLUTTERED',
-        )
-      : undefined;
+    state.phase === 'TURN' && state.actionsRemaining > 0
+      ? getActionEvaluation(state)
+      : { legal: [] };
+  const directRoomAction = legalActions.find(
+    (a) => a.type === 'TIDY_BLOCKED' || a.type === 'TIDY_CLUTTERED',
+  );
 
-  const isBoardTargetStep =
-    state.phase === 'MOVE' ||
-    (state.phase === 'SUBSTEP' &&
-      (sub?.kind === 'ICE_COFFEE_PICK' || sub?.kind === 'TIDY_NEIGHBOR_BONUS'));
+  const isIceCoffeePick = state.phase === 'SUBSTEP' && sub?.kind === 'ICE_COFFEE_PICK';
 
   return (
     <section className="linen-playmat area-board" aria-label="The 3 by 3 House on the Shabbat Table">
@@ -108,26 +91,18 @@ export function BoardGrid({
         {state.rooms.map((room) => {
           const zone = ZONE_META[room.card.zone];
           const occupants = getHelpersInSlot(state, room.slotIndex);
-          const move = state.phase === 'MOVE' ? moveBySlot.get(room.slotIndex) : undefined;
-
-          const isTidyBonusTarget =
-            state.phase === 'SUBSTEP' &&
-            sub?.kind === 'TIDY_NEIGHBOR_BONUS' &&
-            sub.eligibleSlots.includes(room.slotIndex);
+          const move =
+            state.phase === 'TURN' && state.actionsRemaining > 0
+              ? moveBySlot.get(room.slotIndex)
+              : undefined;
 
           const isIceCoffeeTarget =
-            state.phase === 'SUBSTEP' &&
-            sub?.kind === 'ICE_COFFEE_PICK' &&
-            sub.eligibleSlots.includes(room.slotIndex);
-
+            isIceCoffeePick && sub.eligibleSlots.includes(room.slotIndex);
           const isIceCoffeeSelected =
-            state.phase === 'SUBSTEP' &&
-            sub?.kind === 'ICE_COFFEE_PICK' &&
-            sub.selectedSlots.includes(room.slotIndex);
+            isIceCoffeePick && sub.selectedSlots.includes(room.slotIndex);
 
-          const isClickable = Boolean(move || isTidyBonusTarget || isIceCoffeeTarget);
-          const isStayMove = Boolean(move && move.kind === 'STAY');
-          const isUnreachableDuringPick = isBoardTargetStep && !isClickable;
+          const isClickable = Boolean(move || isIceCoffeeTarget);
+          const isUnreachableDuringPick = isIceCoffeePick && !isIceCoffeeTarget;
           const isEventHit = highlightedEventSlots.has(room.slotIndex);
           const isActiveRoom =
             room.slotIndex === activeSlot && state.phase !== 'WON' && state.phase !== 'LOST';
@@ -135,7 +110,7 @@ export function BoardGrid({
           const handleTileClick = () => {
             if (move) {
               onClickMoveSlot(room.slotIndex);
-            } else if (isTidyBonusTarget || isIceCoffeeTarget) {
+            } else if (isIceCoffeeTarget) {
               onClickSubstepSlot(room.slotIndex);
             }
           };
@@ -144,8 +119,7 @@ export function BoardGrid({
             'room-tile',
             room.state === 'CLUTTERED' ? 'cluttered' : '',
             room.state === 'BLOCKED' ? 'blocked' : '',
-            isClickable && !isStayMove ? 'clickable' : '',
-            isStayMove ? 'clickable-stay' : '',
+            isClickable ? 'clickable' : '',
             isUnreachableDuringPick ? 'dimmed-non-target' : '',
             isIceCoffeeSelected ? 'selected-substep' : '',
             isEventHit ? 'event-hit' : '',
@@ -153,6 +127,9 @@ export function BoardGrid({
           ]
             .filter(Boolean)
             .join(' ');
+
+          const crowdClass =
+            occupants.length >= 3 ? 'crowd' : occupants.length === 2 ? 'duo' : 'solo';
 
           return (
             <div key={room.card.id} className="room-slot-wrap">
@@ -212,12 +189,7 @@ export function BoardGrid({
 
                     {/* Top-left action/move badge */}
                     {move && (
-                      <span className={`room-move-banner ${move.kind === 'STAY' ? 'stay' : ''}`}>
-                        {getShortMoveLabel(move)}
-                      </span>
-                    )}
-                    {isTidyBonusTarget && (
-                      <span className="room-move-banner substep">+ Clear Bonus</span>
+                      <span className="room-move-banner">{getShortMoveLabel(move)}</span>
                     )}
                     {isIceCoffeeTarget && (
                       <span className="room-move-banner substep">
@@ -225,7 +197,7 @@ export function BoardGrid({
                       </span>
                     )}
 
-                    {/* Top-right room state / just-hit badge (never squeezes Zone pill!) */}
+                    {/* Top-right room state / just-hit badge */}
                     <div className="room-art-right-badges">
                       {isEventHit && <span className="room-status-pill just-hit">⚡ Hit</span>}
                       {room.state === 'CLUTTERED' && (
@@ -239,7 +211,7 @@ export function BoardGrid({
 
                   {occupants.length > 0 && (
                     <div
-                      className={`figurines-stage ${occupants.length === 2 ? 'duo' : 'solo'}`}
+                      className={`figurines-stage ${crowdClass}`}
                       aria-label={`Helpers in ${room.card.name}: ${occupants.map((h) => HELPER_DEFS[h].name).join(', ')}`}
                     >
                       {occupants.map((hid) => {
@@ -261,8 +233,8 @@ export function BoardGrid({
                           <div
                             key={hid}
                             className={`figurine-piece ${isActive ? 'is-active' : ''} ${
-                              hState.resting ? 'is-resting' : ''
-                            } ${isMekimi ? 'is-mekimi' : ''}`}
+                              isMekimi ? 'is-mekimi' : ''
+                            }`}
                             style={{ '--helper-color': def.accent } as React.CSSProperties}
                             title={errandTooltip}
                           >
@@ -274,12 +246,8 @@ export function BoardGrid({
                             />
                             <div className="figurine-plate">
                               <span>{def.name}</span>
-                              {hState.resting && <em className="figurine-rest-dot">Rest</em>}
                               {hState.carriedErrands.length > 0 && (
-                                <span
-                                  className="figurine-errand-pip"
-                                  title={errandTooltip}
-                                >
+                                <span className="figurine-errand-pip" title={errandTooltip}>
                                   📦{hState.carriedErrands.length}
                                 </span>
                               )}
@@ -308,40 +276,10 @@ export function BoardGrid({
                         onClickBoardAction(directRoomAction.id);
                       }}
                     >
-                      {directRoomAction.type === 'FINISH_TUCKED_CHORE'
-                        ? '✓ Finish Chore'
-                        : directRoomAction.type === 'TIDY_BLOCKED'
-                          ? 'Unblock Room'
-                          : '✨ Tidy Room'}
+                      {directRoomAction.type === 'TIDY_BLOCKED' ? 'Unblock Room' : '✨ Tidy Room'}
                     </button>
                   )}
                 </div>
-
-                {room.tuckedChore && (
-                  <div
-                    className="tucked-chore-strip"
-                    title={`Tucked Chore: ${room.tuckedChore.title} — click to inspect`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onInspectCard({
-                        title: `Tucked: ${room.tuckedChore!.title}`,
-                        subtitle: 'Finish via Room Relay (teammate in row, column, or room)',
-                        frontImage: room.tuckedChore!.frontImage,
-                        backImage: SHARED_BACKS.chores,
-                      });
-                    }}
-                  >
-                    <img
-                      src={assetUrl(room.tuckedChore.frontImage)}
-                      alt={room.tuckedChore.title}
-                      className="tucked-chore-thumb"
-                    />
-                    <div className="tucked-chore-info">
-                      <span className="tucked-mini-tag">Tucked</span>
-                      <span className="tucked-chore-text">{room.tuckedChore.title}</span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           );
