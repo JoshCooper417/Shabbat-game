@@ -158,8 +158,8 @@ After **Mekimi** finishes her Event flip, the round ends:
 | Helper | Start Corner | Timing | Superpower |
 | :--- | :---: | :---: | :--- |
 | **Abba** | Top-Left | Your Turn & Always On | **Solo Cleanup (Your Turn):** Flip a Red Blocked room back to Clear all by yourself (1 Action, no teammate needed).<br>**Balagan Barrier (Always On):** While Abba stands in a Cluttered room, Slow-Downs cannot flip it Blocked (the hit is canceled!). |
-| **Mommy** | Bottom-Right | Your Turn | **Errand Express (Your Turn):** Once per turn, Pick Up **or** Deliver an Errand for **FREE** (does not cost an Action!), and you may Pick Up or Deliver Errands even in **Cluttered** rooms (not Blocked). |
-| **Nael** | Top-Right | Always On | **Learning Tower Power! (Always On):** While Nael and at least 1 teammate share a **Cluttered** room, either one can finish a **Team Chore** there (not Blocked). |
+| **Mommy** | Bottom-Right | Your Turn | **Errand Express (Your Turn):** Once per turn, Pick Up **or** Deliver an Errand for **FREE** (does not cost an Action — even with 0 Actions left!), and you may Pick Up or Deliver Errands even in **Cluttered** rooms (not Blocked). |
+| **Nael** | Top-Right | Always On | **Learning Tower Power! (Always On):** While Nael and at least 1 teammate share a **Cluttered** room, either one can finish a **Team Chore** there on either player's turn (not Blocked). |
 | **Mekimi** | Bottom-Left | Your Turn | **Turbo Crawl (Your Turn):** Whenever you spend 1 Action to Move, crawl straight into **ANY room** on the board! |
 
 ---
@@ -172,7 +172,7 @@ All modes use **9 Rooms** (3 boxed), **4 Helpers**, and **6 Tools** (**2** in Fa
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Beginner** *(First Game · Ages 6+)* | **10** (4 + 6 / 8 boxed) | **7** (6 + 1 / 3 boxed) | **1 room** *(Center)* | **17** *(box Time Flies)* | `53 + 19 = 72` |
 | **Standard** *(Balanced Family Play)* | **13** (4 + 9 / 5 boxed) | **6** (5 + 1 / 4 boxed) | **2 rooms** *(Top-Center & Bot-Center)* | **18** *(all)* | `56 + 16 = 72` |
-| **Hard** *(Expert Friday Rush)* | **15** (4 + 11 / 3 boxed) | **5** (4 + 1 / 5 boxed) | **2 rooms** *(Top-Center & Bot-Center)* | **18** *(all)* | `57 + 15 = 72` |
+| **Hard** *(Expert Friday Rush)* | **15** (4 + 11 / 3 boxed) | **6** (5 + 1 / 4 boxed) | **2 rooms** *(Top-Center & Bot-Center)* | **18** *(all)* | `58 + 14 = 72` |
 
 ---
 

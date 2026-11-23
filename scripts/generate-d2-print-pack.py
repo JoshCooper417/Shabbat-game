@@ -282,7 +282,7 @@ HELPERS_SPEC = [
         "bg": "#FDF2F8",
         "art_h": 425,
         "powers": [
-            ("Errand Express", "YOUR TURN", "Once per turn, Pick Up or Deliver an Errand for FREE (no Action spent). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked)."),
+            ("Errand Express", "YOUR TURN", "Once per turn, Pick Up or Deliver an Errand for FREE (no Action spent — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked)."),
         ],
         "flavor": "“Tracking 47 things in her head and already three steps ahead.”",
     },
@@ -293,7 +293,7 @@ HELPERS_SPEC = [
         "bg": "#ECFDF5",
         "art_h": 425,
         "powers": [
-            ("Learning Tower Power!", "ALWAYS ON", "While Nael and a teammate share a Cluttered room, either one can finish a Team Chore there (not Blocked)."),
+            ("Learning Tower Power!", "ALWAYS ON", "While Nael and a teammate share a Cluttered room, either one can finish a Team Chore there on either player's turn (not Blocked)."),
         ],
         "flavor": "“Messy room? Doesn't stop the sous-chef.”",
     },
@@ -1106,14 +1106,14 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <img src="{av_nael}" alt="Nael">
             <div>
               <h3>2. NAEL · Top-Right</h3>
-              <p><strong>Learning Tower Power! (Always On):</strong> While Nael and a teammate share a <strong>Cluttered</strong> room, either one can finish a <strong>Team Chore</strong> there (not Blocked).</p>
+              <p><strong>Learning Tower Power! (Always On):</strong> While Nael and a teammate share a <strong>Cluttered</strong> room, either one can finish a <strong>Team Chore</strong> there on either player's turn (not Blocked).</p>
             </div>
           </div>
           <div class="helper-row" style="--c:#DB2777;">
             <img src="{av_mommy}" alt="Mommy">
             <div>
               <h3>3. MOMMY · Bottom-Right</h3>
-              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (0 Actions). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms (not Blocked)!</p>
+              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (even with 0 Actions left!). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms (not Blocked)!</p>
             </div>
           </div>
           <div class="helper-row" style="--c:#7C3AED;">
@@ -1155,7 +1155,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
               <tr>
                 <td><strong>Hard</strong><br><span style="font-size:13.5px; color:#B91C1C; white-space:nowrap;">Friday Rush</span></td>
                 <td><strong>15</strong><br>(4+11 / 3 boxed)</td>
-                <td><strong>5</strong><br>(4+1 / 5 boxed)</td>
+                <td><strong>6</strong><br>(5+1 / 4 boxed)</td>
                 <td><strong>2 rooms</strong><br><em>Top &amp; Bot Center</em></td>
                 <td><strong>18</strong><br><em>All included</em></td>
               </tr>
@@ -1165,7 +1165,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <strong>72-Card Check:</strong><br>
             • Beginner: 53 active + 19 boxed = <strong>72 cards</strong><br>
             • Standard: 56 active + 16 boxed = <strong>72 cards</strong><br>
-            • Hard: 57 active + 15 boxed = <strong>72 cards</strong>
+            • Hard: 58 active + 14 boxed = <strong>72 cards</strong>
           </div>
           <div class="box-card">
             <strong>Family Tip:</strong> Play <strong>Beginner</strong> once so kids learn the flow (almost every family wins their first game!), then step up to <strong>Standard</strong> for thrilling final-round finishes!
@@ -1217,37 +1217,46 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         """),
 
         (16, "Tabletop Quick Reference", """
-          <div class="callout callout-blue" style="font-size:19.5px; text-align:center;">
+          <div class="callout callout-blue" style="font-size:19px; text-align:center; padding:12px 16px;">
             <strong>Turn Order:</strong> Abba → Nael → Mommy → Mekimi → <strong>Clock Flip!</strong><br>
             <strong>Every Turn:</strong> <strong>2 Actions</strong> (+ Free Handoff) → <strong>Flip 1 Event</strong>
           </div>
           <div class="grid-2">
-            <div class="box-card">
+            <div class="box-card" style="font-size:17px; padding:12px 14px;">
               <strong style="color:#1E3A8A;">4 Actions (Pick Any 2)</strong><br>
               • <strong>Move:</strong> 1 room straight<br>
               • <strong>Tidy:</strong> Cluttered (1) / Red (2 or Abba)<br>
-              • <strong>Chore:</strong> Team (2+) or Pick Up / Deliver Errand<br>
+              • <strong>Chore:</strong> Team (2+) or Errand<br>
               • <strong>Tool:</strong> Play from Toolbox
             </div>
-            <div class="box-card">
+            <div class="box-card" style="font-size:17px; padding:12px 14px;">
               <strong style="color:#B91C1C;">Slow-Downs (1 Rule!)</strong><br>
-              Scan matching zone L→R, T→B (skip Blocked):<br>
+              Scan matching zone L→R, T→B:<br>
               <strong>1st Cluttered → Blocked!</strong><br>
               Else <strong>1st Clear → Cluttered!</strong>
             </div>
           </div>
-          <div class="box-card">
-            <strong style="color:#047857;">Room States</strong> · <strong>Clear:</strong> Everything! · <strong>Cluttered:</strong> Move in/out, Tidy, Handoff, Tools (+ Nael Team / Mommy Errands) · <strong>Blocked:</strong> Move in/out, Unblock, Handoff, Tools only.
+          <div class="box-card" style="padding:10px 14px; font-size:16px; line-height:1.38;">
+            <strong style="color:#1E3A8A; display:block; margin-bottom:5px;">Room States Cheat Sheet (Keep Face-Up on Table!)</strong>
+            <div style="background:#ECFDF5; border-left:5px solid #059669; padding:5px 9px; border-radius:6px; margin-bottom:5px;">
+              <strong style="color:#065F46;">Clear (Upright):</strong> Everything works! Team Chores, Errands, Handoffs, Tools.
+            </div>
+            <div style="background:#FFFBEB; border-left:5px solid #D97706; padding:5px 9px; border-radius:6px; margin-bottom:5px;">
+              <strong style="color:#92400E;">Cluttered (Tilted):</strong> Walk, Tidy (1), Handoff, Tools. <em>(Team w/ Nael; Errands w/ Mommy.)</em>
+            </div>
+            <div style="background:#FEF2F2; border-left:5px solid #B91C1C; padding:5px 9px; border-radius:6px;">
+              <strong style="color:#991B1B;">Red Blocked (“Stuck”):</strong> Walk, Handoff, Tools only. Fix w/ <strong>2+ Helpers</strong> or <strong>Abba</strong>!
+            </div>
           </div>
-          <div class="box-card">
+          <div class="box-card" style="font-size:16.5px; padding:11px 14px; line-height:1.4;">
             <strong style="color:#B45309;">4 Family Superpowers</strong><br>
-            • <strong>Abba:</strong> Unblocks Red alone; his Cluttered room can't flip Red.<br>
-            • <strong>Nael:</strong> With teammate in Cluttered room, finish Team Chores.<br>
-            • <strong>Mommy:</strong> 1 Free Pick Up/Deliver per turn; Errands work in Cluttered.<br>
+            • <strong>Abba:</strong> Unblocks Red alone; his Cluttered room can't flip Red (canceled!).<br>
+            • <strong>Nael:</strong> With teammate in Cluttered room, either finishes Team Chores (any turn).<br>
+            • <strong>Mommy:</strong> 1 FREE Errand/turn (even at 0 Actions!); Errands work in Cluttered.<br>
             • <strong>Mekimi:</strong> Crawls straight into <strong>ANY room</strong> on any Move!
           </div>
-          <div class="box-card" style="font-size:17.5px; text-align:center;">
-            <strong>Modes:</strong> Beg <strong>10</strong> Chores / <strong>7</strong> Clock (no Time Flies) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>5</strong>
+          <div class="box-card" style="font-size:17px; text-align:center; padding:10px 14px;">
+            <strong>Modes:</strong> Beg <strong>10</strong> Chores / <strong>7</strong> Clock (no Time Flies) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>6</strong>
           </div>
         """),
     ]

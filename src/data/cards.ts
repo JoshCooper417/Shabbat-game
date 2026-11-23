@@ -123,7 +123,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Learning Tower Power!',
         timing: 'Always On',
-        text: 'While Nael and a teammate share a Cluttered room, either one can finish a Team Chore there (not Blocked).',
+        text: "While Nael and a teammate share a Cluttered room, either one can finish a Team Chore there on either player's turn (not Blocked).",
       },
     ],
   },
@@ -141,7 +141,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Errand Express',
         timing: 'Your Turn',
-        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (0 Actions). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
+        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (0 Actions — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
       },
     ],
   },
@@ -196,8 +196,8 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyId, DifficultyConfig> = {
     id: 'HARD',
     name: 'Hard',
     tagline: 'Expert Friday Rush',
-    clockLength: 5,
-    afternoonCards: 4,
+    clockLength: 6,
+    afternoonCards: 5,
     totalChores: 15,
     choreRowTarget: 4,
     choreDeckStart: 11,

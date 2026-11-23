@@ -77,27 +77,36 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
         })}
       </div>
 
-      {shieldCount > 0 && (
-        <button
-          type="button"
-          className="clock-shield-badge"
-          onClick={() =>
-            onInspectCard({
-              title: state.clockShields[0].title,
-              subtitle: `${shieldCount} active shield${shieldCount > 1 ? 's' : ''} guarding upcoming Clock flips (boxed once triggered)`,
-              frontImage: state.clockShields[0].frontImage,
-              backImage: SHARED_BACKS.eventsAndTools,
-            })
-          }
+      <div className="clock-strip-badges">
+        <span
+          className="clock-events-pill"
+          title={`${state.eventDeck.length} cards left in Friday Events Deck · ${state.eventDiscard.length} in Event Discard (reshuffles when empty)`}
         >
-          <img
-            src={assetUrl(state.clockShields[0].frontImage)}
-            alt="Cousin Aviel Drops By! shield"
-            className="clock-shield-thumb"
-          />
-          Shield Active: Cousin Aviel Drops By!{shieldCount > 1 ? ` ×${shieldCount}` : ''}
-        </button>
-      )}
+          Events: <strong>{state.eventDeck.length}</strong>
+        </span>
+
+        {shieldCount > 0 && (
+          <button
+            type="button"
+            className="clock-shield-badge"
+            onClick={() =>
+              onInspectCard({
+                title: state.clockShields[0].title,
+                subtitle: `${shieldCount} active shield${shieldCount > 1 ? 's' : ''} guarding upcoming Clock flips (boxed once triggered)`,
+                frontImage: state.clockShields[0].frontImage,
+                backImage: SHARED_BACKS.eventsAndTools,
+              })
+            }
+          >
+            <img
+              src={assetUrl(state.clockShields[0].frontImage)}
+              alt="Cousin Aviel Drops By! shield"
+              className="clock-shield-thumb"
+            />
+            Shield: Cousin Aviel{shieldCount > 1 ? ` ×${shieldCount}` : ''}
+          </button>
+        )}
+      </div>
     </section>
   );
 }

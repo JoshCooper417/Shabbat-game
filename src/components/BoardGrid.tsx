@@ -83,6 +83,22 @@ export function BoardGrid({
           <span className="playmat-legend">
             Upright = Clear · Tilted = Cluttered · Red = Blocked
           </span>
+          <details className="room-states-help">
+            <summary>? Room States</summary>
+            <div className="room-states-popover">
+              <div className="rs-row rs-clear">
+                <strong>Clear (Upright):</strong> Everything works! Team Chores, Errands, Handoffs, Tools.
+              </div>
+              <div className="rs-row rs-cluttered">
+                <strong>Cluttered (Tilted):</strong> Walk in/out, Tidy (1 Helper), Free Handoff, Tools.
+                <em> Team Chores need Nael; Errands need Mommy.</em>
+              </div>
+              <div className="rs-row rs-blocked">
+                <strong>Red Blocked (“Stuck”):</strong> Walk in/out, Free Handoff, Tools. No Chores or Errands!
+                <em> Fix with 2+ Helpers together (or Abba alone).</em>
+              </div>
+            </div>
+          </details>
         </div>
         <span className="playmat-prompt">{getBoardPrompt(state)}</span>
       </div>

@@ -38,7 +38,7 @@ describe('Preparing for Shabbat: Cooper Family Edition — D2* Rules Engine', ()
     }[] = [
       { diff: 'BEGINNER', clock: 7, row: 4, deck: 6, slow: 17, clutterSlots: [4], boxTimeFlies: true },
       { diff: 'STANDARD', clock: 6, row: 4, deck: 9, slow: 18, clutterSlots: [1, 7], boxTimeFlies: false },
-      { diff: 'HARD', clock: 5, row: 4, deck: 11, slow: 18, clutterSlots: [1, 7], boxTimeFlies: false },
+      { diff: 'HARD', clock: 6, row: 4, deck: 11, slow: 18, clutterSlots: [1, 7], boxTimeFlies: false },
     ];
 
     for (const tc of cases) {
