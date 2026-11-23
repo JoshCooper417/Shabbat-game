@@ -508,7 +508,7 @@ SLOW_DOWNS_SPEC = [
      "“Twenty picture books just materialized on the bedroom floor.”"),
     ("slowdown_60_bamba_trail.png", "DOUBLE", "Challah Flour Trail!", ["KITCHEN", "DOWNSTAIRS"],
      "“Started at the island, left tiny handprints on the couch.”"),
-    ("slowdown_61_whirlwind.png", "DOUBLE", "Upstairs-Downstairs Whirlwind!", ["TABLE", "UPSTAIRS"],
+    ("slowdown_61_whirlwind.png", "DOUBLE", "Table-to-Upstairs Whirlwind!", ["TABLE", "UPSTAIRS"],
      "“Two zones hit in one sweep.”"),
     ("slowdown_62_what_time.png", "TIME_FLIES", "“Wait—Shabbat Is at WHAT Time?!”", ["KITCHEN"],
      "“Winter Friday strikes again!”"),

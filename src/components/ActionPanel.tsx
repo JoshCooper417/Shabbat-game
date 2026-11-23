@@ -166,29 +166,58 @@ export function ActionPanel({
             {/* QUICK MOVE BUTTONS (mirrors clicking any blue-outlined room on the board) */}
             {state.actionsRemaining > 0 && legalMoves.length > 0 && (
               <div className="move-section-block">
-                <div className="move-section-header">
-                  <span className="move-section-title">
-                    {state.activeHelperId === 'MEKIMI'
-                      ? 'Turbo Crawl to Any Room (1 Action)'
-                      : 'Walk 1 Room (1 Action · not diagonal)'}
-                  </span>
-                  <span className="panel-hint">or click room on board</span>
-                </div>
-                <div className="move-quick-grid">
-                  {legalMoves.map((move) => (
-                    <button
-                      key={move.targetSlot}
-                      type="button"
-                      className="move-quick-btn"
-                      onClick={() => onMove(move.targetSlot)}
-                    >
-                      <span className="action-btn-label">
-                        {state.rooms[move.targetSlot].card.name}
+                {legalMoves.length > 4 ? (
+                  <>
+                    <div className="move-section-header">
+                      <span className="move-section-title">
+                        Turbo Crawl to Any Room (1 Action)
                       </span>
-                      <span className="action-btn-detail">{move.label}</span>
-                    </button>
-                  ))}
-                </div>
+                      <span className="panel-hint">Tap any room on the 3×3 House</span>
+                    </div>
+                    <details className="turbo-list-details">
+                      <summary>Or choose from room list ({legalMoves.length})</summary>
+                      <div className="move-quick-grid">
+                        {legalMoves.map((move) => (
+                          <button
+                            key={move.targetSlot}
+                            type="button"
+                            className="move-quick-btn"
+                            onClick={() => onMove(move.targetSlot)}
+                          >
+                            <span className="action-btn-label">
+                              {state.rooms[move.targetSlot].card.name}
+                            </span>
+                            <span className="action-btn-detail">{move.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </details>
+                  </>
+                ) : (
+                  <>
+                    <div className="move-section-header">
+                      <span className="move-section-title">
+                        Walk 1 Room (1 Action · not diagonal)
+                      </span>
+                      <span className="panel-hint">or tap room on board</span>
+                    </div>
+                    <div className="move-quick-grid">
+                      {legalMoves.map((move) => (
+                        <button
+                          key={move.targetSlot}
+                          type="button"
+                          className="move-quick-btn"
+                          onClick={() => onMove(move.targetSlot)}
+                        >
+                          <span className="action-btn-label">
+                            {state.rooms[move.targetSlot].card.name}
+                          </span>
+                          <span className="action-btn-detail">{move.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -331,7 +360,7 @@ export function ActionPanel({
               </div>
             </div>
             <button type="button" className="btn btn-gold" onClick={onFlipEvent}>
-              Flip 1 Event Card
+              Flip 1 Event Card <kbd className="kbd-hint">Space</kbd>
             </button>
           </div>
         </div>
@@ -382,7 +411,7 @@ export function ActionPanel({
           ) : (
             <div className="event-notes-list">
               {state.lastEvent.notes.map((note, idx) => (
-                <div key={idx} className="event-note-pill">
+                <div key={idx} className={`event-note-pill ${note.kind}`}>
                   {note.text}
                 </div>
               ))}
@@ -394,7 +423,8 @@ export function ActionPanel({
               ? state.clockShields.length > 0
                 ? `End Round ${state.round} (Cousin Aviel Shields Clock! · ${state.clockShields.length} Shield${state.clockShields.length > 1 ? 's' : ''})`
                 : `End Round ${state.round} & Flip Shabbat Clock`
-              : `Next Helper: ${nextHelperName} →`}
+              : `Next Helper: ${nextHelperName} →`}{' '}
+            <kbd className="kbd-hint">Space</kbd>
           </button>
         </div>
       )}

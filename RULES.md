@@ -58,7 +58,7 @@ Set up your table like this before Turn 1:
 3. **Shabbat Clock Deck (10 cards):**
    - **9 Friday Afternoon** cards + **1 Shabbat Begins!** card.
 4. **Friday Events & Tools Deck (28 cards, shared back):**
-   - **18 Slow-Downs:** 15 Single-Zone cards, 2 Double Trouble cards (*Challah Flour Trail!* Kitchen + Downstairs; *Upstairs-Downstairs Whirlwind!* Table + Upstairs), and 1 Time Flies card (*"Wait—Shabbat Is at WHAT Time?!"* — Clock flip + Kitchen).
+   - **18 Slow-Downs:** 15 Single-Zone cards, 2 Double Trouble cards (*Challah Flour Trail!* Kitchen + Downstairs; *Table-to-Upstairs Whirlwind!* Table + Upstairs), and 1 Time Flies card (*"Wait—Shabbat Is at WHAT Time?!"* — Clock flip + Kitchen).
    - **10 Household Tools:** 4 *Ice Coffee Boost*, 3 *Strategic Snack Summons*, and 3 *Cousin Aviel Drops By!*.
 
 ---
@@ -263,6 +263,6 @@ Exact inventory across 4 full 18-card TGC Poker sheets (`57` unique fronts, `16`
 | `#26, 34` | Errands: Upstairs → ... | Dressed Kids Downstairs—Keep 'Em Clean! (→ Downstairs) · Everyone in Shabbat Clothes! (→ Table) | 2 |
 | `#35–#44` | Household Tools (10) | Ice Coffee Boost (×4, Reusable) · Strategic Snack Summons (×3, Reusable) · Cousin Aviel Drops By! (×3, One-Time Shield) | 10 |
 | `#45–#59` | Single-Zone Slow-Downs | Kitchen (×3): `#45–47` · Downstairs (×4): `#48–51` · Table (×4): `#52–55` · Upstairs (×4): `#56–59` | 15 |
-| `#60–#62` | Special Slow-Downs (3) | `#60` Challah Flour Trail! (K+D) · `#61` Upstairs-Downstairs Whirlwind! (T+U) · `#62` "Wait—Shabbat Is at WHAT Time?!" (Clock + K, boxed) | 3 |
+| `#60–#62` | Special Slow-Downs (3) | `#60` Challah Flour Trail! (K+D) · `#61` Table-to-Upstairs Whirlwind! (T+U) · `#62` "Wait—Shabbat Is at WHAT Time?!" (Clock + K, boxed) | 3 |
 | `#63–#72` | Shabbat Clock (10) | Friday Afternoon (×9) · Shabbat Begins! (×1) | 10 |
 | **TOTAL** | **4 × 18-Card TGC Sheets** | **4 Helpers + 12 Rooms + 18 Chores + 10 Tools + 18 Slow-Downs + 10 Clock** | **72** |

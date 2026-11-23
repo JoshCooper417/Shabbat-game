@@ -70,9 +70,10 @@ img {
     radial-gradient(ellipse at 25% 0%, rgba(255, 244, 214, 0.22), transparent 55%),
     radial-gradient(ellipse at 50% 100%, rgba(56, 30, 8, 0.28), transparent 65%),
     var(--table-wood-url);
-  background-size: cover, cover, 1100px auto;
-  background-repeat: no-repeat, no-repeat, repeat;
-  background-attachment: scroll;
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-attachment: scroll, scroll, fixed;
 }
 
 /* ============================================================================
@@ -2956,4 +2957,482 @@ img {
     max-height: 56vh;
   }
 }
+
+/* ============================================================================
+   MOBILE-FIRST HUD, ACTIVE CHORE STRIP, STICKY BOTTOM DOCK & DESKTOP FIT
+   ============================================================================ */
+
+/* Topbar row wrapper for clean mobile drawer + desktop inline bar */
+.topbar-row-primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.topbar-mobile-quick {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Active Chores Quick-Strip (always visible on mobile & desktop!) */
+.active-chore-strip {
+  background: rgba(250, 244, 232, 0.94);
+  border: 1.5px solid #e2d4b7;
+  border-radius: 13px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 14px rgba(38, 21, 5, 0.18);
+  min-width: 0;
+}
+
+.active-chore-strip-label {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  line-height: 1.15;
+}
+
+.active-chore-strip-title {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--bg-navy);
+  white-space: nowrap;
+}
+
+.active-chore-strip-meta {
+  font-size: 0.67rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.active-chore-empty {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.active-chore-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+.chore-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffdf9;
+  border: 1.5px solid var(--border-warm);
+  border-radius: 10px;
+  padding: 5px 8px;
+  text-align: left;
+  min-width: 0;
+  transition: transform 0.12s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.chore-chip:hover {
+  border-color: var(--bg-navy);
+  transform: translateY(-1px);
+}
+
+.chore-chip.playable {
+  border-color: var(--teal);
+  background: #edf9f5;
+  box-shadow: 0 0 0 1.5px rgba(14, 124, 102, 0.25);
+}
+
+.chore-chip-zones {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.chore-zone-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 999px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.chore-zone-arrow {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--ink-muted);
+}
+
+.chore-team-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--bg-navy);
+  background: #e6ecf8;
+  border-radius: 999px;
+  padding: 2px 5px;
+  line-height: 1.1;
+}
+
+.chore-chip-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.chore-chip-go {
+  font-size: 0.63rem;
+  font-weight: 800;
+  color: #fff;
+  background: var(--teal);
+  border-radius: 999px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Collapsible Mekimi Turbo Crawl room list */
+.turbo-list-details {
+  margin-top: 6px;
+  background: rgba(255, 253, 248, 0.8);
+  border: 1px solid var(--border-warm);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.turbo-list-details summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--bg-navy);
+  user-select: none;
+}
+
+.turbo-list-details[open] summary {
+  margin-bottom: 8px;
+}
+
+/* Desktop Spacebar keycap hint */
+.kbd-hint {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: inherit;
+  margin-left: 4px;
+}
+
+/* Red Blocked Room: keep "ROOM BLOCKED" & rule text clear of 2-4 standing figurines */
+.room-blocked-cover .room-art-img {
+  object-position: center 30%;
+}
+
+.room-tile.blocked .figurines-stage {
+  bottom: 1px;
+}
+
+.room-tile.blocked .figurine-sprite {
+  height: 52px;
+}
+
+.room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
+  height: 42px;
+}
+
+/* Sticky Mobile Bottom Turn Dock (hidden on desktop) */
+.mobile-turn-dock {
+  display: none;
+}
+
+/* Desktop 1440x900 Above-the-Fold Fit */
+@media (min-width: 1061px) {
+  .topbar {
+    padding: 7px 16px;
+  }
+
+  .game-container {
+    padding: 8px 16px 28px;
+    gap: 8px;
+  }
+
+  .clock-strip {
+    padding: 6px 14px;
+    gap: 10px;
+  }
+
+  .clock-slot {
+    width: 38px;
+  }
+
+  .game-main-grid {
+    gap: 14px;
+  }
+
+  .board-column,
+  .control-column {
+    gap: 12px;
+  }
+
+  .linen-playmat {
+    padding: 10px 14px 12px;
+    gap: 8px;
+    outline-offset: -6px;
+  }
+
+  .house-grid {
+    gap: 8px 10px;
+    padding-top: 2px;
+  }
+
+  .room-slot-wrap {
+    padding: 2px;
+  }
+
+  .room-top-bar {
+    padding: 4px 7px;
+  }
+
+  .room-art-box,
+  .room-blocked-cover {
+    aspect-ratio: 16 / 9.2;
+  }
+
+  .room-footer {
+    padding: 5px 7px 6px;
+  }
+
+  .figurine-sprite {
+    height: 70px;
+  }
+
+  .figurine-piece.is-mekimi .figurine-sprite {
+    height: 54px;
+  }
+
+  .figurines-stage.crowd .figurine-sprite {
+    height: 56px;
+  }
+
+  .figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
+    height: 44px;
+  }
+}
+
+/* Tablet & Mobile (< 1060px): Sticky Bottom Turn Dock + Touch-First Scroll */
+@media (max-width: 1060px) {
+  .tabletop-surface {
+    background-attachment: scroll, scroll, scroll;
+  }
+
+  .kbd-hint {
+    display: none;
+  }
+
+  .game-container {
+    padding-bottom: 84px;
+  }
+
+  .active-chore-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 7px 9px;
+  }
+
+  .active-chore-strip-label {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .active-chore-chips {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+
+  .chore-chip {
+    flex: 0 0 auto;
+    max-width: 230px;
+    min-height: 40px;
+    scroll-snap-align: start;
+  }
+
+  .mobile-turn-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: rgba(250, 245, 234, 0.97);
+    backdrop-filter: blur(8px);
+    border-top: 2px solid var(--gold);
+    box-shadow: 0 -6px 20px rgba(15, 25, 54, 0.24);
+  }
+
+  .mobile-dock-helper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .mobile-dock-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid var(--helper-color, var(--bg-navy));
+    flex-shrink: 0;
+  }
+
+  .mobile-dock-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .mobile-dock-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--bg-navy);
+    line-height: 1.15;
+  }
+
+  .mobile-dock-meta {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--ink-secondary);
+    white-space: nowrap;
+  }
+
+  .mobile-dock-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .mobile-dock-cta .btn {
+    min-height: 38px;
+    padding: 6px 12px;
+  }
+}
+
+/* Compact Mobile-First Header Drawer (< 768px) */
+@media (max-width: 767px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 55;
+    padding: 6px 10px;
+    gap: 6px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbar-title {
+    font-size: 0.96rem;
+  }
+
+  .topbar-sub,
+  .stat-chip-desktop,
+  .nav-btn-desktop-undo {
+    display: none;
+  }
+
+  .topbar-brand {
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+
+  .topbar-mobile-quick {
+    display: flex;
+  }
+
+  .topbar-actions {
+    display: none;
+    width: 100%;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .topbar-actions.mobile-open {
+    display: grid;
+  }
+
+  .topbar-actions .nav-btn {
+    min-height: 38px;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .clock-strip {
+    padding: 7px 10px;
+    gap: 6px;
+  }
+
+  .clock-strip-head {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  .clock-strip-title {
+    font-size: 0.88rem;
+  }
+
+  .clock-strip-sub {
+    font-size: 0.7rem;
+  }
+
+  .room-tile.blocked .figurine-sprite {
+    height: 28px;
+  }
+
+  .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
+    height: 22px;
+  }
+}
+
 

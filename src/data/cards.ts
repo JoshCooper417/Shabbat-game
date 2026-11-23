@@ -750,7 +750,7 @@ export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
     id: 'SLOW_61',
     number: 61,
     kind: 'DOUBLE_TROUBLE',
-    title: 'Upstairs-Downstairs Whirlwind!',
+    title: 'Table-to-Upstairs Whirlwind!',
     zones: ['TABLE', 'UPSTAIRS'],
     rulesText:
       'Hit Table first, then Upstairs (left to right, top to bottom, skip Blocked): flip the 1st Cluttered room to Blocked, or if none are Cluttered, turn the 1st Clear room Cluttered!',
