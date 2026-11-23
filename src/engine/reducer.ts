@@ -40,7 +40,7 @@ function finalizeActionStep(state: GameState, actionNote: string): GameState {
     next = appendLog(
       next,
       'END',
-      `ALL CHORES COMPLETE! ${getHelperName(next.activeHelperId)} finished the final Chore — Shabbat Shalom!`,
+      `ALL MISSIONS COMPLETE! ${getHelperName(next.activeHelperId)} finished the final Mission — Shabbat Shalom!`,
       next.activeHelperId,
     );
     return {

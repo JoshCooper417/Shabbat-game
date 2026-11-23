@@ -47,22 +47,22 @@ export function StartScreen({
         </div>
 
         <div className="start-config">
-          <span className="start-kicker">Cooper Family Edition · v3 Simplified</span>
+          <span className="start-kicker">Cooper Family Edition</span>
           <h1 className="start-heading">Preparing for Shabbat</h1>
           <p className="start-lead">
-            Work together as <strong>Abba, Nael, Mommy, and Mekimi</strong> to finish every{' '}
-            <strong>Team Chore</strong> and <strong>Errand</strong> before{' '}
-            <strong>Shabbat Begins!</strong> flips on the Clock.
+            <strong>You may think you are just coming to play a game, but today we are Mommy, Abba, Nael, and Mekimi!</strong>{' '}
+            Work together to finish every <strong>Mission</strong> (<strong>Team Chores</strong> &amp;{' '}
+            <strong>Errands</strong>) before <strong>Shabbat Begins!</strong> flips on the Clock.
           </p>
 
           <div className="newcomer-strip" aria-label="How to play in 15 seconds">
             <div className="newcomer-item">
               <span className="newcomer-num">Goal</span>
-              <span>Finish all Team Chores &amp; Errands before sunset!</span>
+              <span>Finish all Missions (Team Chores &amp; Errands) before sunset!</span>
             </div>
             <div className="newcomer-item">
               <span className="newcomer-num">Turn</span>
-              <span>Take any 2 Actions (Walk, Tidy, Chore, Tool) → Flip 1 Event</span>
+              <span>Take any 2 Actions (Walk, Tidy, Mission, Tool) → Flip 1 Event</span>
             </div>
             <div className="newcomer-item">
               <span className="newcomer-num">Easy</span>
@@ -85,7 +85,7 @@ export function StartScreen({
                   <span className="diff-name">{cfg.name}</span>
                   <span className="diff-tagline">{cfg.tagline}</span>
                   <span className="diff-meta">
-                    {cfg.totalChores} Chores (4 face-up + {cfg.choreDeckStart} deck)
+                    {cfg.totalChores} Missions (4 face-up + {cfg.choreDeckStart} deck)
                     <br />
                     {cfg.clockLength} Clock · {cfg.startingClutterSlots.length} Clutter
                     {cfg.boxTimeFlies ? ' · No Time Flies' : ''}

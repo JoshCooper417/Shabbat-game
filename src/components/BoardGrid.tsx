@@ -49,7 +49,7 @@ function getBoardPrompt(state: GameState): string {
         : `Review the Event, then end Round ${state.round} & flip the Clock`
       : `Review the Event, then pass the turn after ${activeName}`;
   }
-  if (state.phase === 'WON') return 'Shabbat Shalom — all Chores complete!';
+  if (state.phase === 'WON') return 'Shabbat Shalom — all Missions complete!';
   return 'Shabbat Begins!';
 }
 
@@ -96,7 +96,7 @@ export function BoardGrid({
                 <em> Team Chores need Nael; Errands need Mommy.</em>
               </div>
               <div className="rs-row rs-blocked">
-                <strong>Red Blocked (“Stuck”):</strong> Walk in/out, Free Handoff, Tools. No Chores or Errands!
+                <strong>Red Blocked:</strong> Walk in/out, Free Handoff, Tools. No Team Chores or Errands!
                 <em> Fix with 2+ Helpers together (or Abba alone).</em>
               </div>
             </div>

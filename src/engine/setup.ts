@@ -148,7 +148,7 @@ export function createInitialGameState(options: SetupOptions = {}): GameState {
         round: 1,
         turn: 1,
         kind: 'SETUP',
-        message: `${cfg.name} game started (${cfg.totalChores} Chores, ${cfg.clockLength} Clock cards). Starting clutter: ${clutteredNames}.`,
+        message: `${cfg.name} game started (${cfg.totalChores} Missions, ${cfg.clockLength} Clock cards). Starting clutter: ${clutteredNames}.`,
       },
     ],
     nextLogId: 2,

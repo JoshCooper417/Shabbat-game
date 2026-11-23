@@ -33,19 +33,19 @@ export const TABLE_WOOD_IMAGE = 'assets/oak_tabletop.webp';
 
 export const BOOKLET_PAGES: readonly { page: number; title: string; image: string }[] = [
   { page: 1, title: 'Cover', image: 'assets/booklet/small_booklet_page_01.webp' },
-  { page: 2, title: '1. Goal & Key Basics', image: 'assets/booklet/small_booklet_page_02.webp' },
-  { page: 3, title: 'Table Layout Diagram', image: 'assets/booklet/small_booklet_page_03.webp' },
-  { page: 4, title: "2. What's in the Box", image: 'assets/booklet/small_booklet_page_04.webp' },
-  { page: 5, title: '3. Setup (Standard Mode)', image: 'assets/booklet/small_booklet_page_05.webp' },
-  { page: 6, title: '4. Players & Turn Order', image: 'assets/booklet/small_booklet_page_06.webp' },
-  { page: 7, title: '5. Actions: Move & Tidy', image: 'assets/booklet/small_booklet_page_07.webp' },
-  { page: 8, title: 'Room States: CAN & CANNOT', image: 'assets/booklet/small_booklet_page_08.webp' },
-  { page: 9, title: '6. Actions: Chores & Errands', image: 'assets/booklet/small_booklet_page_09.webp' },
-  { page: 10, title: '7. Actions: Household Tools', image: 'assets/booklet/small_booklet_page_10.webp' },
-  { page: 11, title: '8. Events & End of Round', image: 'assets/booklet/small_booklet_page_11.webp' },
-  { page: 12, title: '9. Meet the 4 Cooper Helpers', image: 'assets/booklet/small_booklet_page_12.webp' },
-  { page: 13, title: '10. Difficulty Modes', image: 'assets/booklet/small_booklet_page_13.webp' },
-  { page: 14, title: '11. Quick 1-Round Example', image: 'assets/booklet/small_booklet_page_14.webp' },
+  { page: 2, title: '1. Welcome, Goal & Players', image: 'assets/booklet/small_booklet_page_02.webp' },
+  { page: 3, title: "2. What's in the Box", image: 'assets/booklet/small_booklet_page_03.webp' },
+  { page: 4, title: '3. Setup (Standard Mode)', image: 'assets/booklet/small_booklet_page_04.webp' },
+  { page: 5, title: 'Table Layout Diagram', image: 'assets/booklet/small_booklet_page_05.webp' },
+  { page: 6, title: '4. Key Terms & Turn Flow', image: 'assets/booklet/small_booklet_page_06.webp' },
+  { page: 7, title: '5. The 4 Actions', image: 'assets/booklet/small_booklet_page_07.webp' },
+  { page: 8, title: '5. Actions: Do a Mission', image: 'assets/booklet/small_booklet_page_08.webp' },
+  { page: 9, title: '5. Actions: Household Tools', image: 'assets/booklet/small_booklet_page_09.webp' },
+  { page: 10, title: '6. Events & End of Round', image: 'assets/booklet/small_booklet_page_10.webp' },
+  { page: 11, title: '7. Meet the 4 Cooper Helpers', image: 'assets/booklet/small_booklet_page_11.webp' },
+  { page: 12, title: '8. Room States: CAN & CANNOT', image: 'assets/booklet/small_booklet_page_12.webp' },
+  { page: 13, title: '9. Difficulty Modes', image: 'assets/booklet/small_booklet_page_13.webp' },
+  { page: 14, title: '10. Quick 1-Round Example', image: 'assets/booklet/small_booklet_page_14.webp' },
   { page: 15, title: "Kid's First-Game Guide (6+)", image: 'assets/booklet/small_booklet_page_15.webp' },
   { page: 16, title: 'Tabletop Quick Reference', image: 'assets/booklet/small_booklet_page_16.webp' },
 ];
@@ -105,7 +105,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Balagan Barrier',
         timing: 'Always On',
-        text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!).",
+        text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!).",
       },
     ],
   },
@@ -141,7 +141,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Errand Express',
         timing: 'Your Turn',
-        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (no Action spent — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
+        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (in addition to your 2 Actions!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
       },
     ],
   },
@@ -742,7 +742,7 @@ export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
     title: 'Challah Flour Trail!',
     zones: ['KITCHEN', 'DOWNSTAIRS'],
     rulesText:
-      'Hit Kitchen first, then Downstairs (left to right, top to bottom, skip Blocked): flip the 1st Cluttered room to Blocked, or if none are Cluttered, turn the 1st Clear room Cluttered!',
+      'Double Slow-Down! Resolve a Kitchen Slow-Down first, then a Downstairs Slow-Down (for each zone, scan left to right, top to bottom: flip the 1st Cluttered room to Blocked, else turn the 1st Clear room Cluttered!).',
     flavor: '“Started at the island, left tiny handprints on the couch.”',
     frontImage: 'assets/cards/slowdown_60_bamba_trail.webp',
   },
@@ -753,7 +753,7 @@ export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
     title: 'Table-to-Upstairs Whirlwind!',
     zones: ['TABLE', 'UPSTAIRS'],
     rulesText:
-      'Hit Table first, then Upstairs (left to right, top to bottom, skip Blocked): flip the 1st Cluttered room to Blocked, or if none are Cluttered, turn the 1st Clear room Cluttered!',
+      'Double Slow-Down! Resolve a Table Slow-Down first, then an Upstairs Slow-Down (for each zone, scan left to right, top to bottom: flip the 1st Cluttered room to Blocked, else turn the 1st Clear room Cluttered!).',
     flavor: '“Two zones hit in one sweep.”',
     frontImage: 'assets/cards/slowdown_61_whirlwind.webp',
   },
@@ -765,7 +765,7 @@ export const SLOW_DOWN_DECK: readonly SlowDownCardDef[] = [
     kind: 'TIME_FLIES',
     title: '“Wait—Shabbat Is at WHAT Time?!”',
     rulesText:
-      '1. Flip the next Clock card (unless Cousin Aviel blocks it). 2. Hit Kitchen: flip 1st Cluttered to Blocked, else turn 1st Clear Cluttered. 3. Return this card to the box.',
+      '1. Flip the next Clock card (unless Cousin Aviel blocks it). 2. Resolve a Kitchen Slow-Down: flip the 1st Cluttered Kitchen to Blocked, else turn the 1st Clear Kitchen sideways. 3. Return this card to the box.',
     flavor: '“Winter Friday strikes again!”',
     frontImage: 'assets/cards/slowdown_62_what_time.webp',
   },
@@ -790,7 +790,7 @@ export const CLOCK_DECK: readonly ClockCard[] = [
 
 export interface GalleryItem {
   id: string;
-  category: 'Helpers' | 'Rooms' | 'Chores' | 'Tools' | 'Slow-Downs' | 'Clock' | 'Card Backs';
+  category: 'Helpers' | 'Rooms' | 'Missions' | 'Tools' | 'Slow-Downs' | 'Clock' | 'Card Backs';
   title: string;
   subtitle: string;
   qty: number;
@@ -819,7 +819,7 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
   })),
   ...CHORE_DECK.map((c) => ({
     id: `GAL_${c.id}`,
-    category: 'Chores' as const,
+    category: 'Missions' as const,
     title: c.title,
     subtitle:
       c.type === 'ERRAND' && c.endZone
@@ -864,8 +864,8 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
       s.kind === 'SINGLE_ZONE' && s.zone
         ? `${ZONE_META[s.zone].shortName} · Cluttered → Blocked, else Clear → Cluttered`
         : s.kind === 'DOUBLE_TROUBLE' && s.zones
-          ? `Double Trouble · ${ZONE_META[s.zones[0]].shortName} + ${ZONE_META[s.zones[1]].shortName}`
-          : 'Time Flies · +1 Clock Flip + Kitchen (then box)',
+          ? `Double Slow-Down · ${ZONE_META[s.zones[0]].shortName} + ${ZONE_META[s.zones[1]].shortName}`
+          : 'Time Flies · +1 Clock Flip + Kitchen Slow-Down (then box)',
     qty: 1,
     frontImage: s.frontImage,
     backImage: SHARED_BACKS.eventsAndTools,
@@ -883,7 +883,7 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
     id: 'GAL_CLOCK_SHABBAT',
     category: 'Clock',
     title: 'Shabbat Begins!',
-    subtitle: 'Placed rightmost · Finish all Chores before this flips!',
+    subtitle: 'Placed rightmost · Finish all Missions before this flips!',
     qty: 1,
     frontImage: 'assets/cards/clock_72_shabbat_begins_QTY1.webp',
     backImage: SHARED_BACKS.clock,
@@ -891,8 +891,8 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
   {
     id: 'GAL_BACK_CHORES',
     category: 'Card Backs',
-    title: 'Chores Deck Back',
-    subtitle: 'Shared back for all 18 Chore cards',
+    title: 'Missions Deck Back',
+    subtitle: 'Back for all 18 Mission cards',
     qty: 18,
     frontImage: SHARED_BACKS.chores,
   },
@@ -900,7 +900,7 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
     id: 'GAL_BACK_EVENTS',
     category: 'Card Backs',
     title: 'Friday Events & Tools Back',
-    subtitle: 'Shared back for all 18 Slow-Downs + 10 Tools',
+    subtitle: 'Back for all 18 Slow-Downs + 10 Tools',
     qty: 28,
     frontImage: SHARED_BACKS.eventsAndTools,
   },
@@ -908,7 +908,7 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
     id: 'GAL_BACK_HELPERS',
     category: 'Card Backs',
     title: 'Helper Cards Back',
-    subtitle: 'Shared back for all 4 Family Helper cards',
+    subtitle: 'Back for all 4 Family Helper cards',
     qty: 4,
     frontImage: SHARED_BACKS.helpers,
   },
@@ -916,7 +916,7 @@ export const GALLERY_ITEMS: readonly GalleryItem[] = [
     id: 'GAL_BACK_CLOCK',
     category: 'Card Backs',
     title: 'Shabbat Clock Back',
-    subtitle: 'Identical back for all 10 Clock cards',
+    subtitle: 'Back for all 10 Clock cards',
     qty: 10,
     frontImage: SHARED_BACKS.clock,
   },

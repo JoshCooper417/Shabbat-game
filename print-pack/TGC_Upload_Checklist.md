@@ -1,4 +1,4 @@
-# Preparing for Shabbat: Cooper Family Edition (v3 Simplified)
+# Preparing for Shabbat: Cooper Family Edition
 ## The Game Crafter (TGC) — Exact Upload & Order Checklist
 
 ### Game Components to Add in TGC Game Editor (Build 1 Game, Set Cart Quantity = 2)
@@ -10,7 +10,7 @@
    - **Upload Fronts in batches of <=25 PNGs from `01_Cards_Fronts/`:**
      - **4 Helpers** (`helper_01..04`): Qty = 1 each | Back From: Card → `02_Cards_Backs/back_SHARED_helpers.png`
      - **12 Rooms** (`room_05..16`): Qty = 1 each | Back From: Card → matching `02_Cards_Backs/back_room_XX_..._BLOCKED.png`
-     - **18 Chores** (`chore_17..34` — 10 Team Chores + 8 Errands): Qty = 1 each | Back From: Card → `02_Cards_Backs/back_SHARED_chores.png`
+     - **18 Missions** (`chore_17..34` — 10 Team Chores + 8 Errands): Qty = 1 each | Back From: Card → `02_Cards_Backs/back_SHARED_chores.png`
      - **Tool #35–38 Ice Coffee Boost:** Qty = 4 | Back From: Deck (shared Event Deck back)
      - **Tool #39–41 Strategic Snack Summons:** Qty = 3 | Back From: Deck (shared Event Deck back)
      - **Tool #42–44 Cousin Aviel Drops By!:** Qty = 3 | Back From: Deck (shared Event Deck back)
@@ -24,7 +24,7 @@
    - Upload: `03_Tuck_Box_90/PokerTuckBox90_FullBleed_2775x2100.png` (`2775×2100 px`, `300 DPI`, `RGB`)
    - Check TGC's live Proofing Overlay to confirm fold alignment.
 
-3. **SMALL BOOKLET (16 PAGES — v3 Simplified Edition)**
+3. **SMALL BOOKLET (16 PAGES)**
    - Upload all 16 PNGs in order from `04_Small_Booklet/` (`small_booklet_page_01.png` .. `small_booklet_page_16.png`).
    - 16 pages ≈ 3–4 cards thickness → 72 cards + booklet fit comfortably inside the 90-card Tuck Box!
 

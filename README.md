@@ -1,10 +1,10 @@
-# Preparing for Shabbat — Cooper Family Edition (v3 Simplified)
+# Preparing for Shabbat — Cooper Family Edition
 
 A 1–4 player cooperative family card game (**Ages 6+ · 15–20 Minutes**) built with 72 illustrated poker cards, 4 family Helpers (**Abba**, **Nael**, **Mommy**, **Mekimi**), 2-Action turns, and an interactive web app featuring all of the official artwork.
 
 ## Repository Contents
 
-- [`RULES.md`](RULES.md) — Complete, up-to-date v3 Simplified rules transcribed from the 16-page Small Booklet + full 72-card inventory.
+- [`RULES.md`](RULES.md) — Complete rules synced 1:1 verbatim with the 16-page Small Booklet and Official Family Rulebook Google Doc, plus the full 72-card inventory.
 - [`print-pack/`](print-pack/) — Original 300-DPI print-ready assets for The Game Crafter (TGC):
   - `01_Cards_Fronts/` — All card front PNGs (`825×1125` px full bleed)
   - `02_Cards_Backs/` — All 12 red Blocked room backs + 4 shared deck backs

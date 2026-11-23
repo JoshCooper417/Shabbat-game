@@ -35,18 +35,18 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
   return (
     <section
       className="table-cards-dock area-cards"
-      aria-label="Chore Row and Family Toolbox on the Table"
+      aria-label="Mission Row and Family Toolbox on the Table"
     >
-      {/* CHORE ROW (AUTO-REFILLS TO 4) + PHYSICAL CHORE DECK STACK */}
+      {/* MISSION ROW (AUTO-REFILLS TO 4) + PHYSICAL MISSION DECK STACK */}
       <div className="dock-section">
         <div className="panel-header-row">
-          <h2 className="panel-title">Chore Row ({state.choreRow.length}/4)</h2>
+          <h2 className="panel-title">Mission Row ({state.choreRow.length}/4)</h2>
           <div className="pile-summary-row">
             <span className="pile-pill done">
               ✓ Done <strong>{state.doneChores.length}/{cfg.totalChores}</strong>
             </span>
             <span className="pile-pill">
-              Chore Deck: <strong>{state.choreDeck.length}</strong>
+              Mission Deck: <strong>{state.choreDeck.length}</strong>
             </span>
           </div>
         </div>
@@ -55,19 +55,19 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
           {state.choreDeck.length > 0 && (
             <div
               className="deck-stack-slot"
-              title={`${state.choreDeck.length} face-down Chores in Chore Deck (auto-refills Chore Row to 4)`}
+              title={`${state.choreDeck.length} face-down Missions in Mission Deck (auto-refills Mission Row to 4)`}
             >
               <div className="physical-deck-stack">
-                <img src={assetUrl(SHARED_BACKS.chores)} alt="Chore Deck" />
+                <img src={assetUrl(SHARED_BACKS.chores)} alt="Mission Deck" />
                 <span className="deck-count-badge">{state.choreDeck.length}</span>
               </div>
-              <span className="deck-caption">Chore Deck</span>
+              <span className="deck-caption">Mission Deck</span>
             </div>
           )}
 
           {state.choreRow.length === 0 ? (
             <div className="panel-hint" style={{ alignSelf: 'center' }}>
-              Chore Row is empty! Deliver remaining carried Errands to win!
+              Mission Row is empty! Deliver remaining carried Errands to win!
             </div>
           ) : (
             <div className="dock-cards-scroll">
@@ -156,11 +156,11 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
         </div>
       </div>
 
-      {/* FAMILY TOOLBOX (SHARED, NO LIMIT!) */}
+      {/* FAMILY TOOLBOX */}
       <div className="tools-subbox toolbox-full">
         <div className="panel-header-row">
           <strong className="subbox-title">
-            Family Toolbox ({state.readyTools.length} Ready · No Limit)
+            Family Toolbox ({state.readyTools.length} Ready)
           </strong>
           <span className="panel-hint">1 Action · Reusable tools return to Event Discard</span>
         </div>

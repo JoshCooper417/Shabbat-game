@@ -27,14 +27,14 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
     } else if (isFirstActionEver) {
       heading = `Welcome! Take 2 Actions for ${active.name}`;
       summary =
-        'Finish all Chores together before Shabbat Begins! flips on the Clock above. Every turn: take 2 Actions (Walk, Tidy, Do a Chore, or Use a Tool — any order, repeats allowed!), then flip 1 Event card.';
+        'Finish all Missions together before Shabbat Begins! flips on the Clock above. Every turn: take 2 Actions (Walk, Tidy, Do a Mission, or Use a Tool — any order, repeats allowed!), then flip 1 Event card.';
     } else {
       const actionNum = 3 - state.actionsRemaining;
       heading = `Step 1 — Action ${actionNum} of 2 for ${active.name}`;
       summary =
         legal.length > 0
           ? 'Pick an action below, click a green “Play / Use” card on the table, or click a blue room on the board to move.'
-          : 'Click any blue-outlined room on the board (or a Move button below) to walk closer to a Chore or teammate.';
+          : 'Click any blue-outlined room on the board (or a Move button below) to walk closer to a Mission or teammate.';
     }
 
     // Lookahead 1-move opportunities when player still has actions left
@@ -85,7 +85,7 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
     // Superpower reminders
     if (state.activeHelperId === 'MOMMY' && !state.mommyFreeErrandUsed) {
       tips.push(
-        'Mommy’s Errand Express: your first Pick Up or Deliver this turn is FREE (0 Actions) and works even in tilted Cluttered rooms!',
+        'Mommy’s Errand Express: your first Pick Up or Deliver this turn is FREE (in addition to your 2 Actions!) and works even in tilted Cluttered rooms!',
       );
     } else if (state.activeHelperId === 'MEKIMI' && state.actionsRemaining > 0) {
       tips.push('Mekimi’s Turbo Crawl: 1 Move crawls straight to ANY room on the 3×3 board!');
@@ -95,7 +95,7 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
       );
     } else if (state.activeHelperId === 'ABBA') {
       tips.push(
-        'Abba’s Powers: Abba unblocks Red Blocked rooms alone (1 Action), and his room can’t flip Blocked while Cluttered.',
+        'Abba’s Powers: Abba unblocks Red Blocked rooms alone (1 Action), and his room can’t flip Blocked while Cluttered (the Slow-Down is canceled!).',
       );
     }
 

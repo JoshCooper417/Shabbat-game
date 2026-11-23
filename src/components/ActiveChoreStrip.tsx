@@ -25,9 +25,9 @@ export function ActiveChoreStrip({ state, onPlayAction, onInspectCard }: ActiveC
   }
 
   return (
-    <section className="active-chore-strip" aria-label="Active Chores Quick Reference">
+    <section className="active-chore-strip" aria-label="Active Missions Quick Reference">
       <div className="active-chore-strip-label">
-        <span className="active-chore-strip-title">Active Chores</span>
+        <span className="active-chore-strip-title">Active Missions</span>
         <span className="active-chore-strip-meta">
           {state.choreRow.length} up · {state.choreDeck.length} deck
         </span>
@@ -35,7 +35,7 @@ export function ActiveChoreStrip({ state, onPlayAction, onInspectCard }: ActiveC
 
       {state.choreRow.length === 0 ? (
         <span className="active-chore-empty">
-          Chore Row empty — deliver remaining carried Errands to win!
+          Mission Row empty — deliver remaining carried Errands to win!
         </span>
       ) : (
         <div className="active-chore-chips">

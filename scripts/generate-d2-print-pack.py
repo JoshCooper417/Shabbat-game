@@ -271,7 +271,7 @@ HELPERS_SPEC = [
         "art_h": 375,
         "powers": [
             ("Solo Cleanup", "YOUR TURN", "Flip a Red Blocked room you're in back to Clear all by yourself (1 Action — no teammate needed)."),
-            ("Balagan Barrier", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!)."),
+            ("Balagan Barrier", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!)."),
         ],
         "flavor": "“Flour on the counter? Fine. Total meltdown? Not on his watch.”",
     },
@@ -282,7 +282,7 @@ HELPERS_SPEC = [
         "bg": "#FDF2F8",
         "art_h": 425,
         "powers": [
-            ("Errand Express", "YOUR TURN", "Once per turn, Pick Up or Deliver an Errand for FREE (no Action spent — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked)."),
+            ("Errand Express", "YOUR TURN", "Once per turn, Pick Up or Deliver an Errand for FREE (in addition to your 2 Actions!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked)."),
         ],
         "flavor": "“Tracking 47 things in her head and already three steps ahead.”",
     },
@@ -391,14 +391,15 @@ def render_chore_html(c: tuple) -> str:
     title_size = 40 if len(title) > 28 else 44
 
     if kind == "TEAM":
-        left_pill = '<span class="pill" style="background:#7C3AED;">TEAM CHORE</span>'
-        right_pills = f'{zone_badge(z1)}<span class="zone-badge" style="background:#7C3AED;">{PEOPLE_ICON}<span>2+</span></span>'
+        left_pill = f'<span class="pill" style="background:#1E293B; color:#FFFFFF;">{PEOPLE_ICON}<span>TEAM CHORE</span></span>'
+        right_pills = f'{zone_badge(z1)}<span class="zone-badge" style="background:#FFFFFF; color:#0F172A; border:2.5px solid #1E293B;">{PEOPLE_ICON}<span>2+</span></span>'
         rules = (
             f"With <strong>2 or more Helpers</strong> in a Clear <strong>{zone_room_phrase(z1)}</strong> "
             f"(or Cluttered if <strong>Nael</strong> is here), spend <strong>1 Action</strong> to finish this together!"
         )
     else:
-        left_pill = '<span class="pill" style="background:#0369A1;">ERRAND</span>'
+        arrow_icon = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>'
+        left_pill = f'<span class="pill" style="background:#FFFFFF; color:#0F172A; border:3px solid #1E293B;">{arrow_icon}<span>ERRAND</span></span>'
         right_pills = f'{zone_badge(z1)}<span class="arrow-sep">→</span>{zone_badge(z2)}'
         rules = (
             f"<strong>1 Action:</strong> Pick Up in a Clear <strong>{zone_room_phrase(z1)}</strong>, then "
@@ -533,16 +534,16 @@ def render_slowdown_html(s: tuple) -> str:
         left_pill = '<span class="pill" style="background:#991B1B;">DOUBLE TROUBLE</span>'
         right_pills = f'{zone_badge(z1)}<span class="plus-sep">+</span>{zone_badge(z2)}'
         rules = (
-            f"Hit <strong>{ZONES[z1]['name']}</strong> first, then <strong>{ZONES[z2]['name']}</strong> "
-            f"(left to right, top to bottom, skip Blocked): flip the <strong>1st Cluttered</strong> room to "
-            f"<strong>Blocked</strong>, or if none are Cluttered, turn the <strong>1st Clear</strong> room <strong>Cluttered</strong>!"
+            f"<strong>Double Slow-Down!</strong> Resolve a <strong>{ZONES[z1]['name']}</strong> Slow-Down first, "
+            f"then a <strong>{ZONES[z2]['name']}</strong> Slow-Down <em>(for each zone, scan left to right, top to bottom: "
+            f"flip the 1st Cluttered room to Blocked, else turn the 1st Clear room Cluttered!)</em>"
         )
     else:
         left_pill = '<span class="pill" style="background:#9A3412;">TIME FLIES!</span>'
         right_pills = f'<span class="zone-badge" style="background:#D97706;">{CLOCK_ICON}<span>+1 FLIP</span></span>{zone_badge("KITCHEN")}'
         rules = (
             "<strong>1.</strong> Flip the next Clock card (unless Cousin Aviel blocks it).<br>"
-            "<strong>2.</strong> Hit <strong>Kitchen</strong>: flip 1st Cluttered to Blocked, else turn 1st Clear Cluttered.<br>"
+            "<strong>2.</strong> Resolve a <strong>Kitchen</strong> Slow-Down: flip the 1st Cluttered Kitchen to Blocked, else turn the 1st Clear Kitchen sideways.<br>"
             "<strong>3.</strong> Return this card to the box."
         )
 
@@ -768,7 +769,29 @@ def build_booklet_pages() -> list[tuple[int, str]]:
     av_nael = avatar_data_uri("nael")
     av_mekimi = avatar_data_uri("mekimi")
 
-    # Page 3: Visual Bird's-Eye Table Layout Diagram (directly resolves Josh's comment #18!)
+    # 4-Zone Visual Legend Strip (Page 3 — pairs each Zone's color + icon!)
+    zone_legend_html = """
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
+      <div style="display:flex; align-items:center; gap:9px; background:#FEF3C7; border:2px solid #D97706; border-radius:12px; padding:7px 11px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#D97706; color:#FFF; flex-shrink:0;">""" + ZONES["KITCHEN"]["icon"] + """</span>
+        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#92400E;">Kitchen</strong><br><span style="font-size:14px; color:#78350F;">Orange · Chef's Hat</span></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:9px; background:#CCFBF1; border:2px solid #0D9488; border-radius:12px; padding:7px 11px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#0D9488; color:#FFF; flex-shrink:0;">""" + ZONES["DOWNSTAIRS"]["icon"] + """</span>
+        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#115E59;">Downstairs Balagan</strong><br><span style="font-size:14px; color:#0F766E;">Teal · Toy Blocks</span></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:9px; background:#DBEAFE; border:2px solid #2563EB; border-radius:12px; padding:7px 11px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#2563EB; color:#FFF; flex-shrink:0;">""" + ZONES["TABLE"]["icon"] + """</span>
+        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#1E40AF;">Table</strong><br><span style="font-size:14px; color:#1E3A8A;">Blue · Shabbat Candles</span></div>
+      </div>
+      <div style="display:flex; align-items:center; gap:9px; background:#F3E8FF; border:2px solid #7C3AED; border-radius:12px; padding:7px 11px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#7C3AED; color:#FFF; flex-shrink:0;">""" + ZONES["UPSTAIRS"]["icon"] + """</span>
+        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#6B21A8;">Upstairs</strong><br><span style="font-size:14px; color:#5B21B6;">Purple · Stairs &amp; Star</span></div>
+      </div>
+    </div>
+    """
+
+    # Page 5: Bird's-Eye Table Layout Diagram (Standard Mode — faces Setup Page 4! Zero forward refs, zero Beg. clutter, neutral Mission cards!)
     diagram_svg = """
     <svg viewBox="0 0 673 730" width="673" height="730" xmlns="http://www.w3.org/2000/svg" style="display:block;">
       <!-- Clock Strip -->
@@ -789,19 +812,19 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         <text x="580" y="26" text-anchor="middle" font-size="12.5" font-weight="800" fill="#FDE047">SHABBAT BEGINS!</text>
       </g>
 
-      <!-- Left Column: Chores & Events -->
-      <rect x="0" y="110" width="235" height="236" rx="16" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.5"/>
-      <text x="14" y="135" font-size="15.5" font-weight="800" fill="#1E3A8A">CHORE ROW (4 face-up)</text>
-      <rect x="14" y="148" width="98" height="60" rx="8" fill="#FFF" stroke="#7C3AED" stroke-width="2"/>
-      <text x="63" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#5B21B6">Chore 1</text>
-      <rect x="122" y="148" width="98" height="60" rx="8" fill="#FFF" stroke="#0369A1" stroke-width="2"/>
-      <text x="171" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#0369A1">Chore 2</text>
-      <rect x="14" y="218" width="98" height="60" rx="8" fill="#FFF" stroke="#7C3AED" stroke-width="2"/>
-      <text x="63" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#5B21B6">Chore 3</text>
-      <rect x="122" y="218" width="98" height="60" rx="8" fill="#FFF" stroke="#0369A1" stroke-width="2"/>
-      <text x="171" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#0369A1">Chore 4</text>
-      <rect x="14" y="290" width="98" height="42" rx="8" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.8"/>
-      <text x="63" y="316" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1E3A8A">Chore Deck</text>
+      <!-- Left Column: Missions & Events (neutral slate borders on Mission cards!) -->
+      <rect x="0" y="110" width="235" height="236" rx="16" fill="#F8FAFC" stroke="#334155" stroke-width="2.5"/>
+      <text x="14" y="135" font-size="15" font-weight="800" fill="#0F172A">MISSION ROW (4 face-up)</text>
+      <rect x="14" y="148" width="98" height="60" rx="8" fill="#FFF" stroke="#334155" stroke-width="2"/>
+      <text x="63" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Mission 1</text>
+      <rect x="122" y="148" width="98" height="60" rx="8" fill="#FFF" stroke="#334155" stroke-width="2"/>
+      <text x="171" y="182" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Mission 2</text>
+      <rect x="14" y="218" width="98" height="60" rx="8" fill="#FFF" stroke="#334155" stroke-width="2"/>
+      <text x="63" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Mission 3</text>
+      <rect x="122" y="218" width="98" height="60" rx="8" fill="#FFF" stroke="#334155" stroke-width="2"/>
+      <text x="171" y="252" text-anchor="middle" font-size="13" font-weight="700" fill="#1E293B">Mission 4</text>
+      <rect x="14" y="290" width="98" height="42" rx="8" fill="#E2E8F0" stroke="#475569" stroke-width="1.8"/>
+      <text x="63" y="316" text-anchor="middle" font-size="12" font-weight="700" fill="#0F172A">Mission Deck</text>
       <rect x="122" y="290" width="98" height="42" rx="8" fill="#DCFCE7" stroke="#059669" stroke-width="1.8"/>
       <text x="171" y="316" text-anchor="middle" font-size="12.5" font-weight="700" fill="#065F46">Done Pile</text>
 
@@ -820,7 +843,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
       <rect x="122" y="496" width="98" height="62" rx="8" fill="#FFF" stroke="#0F766E" stroke-width="2"/>
       <text x="171" y="532" text-anchor="middle" font-size="13" font-weight="700" fill="#0F766E">Tool 2</text>
 
-      <!-- Right Column: 3x3 House -->
+      <!-- Right Column: 3x3 House (Standard Mode: Top-Center & Bottom-Center sideways, all other 7 Clear!) -->
       <rect x="253" y="110" width="420" height="466" rx="18" fill="#FFFBEB" stroke="#B45309" stroke-width="2.5"/>
       <text x="272" y="138" font-size="17" font-weight="800" fill="#78350F">THE 3×3 HOUSE (9 Room Cards)</text>
       <!-- Row 1 -->
@@ -839,12 +862,11 @@ def build_booklet_pages() -> list[tuple[int, str]]:
       <circle cx="596" cy="232" r="24" fill="#059669"/>
       <text x="596" y="237" text-anchor="middle" font-size="13" font-weight="800" fill="#FFF">NAEL</text>
 
-      <!-- Row 2 -->
+      <!-- Row 2 (All 3 upright Clear Rooms!) -->
       <rect x="272" y="294" width="116" height="122" rx="12" fill="#F3E8FF" stroke="#7C3AED" stroke-width="2.5"/>
       <text x="330" y="360" text-anchor="middle" font-size="14" font-weight="700" fill="#6B21A8">Clear Room</text>
       <rect x="405" y="294" width="116" height="122" rx="12" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5"/>
-      <text x="463" y="352" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">Center</text>
-      <text x="463" y="372" text-anchor="middle" font-size="12" font-weight="600" fill="#B45309">(Beg. clutter)</text>
+      <text x="463" y="360" text-anchor="middle" font-size="14" font-weight="700" fill="#92400E">Clear Room</text>
       <rect x="538" y="294" width="116" height="122" rx="12" fill="#CCFBF1" stroke="#0D9488" stroke-width="2.5"/>
       <text x="596" y="360" text-anchor="middle" font-size="14" font-weight="700" fill="#115E59">Clear Room</text>
 
@@ -864,141 +886,251 @@ def build_booklet_pages() -> list[tuple[int, str]]:
       <circle cx="596" cy="508" r="24" fill="#DB2777"/>
       <text x="596" y="513" text-anchor="middle" font-size="11.5" font-weight="800" fill="#FFF">MOMMY</text>
 
-      <!-- Bottom: Helper Power Cards -->
+      <!-- Bottom: Helper Power Cards (zero premature superpower spoilers!) -->
       <rect x="0" y="596" width="673" height="118" rx="16" fill="#F8FAFC" stroke="#64748B" stroke-width="2.2"/>
-      <text x="16" y="622" font-size="16" font-weight="800" fill="#334155">HELPER POWER CARDS (face-up by players — place carried Errands here!)</text>
+      <text x="16" y="622" font-size="16" font-weight="800" fill="#334155">HELPER POWER CARDS (face-up in front of their players)</text>
       <g transform="translate(16, 634)">
         <rect x="0" y="0" width="150" height="64" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2.2"/>
         <text x="75" y="28" text-anchor="middle" font-size="16" font-weight="800" fill="#2563EB">1. ABBA</text>
-        <text x="75" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Unblocks + Barrier</text>
+        <text x="75" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Starts Top-Left</text>
 
         <rect x="163" y="0" width="150" height="64" rx="10" fill="#ECFDF5" stroke="#059669" stroke-width="2.2"/>
         <text x="238" y="28" text-anchor="middle" font-size="16" font-weight="800" fill="#059669">2. NAEL</text>
-        <text x="238" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Cluttered Team</text>
+        <text x="238" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Starts Top-Right</text>
 
         <rect x="326" y="0" width="150" height="64" rx="10" fill="#FDF2F8" stroke="#DB2777" stroke-width="2.2"/>
         <text x="401" y="28" text-anchor="middle" font-size="16" font-weight="800" fill="#DB2777">3. MOMMY</text>
-        <text x="401" y="49" text-anchor="middle" font-size="12.5" fill="#334155">1 Free Errand/Turn</text>
+        <text x="401" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Starts Bot-Right</text>
 
         <rect x="489" y="0" width="152" height="64" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2.2"/>
         <text x="565" y="28" text-anchor="middle" font-size="16" font-weight="800" fill="#7C3AED">4. MEKIMI</text>
-        <text x="565" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Crawl Anywhere!</text>
+        <text x="565" y="49" text-anchor="middle" font-size="12.5" fill="#334155">Starts Bot-Left</text>
       </g>
     </svg>
     """
 
     pages = [
-        (2, "1. Goal & Key Basics", """
-          <p>Work together as a family to finish all <strong>Game Chores</strong> before <strong>Shabbat Begins!</strong> flips face-up on the <strong>Shabbat Clock</strong>.</p>
+        # PAGE 2: Welcome, Goal & Choosing Helpers (Strictly Zero Forward References!)
+        (2, "1. Welcome, Goal &amp; Players", """
+          <p style="font-size:20.5px; color:#1E3A8A;"><strong>You may think you are just coming to play a game, but today we are Mommy, Abba, Nael, and Mekimi!</strong></p>
+          <p>Work together as a family to finish every <strong>Mission</strong> before <strong>Shabbat Begins!</strong> flips face-up on the <strong>Shabbat Clock</strong>.</p>
           <div class="callout">
-            <strong>Win Right Away:</strong> The instant the final Chore enters the <strong>Done Pile</strong> (Chore Row, Chore Deck, and all carried Errands are empty), <strong>Shabbat Shalom—you win!</strong> Skip the Event flip and Clock flip.<br>
-            <strong>Lose Right Away:</strong> If <strong>Shabbat Begins!</strong> flips face-up before all Chores are done, stop right away and try again!
+            <strong>Win Right Away:</strong> The instant your family finishes the final Mission, <strong>Shabbat Shalom—the game ends immediately and you win!</strong><br>
+            <strong>Lose Right Away:</strong> If <strong>Shabbat Begins!</strong> flips face-up before all Missions are done, stop right away and try again!
           </div>
-          <h2>Key Basics</h2>
-          <ul>
-            <li><strong>3D Helpers vs. Helper Cards:</strong> Your <strong>4 3D-Printed Family Helpers</strong> move on top of the 3×3 Room cards. Your <strong>4 Helper Power Cards</strong> stay face-up in front of players to show powers and hold carried Errands. <em>(Any number of Helpers may share a room!)</em></li>
-            <li><strong>Room States:</strong> Every Room card is <strong>Clear</strong> (upright), <strong>Cluttered</strong> (sideways), or <strong>Blocked</strong> (flipped to its shaded red side—the zone icon stays visible).</li>
-            <li><strong>Next-Door Room:</strong> Straight up, down, left, or right (<strong>not diagonal</strong>).</li>
-            <li><strong>Matching Room:</strong> Match the color and icon! Any orange Kitchen Chore works on any orange Kitchen room.</li>
-            <li><strong>Clock Flip:</strong> Flip the leftmost face-down Clock card face-up.</li>
-            <li><strong>Table Talk:</strong> Discuss freely! The player controlling the active Helper makes the final call.</li>
+          <p style="font-size:19.5px;"><strong>Table Talk:</strong> This is a collaborative game so discuss freely! The player taking the current turn makes the final call.</p>
+          <div class="callout callout-blue" style="text-align:center; font-size:20.5px; padding:11px 14px;">
+            <strong>Clockwise Turn Order (Every Game):</strong><br>
+            <span style="color:#2563EB; font-weight:800;">1. Abba</span> →
+            <span style="color:#059669; font-weight:800;">2. Nael</span> →
+            <span style="color:#DB2777; font-weight:800;">3. Mommy</span> →
+            <span style="color:#7C3AED; font-weight:800;">4. Mekimi</span>
+          </div>
+          <h2>Choosing Helpers (1–4 Players)</h2>
+          <p style="font-size:18.5px;">All 4 Helpers always play in every game. Pick whoever you want—let the youngest player pick first, choose freely, or deal them randomly:</p>
+          <ul style="gap:6px;">
+            <li style="font-size:18.5px;"><strong>4 Players:</strong> Each player controls 1 Helper.</li>
+            <li style="font-size:18.5px;"><strong>3 Players:</strong> One player controls 2 Helpers (for example, Abba &amp; Mekimi); the other two control 1 each.</li>
+            <li style="font-size:18.5px;"><strong>2 Players:</strong> Player 1 controls <strong>Abba &amp; Mommy</strong> (turns 1 &amp; 3); Player 2 controls <strong>Nael &amp; Mekimi</strong> (turns 2 &amp; 4) to alternate every turn!</li>
+            <li style="font-size:18.5px;"><strong>1 Player (Solo):</strong> Control all 4 Helpers in order.</li>
           </ul>
         """),
 
-        (3, "Table Layout (Standard Mode)", f"""
-          <p style="font-size:18.5px; color:#475569;">Set up your table like this before Turn 1 (see Page 5 for step-by-step setup):</p>
-          {diagram_svg}
-        """),
-
-        (4, "2. What's in the Box (72 Cards)", """
-          <p>Everything fits in <strong>72 poker-size cards</strong> plus your <strong>4 3D-Printed Family Helpers</strong>—no dice, tokens, or scorepads needed!</p>
-          <div class="box-card">
-            <h2 style="margin-top:0;">Rooms &amp; Helpers (16 cards)</h2>
-            <ul>
-              <li><strong>12 Double-Sided Room Cards:</strong> 3 each of <strong>Kitchen</strong> (orange), <strong>Downstairs Balagan</strong> (teal), <strong>Table</strong> (blue), and <strong>Upstairs</strong> (purple). Clear front, red <strong>Blocked</strong> back.</li>
-              <li><strong>4 Helper Power Cards:</strong> <strong>Abba</strong>, <strong>Mommy</strong>, <strong>Nael</strong>, and <strong>Mekimi</strong>.</li>
+        # PAGE 3: What's in the Box (Purely Physical Inventory + 4-Zone Visual Legend!)
+        (3, "2. What's in the Box (72 Cards)", f"""
+          <p style="font-size:19.5px;">Everything fits in <strong>72 poker-size cards</strong> plus your <strong>4 3D-Printed Family Helpers</strong>:</p>
+          <div class="box-card" style="padding:11px 14px;">
+            <h2 style="margin-top:0; font-size:20.5px;">Rooms &amp; Helpers (16 cards)</h2>
+            <ul style="gap:5px;">
+              <li style="font-size:18.5px;"><strong>12 Double-Sided Room Cards:</strong> 3 rooms in each of the 4 House Zones—an illustrated room scene on the front and a red-striped <strong>Blocked</strong> side on the back (the Zone badge stays visible on both sides).</li>
+              <li style="font-size:18.5px;"><strong>4 Helper Power Cards:</strong> <strong>Abba</strong>, <strong>Nael</strong>, <strong>Mommy</strong>, and <strong>Mekimi</strong> (matching your 4 3D-Printed Family Helpers).</li>
+            </ul>
+            {zone_legend_html}
+          </div>
+          <div class="box-card" style="padding:11px 14px;">
+            <h2 style="margin-top:0; font-size:20.5px;">Missions Deck (18 cards)</h2>
+            <ul style="gap:5px;">
+              <li style="font-size:18.5px;"><strong>10 Team Chores</strong> (marked <strong>TEAM CHORE · 2+</strong>)</li>
+              <li style="font-size:18.5px;"><strong>8 Errands</strong> (marked <strong>ERRAND · Start → End</strong>)</li>
             </ul>
           </div>
-          <div class="box-card">
-            <h2 style="margin-top:0;">Chores Deck (18 cards)</h2>
-            <ul>
-              <li><strong>10 Team Chores:</strong> Finish together with <strong>2+ Helpers</strong> in a matching Clear room.</li>
-              <li><strong>8 Errands:</strong> Shows <strong>Start → End</strong>. Pick up at Start, carry on your Helper card, and deliver to End.</li>
-            </ul>
-          </div>
-          <div class="box-card">
-            <h2 style="margin-top:0;">Shabbat Clock (10) &amp; Events/Tools (28, shared back)</h2>
-            <ul>
-              <li><strong>10 Clock Cards:</strong> 9 <em>Friday Afternoon</em> + 1 <em>Shabbat Begins!</em></li>
-              <li><strong>18 Slow-Downs:</strong> 15 Single-Zone, 2 Double Trouble, and 1 Time Flies (<em>“Wait—Shabbat Is at WHAT Time?!”</em>).</li>
-              <li><strong>10 Household Tools:</strong> 4 <em>Ice Coffee Boost</em>, 3 <em>Strategic Snack Summons</em>, and 3 <em>Cousin Aviel Drops By!</em></li>
+          <div class="box-card" style="padding:11px 14px;">
+            <h2 style="margin-top:0; font-size:20.5px;">Shabbat Clock (10) &amp; Friday Events (28)</h2>
+            <ul style="gap:5px;">
+              <li style="font-size:18.5px;"><strong>10 Clock Cards:</strong> 9 <em>Friday Afternoon</em> + 1 <em>Shabbat Begins!</em></li>
+              <li style="font-size:18.5px;"><strong>18 Slow-Downs:</strong> 15 Single-Zone, 2 Double Trouble, and 1 Time Flies.</li>
+              <li style="font-size:18.5px;"><strong>10 Household Tools:</strong> 4 <em>Ice Coffee Boost</em>, 3 <em>Strategic Snack Summons</em>, and 3 <em>Cousin Aviel Drops By!</em></li>
             </ul>
           </div>
         """),
 
-        (5, "3. Setup (Standard Mode)", """
-          <p style="font-size:19px; color:#475569;"><em>First game? Check Page 13 for Beginner Mode!</em></p>
-          <ol>
-            <li><strong>Build the 3×3 House:</strong> Shuffle the 12 Room cards and deal <strong>9</strong> upright (Clear) in a 3×3 grid with a small gap between cards. Make sure all 4 zone colors appear—if one is missing, swap the <strong>bottom-right room</strong> for a boxed room of that color. Box the 3 unused rooms.</li>
-            <li><strong>Starting Clutter:</strong> Turn the <strong>Top-Center</strong> and <strong>Bottom-Center</strong> rooms sideways (<strong>Cluttered</strong>). All 4 corners start Clear!</li>
-            <li><strong>Place the 4 Helpers:</strong> Set the 3D Helpers in the 4 corners: <strong>Top-Left:</strong> Abba · <strong>Top-Right:</strong> Nael · <strong>Bottom-Left:</strong> Mekimi · <strong>Bottom-Right:</strong> Mommy. Put all 4 Helper Power Cards face-up near the players.</li>
-            <li><strong>Deal the Chores:</strong> Shuffle all 18 Chores once and deal <strong>13</strong> (box the other 5 unseen). Flip <strong>4 face-up</strong> into the <strong>Chore Row</strong> and stack <strong>9 face-down</strong> as the <strong>Chore Deck</strong>. Leave space for the <strong>Done Pile</strong>.</li>
-            <li><strong>Build the Shabbat Clock:</strong> Place <strong>5 Friday Afternoon</strong> cards face-down left to right, with <strong>Shabbat Begins!</strong> face-down on the far right (6 total; box the other 4).</li>
-            <li><strong>Tools &amp; Event Deck:</strong> Shuffle all 10 Tools face-down: put <strong>2 face-up</strong> in the <strong>Family Toolbox</strong> (no limit), shuffle <strong>4</strong> with <strong>all 18 Slow-Downs</strong> face-down to form the <strong>Event Deck</strong> (22 cards), and box 4 Tools unseen. Leave room for <strong>one Event Discard Pile</strong>.</li>
+        # PAGE 4: Setup (Standard Mode) — Faces Table Layout Page 5!
+        (4, "3. Setup (Standard Mode)", """
+          <p style="font-size:18.5px; color:#475569;"><em>First game? Check Page 13 for Beginner Mode! See the diagram on Page 5 as you set up.</em></p>
+          <ol style="gap:10px;">
+            <li style="font-size:19px;"><strong>Build the 3×3 House:</strong> Shuffle the 12 Room cards, deal <strong>9</strong> bright-side upright (<strong>Clear</strong>) in a 3×3 grid with a small gap between cards, and set the other 3 aside. Make sure all 4 House Zones appear—if a zone is missing, swap the <strong>bottom-right room</strong> for a <strong>random</strong> set-aside room of that zone. Return the 3 unused rooms to the box.</li>
+            <li style="font-size:19px;"><strong>Starting Clutter:</strong> Turn the <strong>Top-Center</strong> and <strong>Bottom-Center</strong> rooms sideways (<strong>Cluttered</strong>). Leave all other <strong>7 rooms</strong> (the Center, both sides, and all 4 corners) upright (<strong>Clear</strong>).</li>
+            <li style="font-size:19px;"><strong>Place the 4 Helpers:</strong> Set the 3D Helpers in the 4 corners: <strong>Top-Left:</strong> Abba · <strong>Top-Right:</strong> Nael · <strong>Bottom-Left:</strong> Mekimi · <strong>Bottom-Right:</strong> Mommy. Place each Helper Power Card face-up in front of the player who chose that Helper (Page 2).</li>
+            <li style="font-size:19px;"><strong>Deal the Missions:</strong> Shuffle all 18 Mission cards and deal <strong>13</strong> (box the other 5 unseen). Flip <strong>4 face-up</strong> into the <strong>Mission Row</strong> and stack <strong>9 face-down</strong> as the <strong>Mission Deck</strong>. Leave space for the <strong>Done Pile</strong>.</li>
+            <li style="font-size:19px;"><strong>Build the Shabbat Clock:</strong> Place <strong>5 Friday Afternoon</strong> cards face-down left to right, with <strong>Shabbat Begins!</strong> face-down on the far right (6 total; box the other 4).</li>
+            <li style="font-size:19px;"><strong>Tools &amp; Event Deck:</strong> Shuffle all 10 Tools face-down: place <strong>2 face-up</strong> in the <strong>Family Toolbox</strong>, box <strong>4 unseen</strong>, and shuffle the <strong>remaining 4</strong> with all <strong>18 Slow-Downs</strong> face-down to form the <strong>Event Deck</strong> (22 cards). Leave space for an <strong>Event Discard Pile</strong>.</li>
           </ol>
         """),
 
-        (6, "4. Players & Turn Order", """
-          <div class="callout callout-blue" style="text-align:center; font-size:23px;">
-            <strong>Clockwise Round Order (Every Game):</strong><br>
-            <span style="color:#2563EB; font-weight:800;">Abba</span> →
-            <span style="color:#059669; font-weight:800;">Nael</span> →
-            <span style="color:#DB2777; font-weight:800;">Mommy</span> →
-            <span style="color:#7C3AED; font-weight:800;">Mekimi</span>
-          </div>
-          <h2>Assigning Helpers (1–4 Players)</h2>
-          <ul>
-            <li><strong>4 Players:</strong> Each player controls 1 Helper.</li>
-            <li><strong>3 Players:</strong> The oldest player (or any volunteer) controls <strong>2 Helpers</strong> (for example, Abba &amp; Mekimi); the other two players control 1 Helper each.</li>
-            <li><strong>2 Players:</strong> Player 1 controls <strong>Abba &amp; Mommy</strong> (turns 1 &amp; 3); Player 2 controls <strong>Nael &amp; Mekimi</strong> (turns 2 &amp; 4) so you alternate every turn!</li>
-            <li><strong>1 Player (Solo):</strong> Control all 4 Helpers in order.</li>
+        # PAGE 5: Bird's-Eye Table Layout Diagram (Standard Mode — faces Page 4!)
+        (5, "Table Layout (Standard Mode)", f"""
+          <p style="font-size:18.5px; color:#475569;">Set up your table like this before Turn 1 (follow Steps 1–6 on Page 4):</p>
+          {diagram_svg}
+        """),
+
+        # PAGE 6: Key Terms & How a Turn Works (Zero Forward References!)
+        (6, "4. Key Terms &amp; How a Turn Works", """
+          <h2>Key Terms</h2>
+          <ul style="gap:9px;">
+            <li><strong>3D Helpers vs. Helper Cards:</strong> Your 4 3D-Printed Helpers stand and move on top of the 3×3 Room cards. Your 4 Helper Power Cards stay face-up in front of their players to show powers and hold Errands you are carrying.</li>
+            <li><strong>Room States:</strong> Every Room card is <strong>Clear</strong> (bright side upright), <strong>Cluttered</strong> (bright side turned sideways), or <strong>Blocked</strong> (flipped to its red-striped back—the Zone badge stays visible).</li>
+            <li><strong>Next-Door Room:</strong> Straight up, down, left, or right (<strong>not diagonal</strong>).</li>
+            <li><strong>Matching a Card to a Room:</strong> Each of the 4 House Zones always uses the same color and icon together. When a Mission or Event shows a Zone badge, it matches <strong>any</strong> Room card in that Zone (for example, any orange Kitchen card works on any Kitchen room).</li>
+            <li><strong>Clock Flip:</strong> Flip the leftmost face-down Shabbat Clock card face-up.</li>
           </ul>
           <h2>On Every Turn: Just 2 Easy Steps!</h2>
           <div class="box-card">
             <strong>Step 1 — Take Up to 2 Actions</strong> (in any order; repeats allowed!)<br>
-            Choose from: <strong>Move</strong>, <strong>Tidy</strong>, <strong>Do a Chore</strong>, or <strong>Use a Tool</strong>.<br>
-            <em>(Handing Errands to a teammate in your room is always FREE!)</em>
+            Choose from the <strong>4 Actions</strong> on Pages 7–9: <strong>Move</strong>, <strong>Tidy Room</strong>, <strong>Do a Mission</strong>, or <strong>Use a Household Tool</strong>.
           </div>
           <div class="box-card">
-            <strong>Step 2 — Flip 1 Event Card</strong> (skip if you already won!)<br>
-            Then play passes clockwise. <strong>After Mekimi's turn</strong>, flip 1 Shabbat Clock card and start the next round with <strong>Abba</strong>!
+            <strong>Step 2 — Flip 1 Event Card</strong> (Page 10)<br>
+            Flip and resolve the top card of the Event Deck, then pass play clockwise (<strong>Abba → Nael → Mommy → Mekimi</strong>). <strong>After Mekimi's turn</strong>, do 1 <strong>Clock Flip</strong> and start the next round with <strong>Abba</strong>!
           </div>
         """),
 
-        (7, "5. Actions: Move & Tidy", """
-          <p>On your turn, take <strong>up to 2 Actions</strong> in any order—you may even do the same action twice (like Move → Move or Chore → Chore!).</p>
+        # PAGE 7: 5. The 4 Actions (Unified 4-Action Overview + Action 1 Move + Action 2 Tidy!)
+        (7, "5. The 4 Actions", """
+          <p style="font-size:19px;">On your turn, spend up to <strong>2 Actions</strong> on any mix of these <strong>4 Actions</strong>—you may repeat the same action twice (like Move → Move), or stop early:</p>
+          <div class="grid-2" style="gap:9px;">
+            <div class="box-card" style="padding:9px 12px; font-size:17px; border-left:5px solid #2563EB;"><strong>1. Move</strong> — Walk 1 next-door room</div>
+            <div class="box-card" style="padding:9px 12px; font-size:17px; border-left:5px solid #059669;"><strong>2. Tidy Room</strong> — Clear or Unblock</div>
+            <div class="box-card" style="padding:9px 12px; font-size:17px; border-left:5px solid #1E293B;"><strong>3. Do a Mission</strong> — Team Chore or Errand</div>
+            <div class="box-card" style="padding:9px 12px; font-size:17px; border-left:5px solid #0F766E;"><strong>4. Use a Tool</strong> — Play from Toolbox</div>
+          </div>
           <div class="box-card" style="border-left:7px solid #2563EB;">
-            <h2 style="margin-top:0; color:#1E40AF;">Action: Move (1 Action)</h2>
+            <h2 style="margin-top:0; color:#1E40AF;">Action 1: Move (1 Action)</h2>
             <ul>
-              <li>Walk <strong>1 room</strong> straight up, down, left, or right (<strong>not diagonal</strong>).</li>
-              <li><strong>No Trapping:</strong> Cluttered and Blocked rooms never trap you—you can always walk into or out of them normally!</li>
-              <li><strong>No Room Limit:</strong> Any number of Helpers may stand in the same room.</li>
-              <li><strong>Mekimi's Turbo Crawl:</strong> Whenever Mekimi spends 1 Action to Move, she crawls straight into <strong>ANY room</strong> on the board!</li>
+              <li>Walk your 3D Helper <strong>1 room</strong> straight up, down, left, or right (<strong>not diagonal</strong>).</li>
+              <li>You may walk into and out of Clear, Cluttered, and Blocked rooms.</li>
             </ul>
           </div>
           <div class="box-card" style="border-left:7px solid #059669;">
-            <h2 style="margin-top:0; color:#047857;">Action: Tidy Room (1 Action)</h2>
+            <h2 style="margin-top:0; color:#047857;">Action 2: Tidy Room (1 Action)</h2>
             <ul>
-              <li><strong>Cluttered → Clear:</strong> Stand in a sideways room and turn it upright (1 Helper).</li>
-              <li><strong>Blocked → Clear:</strong> Flip a red Blocked room straight back to Clear! Requires <strong>2 or more Helpers</strong> in that room—or <strong>Abba alone</strong> (<em>Solo Cleanup</em>).</li>
+              <li><strong>Tidy Cluttered → Clear:</strong> Stand in a sideways room and turn it upright (1 Helper).</li>
+              <li><strong>Unblock Red Blocked → Clear:</strong> Flip a red Blocked room straight back to Clear! Requires <strong>2 or more Helpers</strong> standing in that room.</li>
             </ul>
           </div>
-          <div class="callout callout-green">
-            <strong>Great Combo:</strong> Because you get <strong>2 Actions</strong>, you can <strong>Tidy</strong> a Cluttered room on Action 1 and immediately finish a Chore there on Action 2!
+          <div class="callout callout-blue" style="font-size:18px; padding:11px 14px;">
+            <strong>Family Superpowers:</strong> Each Cooper Helper bends one of the core rules—see Page 11 once you've read all 4 Actions and Events!
           </div>
         """),
 
-        (8, "Room States: CAN & CANNOT", """
+        # PAGE 8: 5. The 4 Actions (cont.): Do a Mission (+ Free Handoff + Refill + Exact Win!)
+        (8, "5. The 4 Actions: Do a Mission", """
+          <p style="font-size:19.5px;">There are <strong>2 types of Missions</strong>—each card shows the House Zone(s) where you do it:</p>
+          <div class="box-card" style="border-left:7px solid #1E293B;">
+            <h2 style="margin-top:0; color:#0F172A;">Team Chores (10 cards · TEAM CHORE · 2+)</h2>
+            <p style="font-size:19px;">With <strong>2 or more Helpers</strong> standing together in a <strong>Clear</strong> room of the matching Zone, spend <strong>1 Action</strong> to move the card straight to the <strong>Done Pile</strong>!</p>
+          </div>
+          <div class="box-card" style="border-left:7px solid #334155;">
+            <h2 style="margin-top:0; color:#1E293B;">Errands (8 cards · ERRAND · Start → End)</h2>
+            <ul style="gap:6px;">
+              <li style="font-size:19px;"><strong>Pick Up (1 Action):</strong> In a <strong>Clear</strong> room matching the <strong>Start</strong> Zone, place the Errand on your Helper Power Card.</li>
+              <li style="font-size:19px;"><strong>Deliver (1 Action):</strong> In a <strong>Clear</strong> room matching the <strong>End</strong> Zone, move 1 carried Errand to the <strong>Done Pile</strong>!</li>
+            </ul>
+          </div>
+          <div class="callout callout-blue" style="font-size:18.5px; padding:12px 15px;">
+            <strong>Free Handoff (Free Bonus — Any Room!):</strong> Anytime on your turn, you may freely give or take any carried Errand(s) with a teammate standing in your room at no Action cost.
+          </div>
+          <div class="callout" style="font-size:18.5px; padding:12px 15px;">
+            <strong>Instant Refill &amp; Win Check:</strong> Whenever a Mission leaves the <strong>Mission Row</strong> (finished or picked up), immediately flip the top card of the <strong>Mission Deck</strong> so 4 stay face-up. The instant the final Mission reaches the <strong>Done Pile</strong> (Row, Deck, and all Helper cards empty), you win!
+          </div>
+        """),
+
+        # PAGE 9: 5. The 4 Actions (cont.): Household Tools (Breaks Cycle 2 — no Time Flies mention!)
+        (9, "5. The 4 Actions: Household Tools", """
+          <p style="font-size:19.5px;">Spend <strong>1 Action from any room</strong> to play a face-up Tool from the <strong>Family Toolbox</strong>:</p>
+          <div class="box-card" style="border-left:7px solid #0F766E;">
+            <h2 style="margin-top:0; color:#0F766E;">Ice Coffee Boost (4 cards · Reusable)</h2>
+            <p style="font-size:19px;">Turn <strong>1 or 2 Cluttered rooms</strong> anywhere on the board back to Clear <em>(cannot fix Blocked rooms)</em>, then place this card in the <strong>Event Discard Pile</strong>.</p>
+          </div>
+          <div class="box-card" style="border-left:7px solid #0369A1;">
+            <h2 style="margin-top:0; color:#0369A1;">Strategic Snack Summons (3 cards · Reusable)</h2>
+            <p style="font-size:19px;">Pull <strong>any 1 teammate</strong> from anywhere on the board straight into your room <em>(their carried Errands come with them!)</em>, then place this card in the <strong>Event Discard Pile</strong>.</p>
+          </div>
+          <div class="box-card" style="border-left:7px solid #B45309;">
+            <h2 style="margin-top:0; color:#B45309;">Cousin Aviel Drops By! (3 cards · One-Time Shield)</h2>
+            <p style="font-size:19px;">Place face-up on the leftmost unshielded face-down Clock card. <strong>The next time that Clock card would flip for any reason, return Cousin Aviel to the box instead!</strong> <em>(Multiple shields may guard consecutive Clock cards.)</em></p>
+          </div>
+          <div class="callout callout-green" style="font-size:18.5px; padding:12px 15px;">
+            <strong>Great 2-Action Combos:</strong> Tidy a Cluttered room on Action 1 and immediately finish a Mission there on Action 2—or play <strong>Snack Summons</strong> on Action 1 and finish a <strong>Team Chore</strong> together on Action 2!
+          </div>
+        """),
+
+        # PAGE 10: 6. Events & End of Round (Fixes Comments #1, #2, #4 — faces Helpers Page 11!)
+        (10, "6. Events &amp; End of Round", """
+          <p style="font-size:19px;">After your 2 Actions, flip the top card of the <strong>Event Deck</strong>. If the deck is empty, shuffle the entire <strong>Event Discard Pile</strong> face-down first—so spent Reusable Tools naturally return to the deck!</p>
+          <ul style="gap:8px;">
+            <li style="font-size:18.5px;"><strong>Household Tool:</strong> Place it face-up in the <strong>Family Toolbox</strong>!</li>
+            <li style="font-size:18.5px;"><strong>Slow-Down:</strong> Scan rooms in the matching Zone <strong>left to right, top to bottom</strong> (skip Blocked rooms):
+              <div class="callout callout-red" style="margin-top:6px; padding:10px 14px; font-size:18px;">
+                <strong>1.</strong> If any matching room is <strong>Cluttered</strong>, flip the <strong>1st Cluttered</strong> room to <strong>Red Blocked</strong>!<br>
+                <strong>2.</strong> Else if any matching room is <strong>Clear</strong>, turn the <strong>1st Clear</strong> room sideways (<strong>Cluttered</strong>)!<br>
+                <strong>3.</strong> If all matching rooms are already Blocked, nothing happens.
+              </div>
+              Then place the Slow-Down in the <strong>Event Discard Pile</strong>.
+            </li>
+            <li style="font-size:18.5px;"><strong>Double Trouble (Double Slow-Down!):</strong> Triggers <strong>two Slow-Downs on one card</strong>—resolve a normal Slow-Down for the <strong>left</strong> Zone badge first, then a second Slow-Down for the <strong>right</strong> Zone badge. Discard to Event Discard.</li>
+            <li style="font-size:18.5px;"><strong>Time Flies (<em>“Wait—Shabbat Is at WHAT Time?!”</em>):</strong> (1) Do <strong>1 Clock Flip</strong> right away (<em>Shabbat Begins!</em> = lose unless <strong>Cousin Aviel</strong> shields it); (2) <strong>resolve a Kitchen Slow-Down</strong> (flip the 1st Cluttered Kitchen Blocked, else turn the 1st Clear Kitchen sideways); (3) <strong>return this card to the box</strong>.</li>
+          </ul>
+          <div class="callout" style="font-size:18px; padding:11px 14px;">
+            <strong>End of Round (Only After Mekimi's Turn!):</strong> Do 1 <strong>Clock Flip</strong> (or box a Cousin Aviel shield on it). If <em>Shabbat Begins!</em> flips, you lose! Otherwise, start the next round with <strong>Abba</strong>.
+          </div>
+        """),
+
+        # PAGE 11: 7. Meet the 4 Cooper Helpers (Faces Page 10! Zero Forward Refs!)
+        (11, "7. Meet the 4 Cooper Helpers", f"""
+          <p style="font-size:19px;">Every Helper gets <strong>2 Actions per turn</strong> plus their own Cooper family superpower:</p>
+          <div class="helper-row" style="--c:#2563EB;">
+            <img src="{av_abba}" alt="Abba">
+            <div>
+              <h3>1. ABBA · Top-Left</h3>
+              <p><strong>Solo Cleanup (Your Turn):</strong> Unblock a Red Blocked room alone (1 Action).<br>
+              <strong>Balagan Barrier (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!).</p>
+            </div>
+          </div>
+          <div class="helper-row" style="--c:#059669;">
+            <img src="{av_nael}" alt="Nael">
+            <div>
+              <h3>2. NAEL · Top-Right</h3>
+              <p><strong>Learning Tower Power! (Always On):</strong> While Nael and a teammate share a <strong>Cluttered</strong> room, either one can finish a <strong>Team Chore</strong> there on either player's turn (not Blocked).</p>
+            </div>
+          </div>
+          <div class="helper-row" style="--c:#DB2777;">
+            <img src="{av_mommy}" alt="Mommy">
+            <div>
+              <h3>3. MOMMY · Bottom-Right</h3>
+              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (in addition to your 2 Actions!). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms (not Blocked)!</p>
+            </div>
+          </div>
+          <div class="helper-row" style="--c:#7C3AED;">
+            <img src="{av_mekimi}" alt="Mekimi">
+            <div>
+              <h3>4. MEKIMI · Bottom-Left</h3>
+              <p><strong>Turbo Crawl (Your Turn):</strong> Whenever Mekimi spends 1 Action to Move, crawl straight into <strong>ANY room</strong> on the board!</p>
+            </div>
+          </div>
+        """),
+
+        # PAGE 12: 8. Room States: CAN & CANNOT (Complete Synthesis Table — ZERO Forward Refs! Resolves #7, #8, #9, #10!)
+        (12, "8. Room States: CAN &amp; CANNOT", """
           <p>Check the orientation of the Room card your Helper stands on:</p>
           <table>
             <thead>
@@ -1027,111 +1159,18 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </tbody>
           </table>
           <div class="callout callout-red">
-            <strong>Watch Out for Cluttered Rooms!</strong> Slow-Downs always flip Cluttered rooms to <strong>Red Blocked</strong> first—Tidy messy rooms before they flip red!
+            <strong>Watch Out for Cluttered Rooms!</strong> Slow-Downs always flip Cluttered rooms to <strong>Red Blocked</strong> first—Tidy messy rooms early (or stand <strong>Abba</strong> there with <em>Balagan Barrier</em>)!
           </div>
         """),
 
-        (9, "6. Actions: Chores & Errands", """
-          <p>There are only <strong>2 Chore types</strong>—both match the room's color and icon:</p>
-          <div class="box-card" style="border-left:7px solid #7C3AED;">
-            <h2 style="margin-top:0; color:#6D28D9;">Team Chores (10 cards · Purple)</h2>
-            <p>With <strong>2 or more Helpers</strong> in a matching <strong>Clear</strong> room <em>(or Cluttered if <strong>Nael</strong> is here!)</em>, spend <strong>1 Action</strong> to move the card straight to the <strong>Done Pile</strong>!</p>
-          </div>
-          <div class="box-card" style="border-left:7px solid #0369A1;">
-            <h2 style="margin-top:0; color:#0369A1;">Errands (8 cards · Blue Start → End)</h2>
-            <ul>
-              <li><strong>Pick Up (1 Action):</strong> In a matching Clear <strong>Start</strong> room, place the Errand on your Helper card. <em>(No carry limit!)</em></li>
-              <li><strong>Deliver (1 Action):</strong> In a matching Clear <strong>End</strong> room, move 1 carried Errand to the <strong>Done Pile</strong>!</li>
-              <li><strong>Mommy's Errand Express:</strong> Once per turn, Mommy Picks Up or Delivers for <strong>FREE</strong> (0 Actions), and works in <strong>Cluttered</strong> rooms too!</li>
-            </ul>
-          </div>
-          <div class="callout callout-blue">
-            <strong>Free Handoff (0 Actions — Any Room!):</strong> Anytime on your turn, freely give or take any carried Errand(s) with a teammate standing in your room! <em>(Carried Errands can't be dropped back to the Chore Row.)</em>
-          </div>
-          <div class="callout">
-            <strong>Instant Chore Row Refill:</strong> Whenever a Chore leaves the Chore Row (finished or picked up), <strong>immediately flip the top card of the Chore Deck</strong> so 4 Chores stay face-up!
-          </div>
-        """),
-
-        (10, "7. Actions: Household Tools", """
-          <p>Spend <strong>1 Action from ANY room</strong> to play a face-up Tool from the <strong>Family Toolbox</strong> (there is no cap on how many Tools can sit in the Toolbox!):</p>
-          <div class="box-card" style="border-left:7px solid #0F766E;">
-            <h2 style="margin-top:0; color:#0F766E;">Ice Coffee Boost (4 cards · Reusable)</h2>
-            <p>Turn <strong>1 or 2 Cluttered rooms</strong> anywhere on the board back to Clear <em>(cannot fix Blocked rooms)</em>, then place in the <strong>Event Discard Pile</strong>.</p>
-          </div>
-          <div class="box-card" style="border-left:7px solid #0369A1;">
-            <h2 style="margin-top:0; color:#0369A1;">Strategic Snack Summons (3 cards · Reusable)</h2>
-            <p>Pull <strong>any 1 teammate</strong> from anywhere on the board straight into your room <em>(their carried Errands come with them!)</em>, then place in the <strong>Event Discard Pile</strong>.</p>
-          </div>
-          <div class="box-card" style="border-left:7px solid #B45309;">
-            <h2 style="margin-top:0; color:#B45309;">Cousin Aviel Drops By! (3 cards · One-Time Shield)</h2>
-            <p>Place face-up on the leftmost unshielded face-down Clock card. When that card would flip (from Round End or <em>Time Flies</em>), <strong>return Cousin Aviel to the box instead!</strong> <em>(Multiple shields may guard consecutive Clock cards.)</em></p>
-          </div>
-          <div class="callout callout-green">
-            <strong>One Shared Event Discard:</strong> Spent Reusable Tools go into the same <strong>Event Discard Pile</strong> as Slow-Downs—so when the Event Deck reshuffles, your Tools naturally come back!
-          </div>
-        """),
-
-        (11, "8. Events & End of Round", """
-          <p>After your 2 Actions (skip if you already won!), flip the top card of the <strong>Event Deck</strong>. If the deck is empty, shuffle the entire <strong>Event Discard Pile</strong> face-down first.</p>
-          <ul>
-            <li><strong>Household Tool:</strong> Place it face-up in the <strong>Family Toolbox</strong>!</li>
-            <li><strong>Slow-Down (Universal Cluttered-First Rule):</strong> Scan rooms matching the zone icon <strong>left to right, top to bottom</strong> (skip Blocked rooms):
-              <div class="callout callout-red" style="margin-top:8px;">
-                <strong>1.</strong> If any matching room is <strong>Cluttered</strong>, flip the <strong>1st Cluttered</strong> room to <strong>Red Blocked</strong>! <em>(Canceled if <strong>Abba</strong> is standing there!)</em><br>
-                <strong>2.</strong> Else if any matching room is <strong>Clear</strong>, turn the <strong>1st Clear</strong> room sideways (<strong>Cluttered</strong>)!<br>
-                <strong>3.</strong> If all matching rooms are already Blocked, nothing happens.
-              </div>
-              Then place the Slow-Down in the <strong>Event Discard Pile</strong>.
-            </li>
-            <li><strong>Double Trouble:</strong> Resolve the left zone icon first, then the right zone icon with the exact same rule.</li>
-            <li><strong>Time Flies (<em>“Wait—Shabbat Is at WHAT Time?!”</em>):</strong> (1) Trigger <strong>1 Clock flip</strong> first (<em>Shabbat Begins!</em> = lose right away, unless Cousin Aviel shields it!); (2) hit <strong>Kitchen</strong> using the same rule; (3) <strong>return this card to the box</strong>.</li>
-          </ul>
-          <div class="callout">
-            <strong>End of Round (Only After Mekimi's Turn!):</strong> Flip the leftmost face-down Clock card (or box a Cousin Aviel shield on it). If <em>Shabbat Begins!</em> flips, you lose! Otherwise, start the next round with <strong>Abba</strong>.
-          </div>
-        """),
-
-        (12, "9. Meet the 4 Cooper Helpers", f"""
-          <p style="font-size:19px;">Every Helper gets <strong>2 Actions per turn</strong> plus their own Cooper family superpower:</p>
-          <div class="helper-row" style="--c:#2563EB;">
-            <img src="{av_abba}" alt="Abba">
-            <div>
-              <h3>1. ABBA · Top-Left</h3>
-              <p><strong>Solo Cleanup (Your Turn):</strong> Unblock a Red Blocked room alone (1 Action).<br>
-              <strong>Balagan Barrier (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!).</p>
-            </div>
-          </div>
-          <div class="helper-row" style="--c:#059669;">
-            <img src="{av_nael}" alt="Nael">
-            <div>
-              <h3>2. NAEL · Top-Right</h3>
-              <p><strong>Learning Tower Power! (Always On):</strong> While Nael and a teammate share a <strong>Cluttered</strong> room, either one can finish a <strong>Team Chore</strong> there on either player's turn (not Blocked).</p>
-            </div>
-          </div>
-          <div class="helper-row" style="--c:#DB2777;">
-            <img src="{av_mommy}" alt="Mommy">
-            <div>
-              <h3>3. MOMMY · Bottom-Right</h3>
-              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (even with 0 Actions left!). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms (not Blocked)!</p>
-            </div>
-          </div>
-          <div class="helper-row" style="--c:#7C3AED;">
-            <img src="{av_mekimi}" alt="Mekimi">
-            <div>
-              <h3>4. MEKIMI · Bottom-Left</h3>
-              <p><strong>Turbo Crawl (Your Turn):</strong> Whenever Mekimi spends 1 Action to Move, crawl straight into <strong>ANY room</strong> on the board!</p>
-            </div>
-          </div>
-        """),
-
-        (13, "10. Difficulty Modes", """
-          <p>All modes use <strong>9 Rooms</strong> (3 boxed), <strong>4 Helpers</strong>, and <strong>6 Tools</strong> (<strong>2</strong> in Family Toolbox + <strong>4</strong> in Event Deck; 4 boxed). Always keep <strong>4 Chores</strong> face-up in the Chore Row.</p>
+        # PAGE 13: 9. Difficulty Modes (Purged designer 72-Card Check!)
+        (13, "9. Difficulty Modes", """
+          <p>All modes use <strong>9 Rooms</strong> (3 boxed), <strong>4 Helpers</strong>, and <strong>6 Tools</strong> (<strong>2</strong> in Family Toolbox + <strong>4</strong> in Event Deck; 4 boxed). Always keep <strong>4 Missions</strong> face-up in the Mission Row.</p>
           <table style="font-size:17.5px;">
             <thead>
               <tr>
                 <th>Mode</th>
-                <th>Game Chores<br>(Row+Deck / Box)</th>
+                <th>Missions<br>(Row+Deck / Box)</th>
                 <th>Shabbat Clock<br>(Aft+Shab / Box)</th>
                 <th>Starting Clutter</th>
                 <th>Slow-Downs</th>
@@ -1162,24 +1201,19 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </tbody>
           </table>
           <div class="callout callout-green">
-            <strong>72-Card Check:</strong><br>
-            • Beginner: 53 active + 19 boxed = <strong>72 cards</strong><br>
-            • Standard: 56 active + 16 boxed = <strong>72 cards</strong><br>
-            • Hard: 58 active + 14 boxed = <strong>72 cards</strong>
-          </div>
-          <div class="box-card">
-            <strong>Family Tip:</strong> Play <strong>Beginner</strong> once so kids learn the flow (almost every family wins their first game!), then step up to <strong>Standard</strong> for thrilling final-round finishes!
+            <strong>Family Tip:</strong> Play <strong>Beginner</strong> once so kids learn the flow (almost every family wins their first game!), then step up to <strong>Standard</strong> for thrilling final-round finishes—and try <strong>Hard</strong> when your family is ready for a true Friday afternoon sprint!
           </div>
         """),
 
-        (14, "11. Quick 1-Round Example", """
+        # PAGE 14: 10. Quick 1-Round Example (Purged "isn't trapped!" and "Round 3" artifacts!)
+        (14, "10. Quick 1-Round Example", """
           <p style="font-size:18px; color:#475569;">A sample Standard-mode round showing combos and all 4 Cooper Helpers:</p>
           <div class="box-card" style="border-left:6px solid #2563EB; font-size:17.5px;">
             <strong>1. Abba (2 Actions):</strong> Walks right into Red Blocked <em>The Salon</em> (Action 1) and uses <strong>Solo Cleanup</strong> to flip it Clear alone (Action 2)!<br>
-            <em>Event:</em> Kitchen Slow-Down → Cluttered <em>The Fridge</em> (where Mommy stands) flips Blocked. Mommy isn't trapped!
+            <em>Event:</em> Kitchen Slow-Down → Cluttered <em>The Fridge</em> (where Mommy stands) flips Blocked.
           </div>
           <div class="box-card" style="border-left:6px solid #059669; font-size:17.5px;">
-            <strong>2. Nael (2 Actions):</strong> Plays <strong>Snack Summons</strong> to pull Abba into Nael's Cluttered <em>Dining Table</em> (Action 1), then uses <strong>Learning Tower Power!</strong> to finish <em>Set the Shabbat Table</em> right away (Action 2)! Refill Row to 4.<br>
+            <strong>2. Nael (2 Actions):</strong> Plays <strong>Snack Summons</strong> to pull Abba into Nael's Cluttered <em>Dining Table</em> (Action 1), then uses <strong>Learning Tower Power!</strong> to finish <em>Set the Shabbat Table</em> right away (Action 2)! Refill Mission Row to 4.<br>
             <em>Event:</em> Draws <em>Cousin Aviel Drops By!</em> → added to Family Toolbox!
           </div>
           <div class="box-card" style="border-left:6px solid #DB2777; font-size:17.5px;">
@@ -1187,15 +1221,16 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <em>Event:</em> Downstairs Slow-Down → Clear <em>Salon</em> tilts sideways.
           </div>
           <div class="box-card" style="border-left:6px solid #7C3AED; font-size:17.5px;">
-            <strong>4. Mekimi (2 Actions):</strong> Uses <strong>Turbo Crawl</strong> straight to Clear <em>Giant Island</em> (Action 1) and Picks Up <em>Showstopper</em> Errand (Action 2)! Refill Row.<br>
-            <em>Event:</em> Table Slow-Down targets Cluttered <em>Dining Table</em>—<strong>Abba's Balagan Barrier</strong> cancels the flip!<br>
-            <em>End of Round:</em> <strong>Cousin Aviel</strong> blocks the Clock flip and returns to the box! Round 3 starts with <strong>Abba</strong>!
+            <strong>4. Mekimi (2 Actions):</strong> Uses <strong>Turbo Crawl</strong> straight to Clear <em>Giant Island</em> (Action 1) and Picks Up <em>Showstopper</em> Errand (Action 2)! Refill Mission Row.<br>
+            <em>Event:</em> Table Slow-Down targets Cluttered <em>Dining Table</em>—<strong>Abba's Balagan Barrier</strong> cancels the Slow-Down!<br>
+            <em>End of Round:</em> <strong>Cousin Aviel</strong> blocks the Clock flip and returns to the box! The next round starts with <strong>Abba</strong>!
           </div>
         """),
 
+        # PAGE 15: Kid's First-Game Guide (6+) — Fixed Missions + No Purple/Blue!
         (15, "Kid's First-Game Guide (6+)", """
           <div class="callout" style="font-size:21px; text-align:center;">
-            <strong>How We Win:</strong> Finish <strong>all the Chores</strong> together before <strong>Shabbat Begins!</strong> flips over!
+            <strong>How We Win:</strong> Finish <strong>all the Missions</strong> together before <strong>Shabbat Begins!</strong> flips over!
           </div>
           <h2>On Your Turn: 2 Actions + 1 Event!</h2>
           <ol style="gap:9px;">
@@ -1203,12 +1238,12 @@ def build_booklet_pages() -> list[tuple[int, str]]:
               <ul style="margin-top:6px; gap:5px;">
                 <li><strong>Walk</strong> 1 room up, down, left, or right. <em>(Mekimi crawls ANYWHERE!)</em></li>
                 <li><strong>Tidy</strong> a sideways room (alone) or a Red room (with a friend—or Abba alone!).</li>
-                <li><strong>Team Chore (Purple):</strong> Meet a friend in a matching Clear room and finish it!</li>
-                <li><strong>Errand (Blue):</strong> Pick up at Start, carry it, drop off at End! <em>(Handing to a friend in your room is FREE!)</em></li>
+                <li><strong>Team Chore (2+):</strong> Meet a friend in a Clear room of that Zone and finish it!</li>
+                <li><strong>Errand (Start → End):</strong> Pick up at Start, carry it, and drop off at End—you can also pass it to a friend in your room anytime for free!</li>
                 <li><strong>Use a Tool</strong> from the Toolbox (from any room)!</li>
               </ul>
             </li>
-            <li><strong>Flip 1 Event Card:</strong> Tool → Toolbox! Slow-Down → match the color: flip the 1st sideways room Red (or tilt the 1st Clear room sideways!).</li>
+            <li><strong>Flip 1 Event Card:</strong> Tool → Toolbox! Slow-Down → find rooms in that Zone: flip the 1st sideways room Red (or tilt the 1st Clear room sideways!).</li>
             <li><strong>After Mekimi:</strong> Flip 1 Clock card closer to sunset, then go back to <strong>Abba</strong>!</li>
           </ol>
           <div class="callout callout-green" style="font-size:17.5px;">
@@ -1216,6 +1251,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
           </div>
         """),
 
+        # PAGE 16: Tabletop Quick Reference (Fixed Missions, purged "1 Rule!" & "Stuck"!)
         (16, "Tabletop Quick Reference", """
           <div class="callout callout-blue" style="font-size:19px; text-align:center; padding:12px 16px;">
             <strong>Turn Order:</strong> Abba → Nael → Mommy → Mekimi → <strong>Clock Flip!</strong><br>
@@ -1226,12 +1262,12 @@ def build_booklet_pages() -> list[tuple[int, str]]:
               <strong style="color:#1E3A8A;">4 Actions (Pick Any 2)</strong><br>
               • <strong>Move:</strong> 1 room straight<br>
               • <strong>Tidy:</strong> Cluttered (1) / Red (2 or Abba)<br>
-              • <strong>Chore:</strong> Team (2+) or Errand<br>
+              • <strong>Mission:</strong> Team Chore (2+) or Errand<br>
               • <strong>Tool:</strong> Play from Toolbox
             </div>
             <div class="box-card" style="font-size:17px; padding:12px 14px;">
-              <strong style="color:#B91C1C;">Slow-Downs (1 Rule!)</strong><br>
-              Scan matching zone L→R, T→B:<br>
+              <strong style="color:#B91C1C;">Slow-Downs</strong><br>
+              Scan matching Zone L→R, T→B:<br>
               <strong>1st Cluttered → Blocked!</strong><br>
               Else <strong>1st Clear → Cluttered!</strong>
             </div>
@@ -1245,24 +1281,25 @@ def build_booklet_pages() -> list[tuple[int, str]]:
               <strong style="color:#92400E;">Cluttered (Tilted):</strong> Walk, Tidy (1), Handoff, Tools. <em>(Team w/ Nael; Errands w/ Mommy.)</em>
             </div>
             <div style="background:#FEF2F2; border-left:5px solid #B91C1C; padding:5px 9px; border-radius:6px;">
-              <strong style="color:#991B1B;">Red Blocked (“Stuck”):</strong> Walk, Handoff, Tools only. Fix w/ <strong>2+ Helpers</strong> or <strong>Abba</strong>!
+              <strong style="color:#991B1B;">Red Blocked:</strong> Walk, Handoff, Tools only. Fix w/ <strong>2+ Helpers</strong> or <strong>Abba</strong>!
             </div>
           </div>
           <div class="box-card" style="font-size:16.5px; padding:11px 14px; line-height:1.4;">
             <strong style="color:#B45309;">4 Family Superpowers</strong><br>
             • <strong>Abba:</strong> Unblocks Red alone; his Cluttered room can't flip Red (canceled!).<br>
             • <strong>Nael:</strong> With teammate in Cluttered room, either finishes Team Chores (any turn).<br>
-            • <strong>Mommy:</strong> 1 FREE Errand/turn (even at 0 Actions!); Errands work in Cluttered.<br>
+            • <strong>Mommy:</strong> 1 FREE Errand/turn (in addition to 2 Actions!); works in Cluttered.<br>
             • <strong>Mekimi:</strong> Crawls straight into <strong>ANY room</strong> on any Move!
           </div>
           <div class="box-card" style="font-size:17px; text-align:center; padding:10px 14px;">
-            <strong>Modes:</strong> Beg <strong>10</strong> Chores / <strong>7</strong> Clock (no Time Flies) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>6</strong>
+            <strong>Modes:</strong> Beg <strong>10</strong> Missions / <strong>7</strong> Clock (no Time Flies) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>6</strong>
           </div>
         """),
     ]
     return [(num, booklet_page(num, title, body)) for num, title, body in pages]
 
 BACKS_DIR = ROOT / "print-pack" / "02_Cards_Backs"
+TUCK_DIR = ROOT / "print-pack" / "03_Tuck_Box_90"
 
 def render_blocked_back_html(orig_path: Path) -> str:
     b64 = base64.b64encode(orig_path.read_bytes()).decode("ascii")
@@ -1294,8 +1331,8 @@ def render_blocked_back_html(orig_path: Path) -> str:
     </style></head><body>
       <div class="card">
         <div class="bottom-pill">
-          <div>Helpers &amp; carried Errands stay safe here —</div>
-          <div>walk in/out, Free Handoff Errands, and use Tools normally.</div>
+          <div>Still allowed here: walk in or out,</div>
+          <div>hand off Errands for free, and use Tools normally.</div>
         </div>
       </div>
     </body></html>"""
@@ -1341,6 +1378,110 @@ def render_shared_helper_back_html(orig_path: Path) -> str:
     </style></head><body>
       <div class="card">
         <div class="subtitle">Keep face-up · Place carried Errands here</div>
+      </div>
+    </body></html>"""
+
+def _interp_box(im: Image.Image, x0: int, y0: int, x1: int, y1: int) -> None:
+    px = im.load()
+    for x in range(x0, x1 + 1):
+        c0 = px[x, y0]
+        c1 = px[x, y1]
+        for y in range(y0 + 1, y1):
+            t = (y - y0) / (y1 - y0)
+            px[x, y] = (
+                round(c0[0] * (1 - t) + c1[0] * t),
+                round(c0[1] * (1 - t) + c1[1] * t),
+                round(c0[2] * (1 - t) + c1[2] * t),
+            )
+
+def render_shared_chores_back_html(orig_path: Path) -> str:
+    im = Image.open(orig_path).convert("RGB")
+    _interp_box(im, 140, 682, 685, 788)
+    _interp_box(im, 265, 938, 560, 994)
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700;800&display=swap');
+      * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+      html, body {{ width: 825px; height: 1125px; overflow: hidden; font-family: 'DM Sans', sans-serif; }}
+      .card {{ position: relative; width: 825px; height: 1125px; background: url("data:image/png;base64,{b64}") no-repeat 0 0 / 825px 1125px; }}
+      .heading {{
+        position: absolute; left: 90px; right: 90px; top: 684px;
+        text-align: center; color: #FDE68A; font-size: 38px; font-weight: 600; letter-spacing: 0.03em;
+      }}
+      .sub {{
+        position: absolute; left: 90px; right: 90px; top: 746px;
+        text-align: center; color: #E2E8F0; font-size: 24px; font-weight: 500;
+      }}
+      .pill {{
+        position: absolute; left: 50%; top: 944px; transform: translateX(-50%);
+        background: #FCD34D; color: #0F172A; font-size: 20px; font-weight: 800;
+        letter-spacing: 0.07em; padding: 10px 26px; border-radius: 999px; white-space: nowrap;
+      }}
+    </style></head><body>
+      <div class="card">
+        <div class="heading">MISSIONS DECK</div>
+        <div class="sub">Finish all Missions before Shabbat begins!</div>
+        <div class="pill">18 MISSION CARDS</div>
+      </div>
+    </body></html>"""
+
+def render_shabbat_begins_html(orig_path: Path) -> str:
+    im = Image.open(orig_path).convert("RGB")
+    _interp_box(im, 72, 864, 753, 976)
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700&display=swap');
+      * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+      html, body {{ width: 825px; height: 1125px; overflow: hidden; font-family: 'DM Sans', sans-serif; }}
+      .card {{ position: relative; width: 825px; height: 1125px; background: url("data:image/png;base64,{b64}") no-repeat 0 0 / 825px 1125px; }}
+      .box {{
+        position: absolute; left: 76px; top: 872px; width: 673px; height: 96px;
+        background: rgba(255, 255, 255, 0.13); border-radius: 22px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding: 10px 24px; color: #FFFFFF; font-size: 23.5px; font-weight: 700; line-height: 1.38;
+      }}
+    </style></head><body>
+      <div class="card">
+        <div class="box">
+          <div>If any Missions are still unfinished, Shabbat has begun</div>
+          <div>before the house is ready — try again!</div>
+        </div>
+      </div>
+    </body></html>"""
+
+def render_tuck_box_html(orig_path: Path) -> str:
+    im = Image.open(orig_path).convert("RGB")
+    # Erase inside back blurb card (keep outer rounded border intact!)
+    _interp_box(im, 696, 768, 1304, 1006)
+    # Erase top flap subtitle line ("Can your family finish every chore before sunset?")
+    _interp_box(im, 1930, 326, 2520, 362)
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+      * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+      html, body {{ width: 2775px; height: 2100px; overflow: hidden; font-family: 'DM Sans', sans-serif; }}
+      .tuck {{ position: relative; width: 2775px; height: 2100px; background: url("data:image/png;base64,{b64}") no-repeat 0 0 / 2775px 2100px; }}
+      .blurb {{
+        position: absolute; left: 712px; top: 785px; width: 562px;
+        color: #E2E8F0; font-size: 27px; font-weight: 400; line-height: 1.34;
+      }}
+      .blurb strong {{ color: #FFFFFF; font-weight: 700; }}
+      .flap-sub {{
+        position: absolute; left: 1930px; top: 329px; width: 590px;
+        text-align: center; color: #CBD5E1; font-size: 24px; font-weight: 400;
+      }}
+    </style></head><body>
+      <div class="tuck">
+        <div class="blurb">
+          It's Friday afternoon in Givot Eden—challah is rising, toys are exploding out of the Mamad, and winter sunset is coming fast! Team up as <strong>Abba, Mommy, Nael, and Mekimi</strong> to tidy rooms, unleash Household Tools, and finish every Mission before <strong>Shabbat Begins!</strong>
+        </div>
+        <div class="flap-sub">Can your family finish every Mission before sunset?</div>
       </div>
     </body></html>"""
 

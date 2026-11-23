@@ -16,7 +16,7 @@ export function FigureBar({ state, onInspectCard }: FigureBarProps) {
       <div className="panel-header-row">
         <h2 className="panel-title">Helper Cards Around the Table</h2>
         <span className="panel-hint">
-          Clockwise order: Abba → Nael → Mommy → Mekimi · No carry limit on Errands!
+          Clockwise order: Abba → Nael → Mommy → Mekimi
         </span>
       </div>
 

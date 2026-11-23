@@ -100,7 +100,7 @@ export function getActionEvaluation(state: GameState): ActionEvaluation {
         disabledHints.push({
           label: `Team Chore: ${chore.title}`,
           reason: isBlocked
-            ? 'Cannot finish Chores in a Red Blocked room — Unblock it first!'
+            ? 'Cannot finish Team Chores in a Red Blocked room — Unblock it first!'
             : 'Room is Cluttered — Tidy it first, or team up with Nael here.',
         });
       }

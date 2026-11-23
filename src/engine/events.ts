@@ -345,7 +345,7 @@ export function advanceAfterEvent(state: GameState): GameState {
         next = appendLog(
           next,
           'END',
-          `End of Round ${next.round}: Shabbat Begins! flipped — candles are lit before all Chores finished.`,
+          `End of Round ${next.round}: Shabbat Begins! flipped — candles are lit before all Missions finished.`,
         );
         return {
           ...next,

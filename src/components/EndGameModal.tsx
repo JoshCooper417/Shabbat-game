@@ -29,9 +29,9 @@ export function EndGameModal({ state, onPlayAgain, onBackToMenu }: EndGameModalP
             />
             <p className="start-lead">
               {won
-                ? `Amazing teamwork! Abba, Nael, Mommy, and Mekimi finished all ${cfg.totalChores} Chores before sunset on ${cfg.name} difficulty!`
+                ? `Amazing teamwork! Abba, Nael, Mommy, and Mekimi finished all ${cfg.totalChores} Missions before sunset on ${cfg.name} difficulty!`
                 : state.lossReason ??
-                  'Candles are lit before all Chores were finished — reshuffle and give Friday afternoon another run!'}
+                  'Candles are lit before all Missions were finished — reshuffle and give Friday afternoon another run!'}
             </p>
 
             <div className="end-stats-grid">
@@ -39,7 +39,7 @@ export function EndGameModal({ state, onPlayAgain, onBackToMenu }: EndGameModalP
                 <span className="end-stat-val">
                   {state.doneChores.length}/{cfg.totalChores}
                 </span>
-                <span className="end-stat-lbl">Chores Done</span>
+                <span className="end-stat-lbl">Missions Done</span>
               </div>
               <div className="end-stat-box">
                 <span className="end-stat-val">Round {state.round}</span>

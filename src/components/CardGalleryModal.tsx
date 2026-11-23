@@ -12,7 +12,7 @@ const CATEGORIES: ('All' | GalleryItem['category'])[] = [
   'All',
   'Helpers',
   'Rooms',
-  'Chores',
+  'Missions',
   'Tools',
   'Slow-Downs',
   'Clock',
