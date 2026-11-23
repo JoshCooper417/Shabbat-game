@@ -976,7 +976,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         """),
 
         (7, "5. Actions: Move & Tidy", """
-          <p>On your turn, take <strong>up to 2 Actions</strong> in any order—you may even do the same action twice (like Move → Move, or Tidy → Chore!).</p>
+          <p>On your turn, take <strong>up to 2 Actions</strong> in any order—you may even do the same action twice (like Move → Move or Tidy → Tidy!).</p>
           <div class="box-card" style="border-left:7px solid #2563EB;">
             <h2 style="margin-top:0; color:#1E40AF;">Action: Move (1 Action)</h2>
             <ul>
@@ -1113,7 +1113,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <img src="{av_mommy}" alt="Mommy">
             <div>
               <h3>3. MOMMY · Bottom-Right</h3>
-              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (0 Actions). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms!</p>
+              <p><strong>Errand Express (Your Turn):</strong> Once per turn, Pick Up or Deliver an Errand for <strong>FREE</strong> (0 Actions). Pick Up &amp; Deliver also work in <strong>Cluttered</strong> rooms (not Blocked)!</p>
             </div>
           </div>
           <div class="helper-row" style="--c:#7C3AED;">
@@ -1139,21 +1139,21 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </thead>
             <tbody>
               <tr>
-                <td><strong>Beginner</strong><br><span style="font-size:14.5px; color:#047857;">First Game · 6+</span></td>
+                <td><strong>Beginner</strong><br><span style="font-size:13.5px; color:#047857; white-space:nowrap;">First Game · 6+</span></td>
                 <td><strong>10</strong><br>(4+6 / 8 boxed)</td>
                 <td><strong>7</strong><br>(6+1 / 3 boxed)</td>
                 <td><strong>1 room</strong><br><em>Center</em></td>
                 <td><strong>17</strong><br><em>Box Time Flies!</em></td>
               </tr>
               <tr>
-                <td><strong>Standard</strong><br><span style="font-size:14.5px; color:#1D4ED8;">Family Balance</span></td>
+                <td><strong>Standard</strong><br><span style="font-size:13.5px; color:#1D4ED8; white-space:nowrap;">Family Balance</span></td>
                 <td><strong>13</strong><br>(4+9 / 5 boxed)</td>
                 <td><strong>6</strong><br>(5+1 / 4 boxed)</td>
                 <td><strong>2 rooms</strong><br><em>Top &amp; Bot Center</em></td>
                 <td><strong>18</strong><br><em>All included</em></td>
               </tr>
               <tr>
-                <td><strong>Hard</strong><br><span style="font-size:14.5px; color:#B91C1C;">Friday Rush</span></td>
+                <td><strong>Hard</strong><br><span style="font-size:13.5px; color:#B91C1C; white-space:nowrap;">Friday Rush</span></td>
                 <td><strong>15</strong><br>(4+11 / 3 boxed)</td>
                 <td><strong>5</strong><br>(4+1 / 5 boxed)</td>
                 <td><strong>2 rooms</strong><br><em>Top &amp; Bot Center</em></td>
@@ -1173,21 +1173,22 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         """),
 
         (14, "11. Quick 1-Round Example", """
-          <p style="font-size:18.5px; color:#475569;">A sample Standard-mode round showing combos and all 4 Cooper powers:</p>
-          <div class="box-card" style="border-left:6px solid #2563EB; font-size:18.5px;">
+          <p style="font-size:18px; color:#475569;">A sample Standard-mode round showing combos and all 4 Cooper Helpers:</p>
+          <div class="box-card" style="border-left:6px solid #2563EB; font-size:17.5px;">
             <strong>1. Abba (2 Actions):</strong> Walks right into Red Blocked <em>The Salon</em> (Action 1) and uses <strong>Solo Cleanup</strong> to flip it Clear alone (Action 2)!<br>
             <em>Event:</em> Kitchen Slow-Down → Cluttered <em>The Fridge</em> (where Mommy stands) flips Blocked. Mommy isn't trapped!
           </div>
-          <div class="box-card" style="border-left:6px solid #059669; font-size:18.5px;">
-            <strong>2. Nael (2 Actions):</strong> Plays <strong>Snack Summons</strong> to pull Abba into Nael's Cluttered <em>Dining Table</em> (Action 1), then uses <strong>Learning Tower Power!</strong> to finish <em>Set the Shabbat Table</em> right away (Action 2)! Refill Chore Row to 4.<br>
+          <div class="box-card" style="border-left:6px solid #059669; font-size:17.5px;">
+            <strong>2. Nael (2 Actions):</strong> Plays <strong>Snack Summons</strong> to pull Abba into Nael's Cluttered <em>Dining Table</em> (Action 1), then uses <strong>Learning Tower Power!</strong> to finish <em>Set the Shabbat Table</em> right away (Action 2)! Refill Row to 4.<br>
             <em>Event:</em> Draws <em>Cousin Aviel Drops By!</em> → added to Family Toolbox!
           </div>
-          <div class="box-card" style="border-left:6px solid #DB2777; font-size:18.5px;">
+          <div class="box-card" style="border-left:6px solid #DB2777; font-size:17.5px;">
             <strong>3. Mommy (2 Actions + Free Errand):</strong> Walks out of Blocked <em>Fridge</em> into Clear <em>Chairs</em> (Action 1), Delivers <em>Challah</em> for <strong>FREE</strong> (<strong>Errand Express</strong>!), and puts <em>Cousin Aviel</em> on the Clock (Action 2)!<br>
             <em>Event:</em> Downstairs Slow-Down → Clear <em>Salon</em> tilts sideways.
           </div>
-          <div class="box-card" style="border-left:6px solid #7C3AED; font-size:18.5px;">
+          <div class="box-card" style="border-left:6px solid #7C3AED; font-size:17.5px;">
             <strong>4. Mekimi (2 Actions):</strong> Uses <strong>Turbo Crawl</strong> straight to Clear <em>Giant Island</em> (Action 1) and Picks Up <em>Showstopper</em> Errand (Action 2)! Refill Row.<br>
+            <em>Event:</em> Table Slow-Down targets Cluttered <em>Dining Table</em>—<strong>Abba's Balagan Barrier</strong> cancels the flip!<br>
             <em>End of Round:</em> <strong>Cousin Aviel</strong> blocks the Clock flip and returns to the box! Round 3 starts with <strong>Abba</strong>!
           </div>
         """),
@@ -1197,7 +1198,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <strong>How We Win:</strong> Finish <strong>all the Chores</strong> together before <strong>Shabbat Begins!</strong> flips over!
           </div>
           <h2>On Your Turn: 2 Actions + 1 Event!</h2>
-          <ol style="gap:10px;">
+          <ol style="gap:9px;">
             <li><strong>Pick Any 2 Fun Actions</strong> (you can even do the same one twice!):
               <ul style="margin-top:6px; gap:5px;">
                 <li><strong>Walk</strong> 1 room up, down, left, or right. <em>(Mekimi crawls ANYWHERE!)</em></li>
@@ -1210,8 +1211,8 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <li><strong>Flip 1 Event Card:</strong> Tool → Toolbox! Slow-Down → match the color: flip the 1st sideways room Red (or tilt the 1st Clear room sideways!).</li>
             <li><strong>After Mekimi:</strong> Flip 1 Clock card closer to sunset, then go back to <strong>Abba</strong>!</li>
           </ol>
-          <div class="callout callout-green" style="font-size:18.5px;">
-            <strong>Superpowers:</strong> <strong>Abba</strong> fixes Red rooms alone · <strong>Nael</strong> finishes Team Chores in sideways rooms with a friend · <strong>Mommy</strong> gets 1 FREE Errand/turn (even sideways!) · <strong>Mekimi</strong> crawls to ANY room!
+          <div class="callout callout-green" style="font-size:17.5px;">
+            <strong>Superpowers:</strong> <strong>Abba</strong> fixes Red rooms alone &amp; keeps his sideways room from flipping Red · <strong>Nael</strong> finishes Team Chores in sideways rooms with a friend · <strong>Mommy</strong> gets 1 FREE Errand/turn (even sideways!) · <strong>Mekimi</strong> crawls to ANY room!
           </div>
         """),
 
@@ -1236,7 +1237,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </div>
           </div>
           <div class="box-card">
-            <strong style="color:#047857;">Room States</strong> · <strong>Clear:</strong> Everything! · <strong>Cluttered:</strong> Tidy, Handoff, Tools (+ Nael Team / Mommy Errands) · <strong>Blocked:</strong> Move out, Unblock, Handoff, Tools only.
+            <strong style="color:#047857;">Room States</strong> · <strong>Clear:</strong> Everything! · <strong>Cluttered:</strong> Tidy, Handoff, Tools (+ Nael Team / Mommy Errands) · <strong>Blocked:</strong> Move in/out, Unblock, Handoff, Tools only.
           </div>
           <div class="box-card">
             <strong style="color:#B45309;">4 Family Superpowers</strong><br>
@@ -1245,30 +1246,119 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             • <strong>Mommy:</strong> 1 Free Pick Up/Deliver per turn; Errands work in Cluttered.<br>
             • <strong>Mekimi:</strong> Crawls straight into <strong>ANY room</strong> on any Move!
           </div>
-          <div class="box-card" style="font-size:18px; text-align:center;">
-            <strong>Modes:</strong> Beg <strong>10</strong> Chores / <strong>7</strong> Clock (no TF) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>5</strong>
+          <div class="box-card" style="font-size:17.5px; text-align:center;">
+            <strong>Modes:</strong> Beg <strong>10</strong> Chores / <strong>7</strong> Clock (no Time Flies) · Std <strong>13</strong> / <strong>6</strong> · Hard <strong>15</strong> / <strong>5</strong>
           </div>
         """),
     ]
     return [(num, booklet_page(num, title, body)) for num, title, body in pages]
 
-def render_all():
+BACKS_DIR = ROOT / "print-pack" / "02_Cards_Backs"
+
+def render_blocked_back_html(orig_path: Path) -> str:
+    b64 = base64.b64encode(orig_path.read_bytes()).decode("ascii")
+    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@600;700;800&display=swap');
+      * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+      html, body {{ width: 825px; height: 1125px; overflow: hidden; font-family: 'DM Sans', sans-serif; }}
+      .card {{ position: relative; width: 825px; height: 1125px; background: url("data:image/png;base64,{b64}") no-repeat 0 0 / 825px 1125px; }}
+      .bottom-pill {{
+        position: absolute;
+        left: 76px;
+        top: 974px;
+        width: 673px;
+        height: 76px;
+        background: #FFFFFF;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 8px 22px;
+        color: #991B1B;
+        font-size: 20.5px;
+        font-weight: 700;
+        line-height: 1.28;
+        letter-spacing: -0.01em;
+      }}
+    </style></head><body>
+      <div class="card">
+        <div class="bottom-pill">
+          <div>Helpers &amp; carried Errands stay safe here —</div>
+          <div>walk in/out, Free Handoff Errands, and use Tools normally.</div>
+        </div>
+      </div>
+    </body></html>"""
+
+def render_shared_helper_back_html(orig_path: Path) -> str:
+    # Smoothly erase the old subtitle band (y=740..792, x=100..725) via vertical per-column gradient interpolation
+    im = Image.open(orig_path).convert("RGB")
+    px = im.load()
+    y0, y1 = 740, 792
+    for x in range(100, 726):
+        c0 = px[x, y0]
+        c1 = px[x, y1]
+        for y in range(y0 + 1, y1):
+            t = (y - y0) / (y1 - y0)
+            px[x, y] = (
+                round(c0[0] * (1 - t) + c1[0] * t),
+                round(c0[1] * (1 - t) + c1[1] * t),
+                round(c0[2] * (1 - t) + c1[2] * t),
+            )
+    buf = io.BytesIO()
+    im.save(buf, format="PNG")
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"""<!doctype html><html><head><meta charset="utf-8"><style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600&display=swap');
+      * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+      html, body {{ width: 825px; height: 1125px; overflow: hidden; font-family: 'DM Sans', sans-serif; }}
+      .card {{ position: relative; width: 825px; height: 1125px; background: url("data:image/png;base64,{b64}") no-repeat 0 0 / 825px 1125px; }}
+      .subtitle {{
+        position: absolute;
+        left: 90px;
+        right: 90px;
+        top: 744px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #E2E8F0;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 0.005em;
+      }}
+    </style></head><body>
+      <div class="card">
+        <div class="subtitle">Keep face-up · Place carried Errands here</div>
+      </div>
+    </body></html>"""
+
+def render_all(only_backs_and_pages: set[int] | None = None):
     jobs: list[tuple[Path, str]] = []
 
-    for h in HELPERS_SPEC:
-        jobs.append((FRONTS_DIR / h["file"], render_helper_html(h)))
-    for c in CHORES_SPEC:
-        jobs.append((FRONTS_DIR / c[0], render_chore_html(c)))
-    for t in TOOLS_SPEC:
-        jobs.append((FRONTS_DIR / t["file"], render_tool_html(t)))
-    for s in SLOW_DOWNS_SPEC:
-        jobs.append((FRONTS_DIR / s[0], render_slowdown_html(s)))
-    jobs.append((FRONTS_DIR / "clock_63_71_friday_afternoon_QTY9.png", render_friday_afternoon_html()))
+    if only_backs_and_pages is None:
+        for h in HELPERS_SPEC:
+            jobs.append((FRONTS_DIR / h["file"], render_helper_html(h)))
+        for c in CHORES_SPEC:
+            jobs.append((FRONTS_DIR / c[0], render_chore_html(c)))
+        for t in TOOLS_SPEC:
+            jobs.append((FRONTS_DIR / t["file"], render_tool_html(t)))
+        for s in SLOW_DOWNS_SPEC:
+            jobs.append((FRONTS_DIR / s[0], render_slowdown_html(s)))
+        jobs.append((FRONTS_DIR / "clock_63_71_friday_afternoon_QTY9.png", render_friday_afternoon_html()))
+
+    # 13 updated card backs (12 Red Blocked Rooms + Shared Helper Back)
+    for back_path in sorted(BACKS_DIR.glob("back_room_*_BLOCKED.png")):
+        jobs.append((back_path, render_blocked_back_html(back_path)))
+    jobs.append((BACKS_DIR / "back_SHARED_helpers.png", render_shared_helper_back_html(BACKS_DIR / "back_SHARED_helpers.png")))
 
     for num, html in build_booklet_pages():
-        jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
+        if only_backs_and_pages is None or num in only_backs_and_pages:
+            jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
 
-    print(f"Rendering {len(jobs)} TGC 300-DPI RGB PNGs (44 cards + 15 booklet pages)...")
+    print(f"Rendering {len(jobs)} TGC 300-DPI RGB PNGs...")
     overflows = []
 
     with sync_playwright() as p:
@@ -1277,9 +1367,8 @@ def render_all():
 
         for out_path, html in jobs:
             page.set_content(html, wait_until="load")
-            # Check overflow strictly!
+            page.evaluate("() => document.fonts ? document.fonts.ready : Promise.resolve()")
             dims = page.evaluate("""() => {
-                const body = document.body;
                 const el = document.querySelector('.card, .page');
                 const inner = document.querySelector('.page-body');
                 return {
@@ -1309,4 +1398,8 @@ def render_all():
     print(f"SUCCESS: Rendered & verified {len(jobs)} crisp 825x1125 RGB 300-DPI PNGs with 0 overflows!")
 
 if __name__ == "__main__":
-    render_all()
+    import sys
+    if "--backs-and-booklet" in sys.argv:
+        render_all(only_backs_and_pages={7, 12, 13, 14, 15, 16})
+    else:
+        render_all()

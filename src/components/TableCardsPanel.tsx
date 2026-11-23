@@ -117,7 +117,7 @@ export function TableCardsPanel({ state, onPlayAction, onInspectCard }: TableCar
                       <span className="table-card-howto">
                         {chore.type === 'TEAM_CHORE'
                           ? '2+ Helpers in matching Clear room (1 Action)'
-                          : 'Pick Up at Start → Deliver to End (1 Action)'}
+                          : 'Pick Up at Start → Deliver to End (1 Action each)'}
                       </span>
                       <div className="table-card-caption-actions">
                         {playableAction ? (

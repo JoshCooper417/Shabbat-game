@@ -197,7 +197,7 @@ All modes use **9 Rooms** (3 boxed), **4 Helpers**, and **6 Tools** (**2** in Fa
 4. **Mekimi's Turn (2 Actions):**
    - *Action 1 (Move — **Turbo Crawl**):* Crawls straight across the house into *The Giant Island* (Clear Kitchen)!
    - *Action 2 (Pick Up Errand):* Picks up *Half Baked Harvest Showstopper* (Kitchen → Table) onto her Helper card! *(Refill Chore Row back to 4!)*
-   - *Event:* Flips *Out of Shabbat Candles!* (Table) → *The Dining Table* is Cluttered, so it flips Blocked.
+   - *Event:* Flips *Out of Shabbat Candles!* (Table) → targets Cluttered *The Dining Table*, where **Abba** is standing — **Balagan Barrier** cancels the flip so it stays Cluttered!
 - **End of Round (after Mekimi):** The Clock tries to flip — **Cousin Aviel Drops By!** absorbs the flip and returns to the box! Round 3 starts fresh with **Abba**!
 
 ---
@@ -239,3 +239,30 @@ Finish **all the Chores** together before **Shabbat Begins!** flips over!
 - **Mommy:** Errand superstar! Gets 1 FREE Pick Up or Drop Off every turn, even in sideways rooms!
 - **Nael:** Learning Tower helper! With a friend in a sideways room, you can still finish a Team Chore together!
 - **Mekimi:** Turbo crawler! Can zoom straight into **ANY room** in the whole house!
+
+---
+
+## 11. Complete 72-Card Deck Reference (Synced with TGC Print Pack)
+
+Exact inventory across 4 full 18-card TGC Poker sheets (`57` unique fronts, `16` unique backs, `72` cards total):
+
+| Card # | Category | Title / Details | Qty |
+| :--- | :--- | :--- | :---: |
+| `#01–#04` | Helpers (4) | Abba (Top-Left) · Mommy (Bot-Right) · Nael (Top-Right) · Mekimi (Bot-Left) | 4 |
+| `#05–#07` | Rooms: Kitchen | The Giant Island · Mixer Counter (Plata & Kumkum) · The Fridge | 3 |
+| `#08–#10` | Rooms: Downstairs | The Mamad (Playroom) · The Salon · Sink & Dishwasher | 3 |
+| `#11–#13` | Rooms: Table | The Dining Table · Shabbat Candles Cabinet · Chairs | 3 |
+| `#14–#16` | Rooms: Upstairs | The Bathtub · The Shower · The Bedrooms | 3 |
+| `#18, 27, 31` | Team Chores: Kitchen | Fill Kumkum & Set Plata Timer · Learning Tower Bake-Off · Clear the Giant Island | 3 |
+| `#28, 32` | Team Chores: Downstairs | Mamad Toy Avalanche · The Great Salon Reset | 2 |
+| `#20, 29, 33` | Team Chores: Table | High Chair & Chair Stack · Set the Shabbat Table · Shabbat Candles Ready | 3 |
+| `#21, 30` | Team Chores: Upstairs | Lay Out the Shabbat Outfits · Bath Time Splash Squad | 2 |
+| `#17, 22` | Errands: Kitchen → Table | Challah: Mixer to Oven · Half Baked Harvest Showstopper | 2 |
+| `#23, 25` | Errands: Downstairs → ... | Shabbat Flowers to the Center (→ Table) · Herd the Kids Upstairs for Baths (→ Upstairs) | 2 |
+| `#19, 24` | Errands: Table → ... | Dishwasher Round #3 (→ Downstairs) · Mystery Table Pile (→ Kitchen) | 2 |
+| `#26, 34` | Errands: Upstairs → ... | Dressed Kids Downstairs—Keep 'Em Clean! (→ Downstairs) · Everyone in Shabbat Clothes! (→ Table) | 2 |
+| `#35–#44` | Household Tools (10) | Ice Coffee Boost (×4, Reusable) · Strategic Snack Summons (×3, Reusable) · Cousin Aviel Drops By! (×3, One-Time Shield) | 10 |
+| `#45–#59` | Single-Zone Slow-Downs | Kitchen (×3): `#45–47` · Downstairs (×4): `#48–51` · Table (×4): `#52–55` · Upstairs (×4): `#56–59` | 15 |
+| `#60–#62` | Special Slow-Downs (3) | `#60` Challah Flour Trail! (K+D) · `#61` Upstairs-Downstairs Whirlwind! (T+U) · `#62` "Wait—Shabbat Is at WHAT Time?!" (Clock + K, boxed) | 3 |
+| `#63–#72` | Shabbat Clock (10) | Friday Afternoon (×9) · Shabbat Begins! (×1) | 10 |
+| **TOTAL** | **4 × 18-Card TGC Sheets** | **4 Helpers + 12 Rooms + 18 Chores + 10 Tools + 18 Slow-Downs + 10 Clock** | **72** |

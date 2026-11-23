@@ -22,7 +22,7 @@ export function ClockStrip({ state, onInspectCard }: ClockStripProps) {
             ? shieldCount > 0
               ? `FINAL ROUND (+${shieldCount} shielded by Cousin Aviel!)`
               : 'FINAL ROUND — Next flip is Shabbat Begins!'
-            : `${safeFlipsLeft} round${safeFlipsLeft === 1 ? '' : 's'} left before Shabbat Begins!${
+            : `${safeFlipsLeft} safe flip${safeFlipsLeft === 1 ? '' : 's'} left before Shabbat Begins!${
                 shieldCount > 0 ? ` (+${shieldCount} shielded)` : ''
               }`}
         </span>

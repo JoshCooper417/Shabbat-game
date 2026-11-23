@@ -20,12 +20,12 @@ ROOM_ART_SIZE = (480, 398)
 # Booklet pages: keep full safe layout (small_booklet_page_01..16 are 825x1125)
 BOOKLET_SIZE = (750, 1023)
 
-# Face-centered square crops for the 4 Helper portrait tokens
+# Face-centered square crops for the 4 Helper portrait tokens (aligned inside v3 Helper card art frames)
 HELPER_AVATAR_CROPS = {
-    "abba": ("01_Cards_Fronts/helper_01_abba.png", (275, 152, 555, 432)),
-    "mommy": ("01_Cards_Fronts/helper_02_mommy.png", (368, 150, 628, 410)),
-    "nael": ("01_Cards_Fronts/helper_03_nael.png", (285, 148, 555, 418)),
-    "mekimi": ("01_Cards_Fronts/helper_04_mekimi.png", (235, 165, 515, 445)),
+    "abba": ("01_Cards_Fronts/helper_01_abba.png", (275, 180, 555, 460)),
+    "mommy": ("01_Cards_Fronts/helper_02_mommy.png", (355, 198, 615, 458)),
+    "nael": ("01_Cards_Fronts/helper_03_nael.png", (285, 206, 555, 476)),
+    "mekimi": ("01_Cards_Fronts/helper_04_mekimi.png", (235, 212, 515, 492)),
 }
 
 
