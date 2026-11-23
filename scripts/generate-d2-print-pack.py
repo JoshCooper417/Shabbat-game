@@ -271,7 +271,7 @@ HELPERS_SPEC = [
         "art_h": 375,
         "powers": [
             ("Solo Cleanup", "YOUR TURN", "Flip a Red Blocked room you're in back to Clear all by yourself (1 Action — no teammate needed)."),
-            ("Balagan Barrier", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked."),
+            ("Balagan Barrier", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!)."),
         ],
         "flavor": "“Flour on the counter? Fine. Total meltdown? Not on his watch.”",
     },
@@ -976,7 +976,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         """),
 
         (7, "5. Actions: Move & Tidy", """
-          <p>On your turn, take <strong>up to 2 Actions</strong> in any order—you may even do the same action twice (like Move → Move or Tidy → Tidy!).</p>
+          <p>On your turn, take <strong>up to 2 Actions</strong> in any order—you may even do the same action twice (like Move → Move or Chore → Chore!).</p>
           <div class="box-card" style="border-left:7px solid #2563EB;">
             <h2 style="margin-top:0; color:#1E40AF;">Action: Move (1 Action)</h2>
             <ul>
@@ -1099,7 +1099,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <div>
               <h3>1. ABBA · Top-Left</h3>
               <p><strong>Solo Cleanup (Your Turn):</strong> Unblock a Red Blocked room alone (1 Action).<br>
-              <strong>Balagan Barrier (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked!</p>
+              <strong>Balagan Barrier (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!).</p>
             </div>
           </div>
           <div class="helper-row" style="--c:#059669;">
@@ -1205,7 +1205,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
                 <li><strong>Tidy</strong> a sideways room (alone) or a Red room (with a friend—or Abba alone!).</li>
                 <li><strong>Team Chore (Purple):</strong> Meet a friend in a matching Clear room and finish it!</li>
                 <li><strong>Errand (Blue):</strong> Pick up at Start, carry it, drop off at End! <em>(Handing to a friend in your room is FREE!)</em></li>
-                <li><strong>Use a Tool</strong> from the Toolbox anytime!</li>
+                <li><strong>Use a Tool</strong> from the Toolbox (from any room)!</li>
               </ul>
             </li>
             <li><strong>Flip 1 Event Card:</strong> Tool → Toolbox! Slow-Down → match the color: flip the 1st sideways room Red (or tilt the 1st Clear room sideways!).</li>
@@ -1237,7 +1237,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </div>
           </div>
           <div class="box-card">
-            <strong style="color:#047857;">Room States</strong> · <strong>Clear:</strong> Everything! · <strong>Cluttered:</strong> Tidy, Handoff, Tools (+ Nael Team / Mommy Errands) · <strong>Blocked:</strong> Move in/out, Unblock, Handoff, Tools only.
+            <strong style="color:#047857;">Room States</strong> · <strong>Clear:</strong> Everything! · <strong>Cluttered:</strong> Move in/out, Tidy, Handoff, Tools (+ Nael Team / Mommy Errands) · <strong>Blocked:</strong> Move in/out, Unblock, Handoff, Tools only.
           </div>
           <div class="box-card">
             <strong style="color:#B45309;">4 Family Superpowers</strong><br>
@@ -1335,28 +1335,34 @@ def render_shared_helper_back_html(orig_path: Path) -> str:
       </div>
     </body></html>"""
 
-def render_all(only_backs_and_pages: set[int] | None = None):
+def render_all(only_backs_and_pages: set[int] | None = None, only_abba_and_pages: set[int] | None = None):
     jobs: list[tuple[Path, str]] = []
 
-    if only_backs_and_pages is None:
-        for h in HELPERS_SPEC:
-            jobs.append((FRONTS_DIR / h["file"], render_helper_html(h)))
-        for c in CHORES_SPEC:
-            jobs.append((FRONTS_DIR / c[0], render_chore_html(c)))
-        for t in TOOLS_SPEC:
-            jobs.append((FRONTS_DIR / t["file"], render_tool_html(t)))
-        for s in SLOW_DOWNS_SPEC:
-            jobs.append((FRONTS_DIR / s[0], render_slowdown_html(s)))
-        jobs.append((FRONTS_DIR / "clock_63_71_friday_afternoon_QTY9.png", render_friday_afternoon_html()))
+    if only_abba_and_pages is not None:
+        jobs.append((FRONTS_DIR / HELPERS_SPEC[0]["file"], render_helper_html(HELPERS_SPEC[0])))
+        for num, html in build_booklet_pages():
+            if num in only_abba_and_pages:
+                jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
+    else:
+        if only_backs_and_pages is None:
+            for h in HELPERS_SPEC:
+                jobs.append((FRONTS_DIR / h["file"], render_helper_html(h)))
+            for c in CHORES_SPEC:
+                jobs.append((FRONTS_DIR / c[0], render_chore_html(c)))
+            for t in TOOLS_SPEC:
+                jobs.append((FRONTS_DIR / t["file"], render_tool_html(t)))
+            for s in SLOW_DOWNS_SPEC:
+                jobs.append((FRONTS_DIR / s[0], render_slowdown_html(s)))
+            jobs.append((FRONTS_DIR / "clock_63_71_friday_afternoon_QTY9.png", render_friday_afternoon_html()))
 
-    # 13 updated card backs (12 Red Blocked Rooms + Shared Helper Back)
-    for back_path in sorted(BACKS_DIR.glob("back_room_*_BLOCKED.png")):
-        jobs.append((back_path, render_blocked_back_html(back_path)))
-    jobs.append((BACKS_DIR / "back_SHARED_helpers.png", render_shared_helper_back_html(BACKS_DIR / "back_SHARED_helpers.png")))
+        # 13 updated card backs (12 Red Blocked Rooms + Shared Helper Back)
+        for back_path in sorted(BACKS_DIR.glob("back_room_*_BLOCKED.png")):
+            jobs.append((back_path, render_blocked_back_html(back_path)))
+        jobs.append((BACKS_DIR / "back_SHARED_helpers.png", render_shared_helper_back_html(BACKS_DIR / "back_SHARED_helpers.png")))
 
-    for num, html in build_booklet_pages():
-        if only_backs_and_pages is None or num in only_backs_and_pages:
-            jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
+        for num, html in build_booklet_pages():
+            if only_backs_and_pages is None or num in only_backs_and_pages:
+                jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
 
     print(f"Rendering {len(jobs)} TGC 300-DPI RGB PNGs...")
     overflows = []
@@ -1399,7 +1405,9 @@ def render_all(only_backs_and_pages: set[int] | None = None):
 
 if __name__ == "__main__":
     import sys
-    if "--backs-and-booklet" in sys.argv:
+    if "--targeted-polish" in sys.argv:
+        render_all(only_abba_and_pages={7, 12, 15, 16})
+    elif "--backs-and-booklet" in sys.argv:
         render_all(only_backs_and_pages={7, 12, 13, 14, 15, 16})
     else:
         render_all()

@@ -358,7 +358,7 @@ export function advanceAfterEvent(state: GameState): GameState {
       clockNote =
         remainingSafe <= 0
           ? 'Clock flipped (FINAL ROUND!)'
-          : `Clock flipped (${remainingSafe} safe round${remainingSafe === 1 ? '' : 's'} left)`;
+          : `Clock flipped (${remainingSafe} safe flip${remainingSafe === 1 ? '' : 's'} left)`;
       next = appendLog(
         next,
         'ROUND',

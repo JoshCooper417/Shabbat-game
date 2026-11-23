@@ -136,7 +136,7 @@ export default function App() {
       className="app-shell tabletop-surface"
       style={
         {
-          '--table-wood-url': `url(${assetUrl(TABLE_WOOD_IMAGE)})`,
+          '--table-wood-url': `url("${new URL(assetUrl(TABLE_WOOD_IMAGE), document.baseURI).href}")`,
         } as React.CSSProperties
       }
     >

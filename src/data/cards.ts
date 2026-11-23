@@ -105,7 +105,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Balagan Barrier',
         timing: 'Always On',
-        text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked.",
+        text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the hit is canceled!).",
       },
     ],
   },
