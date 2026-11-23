@@ -141,7 +141,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
       {
         name: 'Errand Express',
         timing: 'Your Turn',
-        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (0 Actions — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
+        text: 'Once per turn, Pick Up or Deliver an Errand for FREE (no Action spent — even with 0 Actions left!). You may Pick Up or Deliver Errands even in a Cluttered room (not Blocked).',
       },
     ],
   },

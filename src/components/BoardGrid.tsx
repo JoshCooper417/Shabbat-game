@@ -44,7 +44,9 @@ function getBoardPrompt(state: GameState): string {
   }
   if (state.phase === 'EVENT_RESOLVED') {
     return state.turnInRound === 4
-      ? `Review the Event, then end Round ${state.round} & flip the Clock`
+      ? state.clockShields.length > 0
+        ? `Review the Event, then end Round ${state.round} (Cousin Aviel shields the Clock!)`
+        : `Review the Event, then end Round ${state.round} & flip the Clock`
       : `Review the Event, then pass the turn after ${activeName}`;
   }
   if (state.phase === 'WON') return 'Shabbat Shalom — all Chores complete!';

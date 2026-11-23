@@ -32,7 +32,7 @@ export interface SetupOptions {
  * - Fixed Starting Clutter: Center (Beginner) or Top-Center & Bottom-Center (Standard/Hard)
  * - 4 Helpers in Clear corners (Abba TL, Nael TR, Mekimi BL, Mommy BR)
  * - Single-shuffle Chore deal: 10 (Beg) / 13 (Std) / 15 (Hard) -> 4 face-up Chore Row + rest Chore Deck
- * - Shabbat Clock: 6+1 (Beg) / 5+1 (Std) / 4+1 (Hard)
+ * - Shabbat Clock: 6+1 (Beg) / 5+1 (Std) / 5+1 (Hard)
  * - Tools: 2 face-up Family Toolbox (no cap) + 4 shuffled into Event Deck + 4 boxed
  * - Slow-Downs: all 18 (Beginner boxes Time Flies -> 17)
  */
