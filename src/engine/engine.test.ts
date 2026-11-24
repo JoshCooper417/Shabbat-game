@@ -160,7 +160,7 @@ describe('Preparing for Shabbat: Cooper Family Edition — D2* Rules Engine', ()
     expect(afterChore.phase).toBe('EVENT_READY');
   });
 
-  it('enforces Abba Solo Cleanup and Always-On Balagan Barrier', () => {
+  it('enforces Abba Solo Cleanup and Always-On Clutter Guard', () => {
     const base = createInitialGameState({ difficulty: 'STANDARD', seed: 7 });
     const rooms: RoomSlot[] = base.rooms.map((r, i) =>
       i === 0 ? { ...r, state: 'BLOCKED' } : { ...r, state: 'CLEAR' },
@@ -194,7 +194,7 @@ describe('Preparing for Shabbat: Cooper Family Edition — D2* Rules Engine', ()
     };
     expect(getActionEvaluation(naelSolo).legal.some((a) => a.type === 'TIDY_BLOCKED')).toBe(false);
 
-    // Balagan Barrier: Cluttered room where Abba stands cannot flip Blocked!
+    // Clutter Guard: Cluttered room where Abba stands cannot flip Blocked!
     const zone0 = rooms[0].card.zone;
     const zoneSlowDown = SLOW_DOWN_DECK.find((s) => s.kind === 'SINGLE_ZONE' && s.zone === zone0)!;
     const barrierState: GameState = {

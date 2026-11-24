@@ -966,47 +966,35 @@ img {
 }
 
 /* ============================================================================
-   3D STANDING COOPER FAMILY FIGURINES ON ROOM CARDS
+   3D STANDING COOPER FAMILY FIGURINES ON ROOM CARDS (OPTION D — HERO RIM + SOCKET + 3D V-CROWD)
    ============================================================================ */
 .figurines-stage {
   position: absolute;
-  left: 6px;
-  right: 6px;
-  bottom: 4px;
-  z-index: 8;
+  left: 4px;
+  right: 4px;
+  bottom: 10px;
+  z-index: 12;
   display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
-  gap: 2px;
+  justify-content: center;
+  gap: 8px;
   pointer-events: none;
 }
 
+.figurines-stage.solo {
+  justify-content: flex-end;
+  padding-right: 12px;
+}
+
 .figurines-stage.duo {
-  justify-content: space-between;
+  justify-content: space-around;
   padding: 0 4px;
 }
 
 .figurines-stage.crowd {
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 0;
-  padding: 0 1px;
-}
-
-.figurines-stage.crowd .figurine-piece {
-  margin: 0 -6px;
-}
-
-.figurines-stage.crowd .figurine-sprite {
-  height: 68px;
-}
-
-.figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
-  height: 54px;
-}
-
-.figurines-stage.crowd .figurine-plate {
-  font-size: 0.56rem;
-  padding: 1px 4px;
+  padding: 0 4px;
 }
 
 .figurine-piece {
@@ -1014,12 +1002,11 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s ease;
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), filter 0.24s ease;
 }
 
 .figurine-piece.is-active {
-  transform: translateY(-6px) scale(1.07);
-  z-index: 3;
+  z-index: 12;
 }
 
 .figurine-piece.is-resting {
@@ -1027,57 +1014,207 @@ img {
   opacity: 0.88;
 }
 
-.figurine-shadow {
+/* 3D Beveled Color-Matched Tabletop Token Socket directly under the cylinder base */
+.figurine-token-socket {
   position: absolute;
-  bottom: 13px;
-  width: 44px;
-  height: 11px;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 68px;
+  height: 21px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(22, 12, 3, 0.52) 0%, rgba(22, 12, 3, 0) 74%);
-  z-index: 1;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    rgba(12, 8, 4, 0.56) 0%,
+    rgba(12, 8, 4, 0.28) 56%,
+    transparent 74%
+  );
+  border: 2.5px solid color-mix(in srgb, var(--helper-color, #1b316b) 85%, white);
+  box-shadow:
+    0 3px 0 color-mix(in srgb, var(--helper-color, #1b316b) 62%, black),
+    0 6px 10px rgba(16, 8, 2, 0.42),
+    inset 0 2px 4px rgba(255, 255, 255, 0.45);
+  z-index: 2;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
 }
 
+.figurine-piece.is-mekimi .figurine-token-socket {
+  width: 74px;
+}
+
+.figurine-piece.is-active .figurine-token-socket {
+  border-color: #ffe07d;
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(255, 218, 102, 0.66) 0%,
+    rgba(229, 151, 11, 0.32) 60%,
+    transparent 78%
+  );
+  box-shadow:
+    0 3px 0 #b87004,
+    0 0 16px rgba(255, 206, 68, 0.95),
+    0 7px 14px rgba(16, 8, 2, 0.46),
+    inset 0 2px 5px rgba(255, 250, 224, 0.9);
+  animation: figurineHaloPulse 1.9s ease-in-out infinite;
+}
+
+/* Keep .figurine-shadow.large for StartScreen / showcase helpers */
 .figurine-shadow.large {
+  position: absolute;
   bottom: 2px;
   width: 82px;
   height: 18px;
+  border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(36, 18, 4, 0.45) 0%, rgba(36, 18, 4, 0) 72%);
+  z-index: 1;
+}
+
+.figurine-sprite-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 4;
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .figurine-sprite {
   position: relative;
-  z-index: 2;
-  height: 86px;
+  z-index: 4;
+  height: 112px;
   width: auto;
-  filter: drop-shadow(0 6px 8px rgba(24, 14, 4, 0.38));
+  display: block;
+  /* Warm porcelain studio rim-light contour + multi-step tabletop drop shadow */
+  filter:
+    drop-shadow(1.3px 0 0 rgba(255, 252, 244, 0.95))
+    drop-shadow(-1.3px 0 0 rgba(255, 252, 244, 0.95))
+    drop-shadow(0 -1.3px 0 rgba(255, 252, 244, 0.95))
+    drop-shadow(0 1.3px 0 rgba(255, 252, 244, 0.72))
+    drop-shadow(4px 8px 6px rgba(18, 9, 2, 0.45))
+    drop-shadow(8px 14px 14px rgba(18, 9, 2, 0.24));
 }
 
 .figurine-piece.is-mekimi .figurine-sprite {
-  height: 66px;
+  height: 88px;
+}
+
+.figurine-piece.is-active .figurine-sprite-wrap {
+  transform: translateY(-7px) scale(1.06);
+  animation: figurineGentleFloat 2.3s ease-in-out infinite;
 }
 
 .figurine-piece.is-active .figurine-sprite {
   filter:
-    drop-shadow(0 0 6px rgba(255, 224, 120, 0.92))
-    drop-shadow(0 9px 12px rgba(24, 14, 4, 0.44));
+    drop-shadow(1.6px 0 0 #fff7d1)
+    drop-shadow(-1.6px 0 0 #fff7d1)
+    drop-shadow(0 -1.6px 0 #fff7d1)
+    drop-shadow(0 0 10px rgba(255, 208, 72, 0.85))
+    drop-shadow(6px 12px 10px rgba(18, 9, 2, 0.45));
 }
 
-.figurine-plate {
-  position: relative;
+/* Tactile lift response when hovering a clickable room tile */
+.room-tile.clickable:hover .figurine-piece .figurine-sprite-wrap {
+  transform: translateY(-10px) scale(1.08) rotate(-2deg);
+}
+
+/* STAGGERED 3D V-FORMATION FOR CROWDS (3-4 Helpers stay HUGE in 2 physical depth rows!) */
+.figurines-stage.crowd .figurine-piece {
+  margin: 0 -10px;
+}
+
+.figurines-stage.crowd .figurine-sprite {
+  height: 94px;
+}
+
+.figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
+  height: 74px;
+}
+
+.figurines-stage.crowd .figurine-token-socket {
+  width: 54px;
+  height: 17px;
+}
+
+.figurines-stage.crowd .figurine-plate {
+  font-size: 0.58rem;
+  padding: 1.5px 5px;
+}
+
+/* 3-Helper V-Formation: idx 0 & 2 in front, idx 1 raised in back center */
+.figurines-stage.crowd-3 .figurine-piece[data-idx='0'] {
+  z-index: 6;
+  transform: translate(-3px, 2px) scale(1.02);
+}
+
+.figurines-stage.crowd-3 .figurine-piece[data-idx='1'] {
   z-index: 3;
-  margin-top: -5px;
+  transform: translateY(-20px) scale(0.91);
+  filter: brightness(0.96);
+}
+
+.figurines-stage.crowd-3 .figurine-piece[data-idx='2'] {
+  z-index: 7;
+  transform: translate(3px, 2px) scale(1.02);
+}
+
+.figurines-stage.crowd-3 .figurine-piece[data-idx='1'] .figurine-plate {
+  bottom: auto;
+  top: -15px;
+}
+
+/* 4-Helper V-Formation: idx 0 & 3 in front, idx 1 & 2 raised in back row with clear top tags */
+.figurines-stage.crowd-4 .figurine-piece[data-idx='0'] {
+  z-index: 6;
+  transform: translate(-4px, 2px) scale(1.02);
+}
+
+.figurines-stage.crowd-4 .figurine-piece[data-idx='1'] {
+  z-index: 3;
+  transform: translate(-3px, -21px) scale(0.9);
+  filter: brightness(0.95);
+}
+
+.figurines-stage.crowd-4 .figurine-piece[data-idx='2'] {
+  z-index: 4;
+  transform: translate(3px, -19px) scale(0.92);
+  filter: brightness(0.97);
+}
+
+.figurines-stage.crowd-4 .figurine-piece[data-idx='3'] {
+  z-index: 7;
+  transform: translate(4px, 2px) scale(1.03);
+}
+
+.figurines-stage.crowd-4 .figurine-piece[data-idx='1'] .figurine-plate,
+.figurines-stage.crowd-4 .figurine-piece[data-idx='2'] .figurine-plate {
+  bottom: auto;
+  top: -15px;
+}
+
+.figurines-stage.crowd .figurine-piece.is-active {
+  z-index: 12;
+  filter: brightness(1.03);
+}
+
+/* Nameplate tucked cleanly below the 3D cylinder base so 100% of the wooden base shows */
+.figurine-plate {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
   display: inline-flex;
   align-items: center;
   gap: 3px;
   background: rgba(255, 253, 248, 0.96);
   border: 2px solid var(--helper-color, #1b316b);
   color: var(--ink-primary);
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
   line-height: 1;
   padding: 2px 6px;
   border-radius: 999px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.32);
   white-space: nowrap;
 }
 
@@ -1098,12 +1235,34 @@ img {
   color: var(--bg-navy-deep);
   border-radius: 999px;
   padding: 1px 4px;
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 800;
 }
 
+@keyframes figurineHaloPulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes figurineGentleFloat {
+  0%,
+  100% {
+    transform: translateY(-6px) scale(1.06);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.07);
+  }
+}
+
 .room-footer {
-  padding: 7px 8px 8px;
+  padding: 11px 8px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2490,13 +2649,13 @@ img {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Slightly smaller figurine on Red Blocked rooms so Blocked card rules stay visible */
+/* Prominent Option D figurine on Red Blocked rooms while keeping Blocked header clear */
 .room-tile.blocked .figurine-sprite {
-  height: 66px;
+  height: 92px;
 }
 
 .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
-  height: 52px;
+  height: 74px;
 }
 
 /* Zero-clipping room names & subtitles */
@@ -2878,58 +3037,113 @@ img {
     padding: 2px 6px;
   }
 
-  .figurines-stage {
-    bottom: 2px;
-    left: 2px;
-    right: 2px;
+  .room-footer {
+    padding: 8px 5px 5px;
   }
 
-  .figurine-piece.is-active {
-    transform: translateY(-2px) scale(1.03);
+  .figurines-stage {
+    bottom: 7px;
+    left: 2px;
+    right: 2px;
+    gap: 4px;
+  }
+
+  .figurines-stage.solo {
+    padding-right: 6px;
+  }
+
+  .figurine-piece.is-active .figurine-sprite-wrap {
+    transform: translateY(-4px) scale(1.05);
   }
 
   .figurine-sprite {
-    height: 38px;
+    height: 64px;
+    filter:
+      drop-shadow(1px 0 0 rgba(255, 252, 244, 0.95))
+      drop-shadow(-1px 0 0 rgba(255, 252, 244, 0.95))
+      drop-shadow(0 -1px 0 rgba(255, 252, 244, 0.95))
+      drop-shadow(0 1px 0 rgba(255, 252, 244, 0.72))
+      drop-shadow(2px 5px 4px rgba(18, 9, 2, 0.44))
+      drop-shadow(4px 8px 8px rgba(18, 9, 2, 0.22));
   }
 
   .figurine-piece.is-mekimi .figurine-sprite {
-    height: 30px;
+    height: 50px;
   }
 
   .room-tile.blocked .figurine-sprite {
-    height: 34px;
+    height: 50px;
   }
 
   .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
-    height: 28px;
+    height: 40px;
   }
 
-  .figurine-shadow {
-    width: 22px;
-    height: 5px;
-    bottom: 8px;
+  .figurine-token-socket {
+    width: 38px;
+    height: 12px;
+    border-width: 1.8px;
+    bottom: -3px;
+    box-shadow:
+      0 2px 0 color-mix(in srgb, var(--helper-color, #1b316b) 62%, black),
+      0 4px 6px rgba(16, 8, 2, 0.38),
+      inset 0 1px 3px rgba(255, 255, 255, 0.45);
+  }
+
+  .figurine-piece.is-mekimi .figurine-token-socket {
+    width: 42px;
   }
 
   .figurine-plate {
-    font-size: 0.52rem;
+    font-size: 0.48rem;
     padding: 1px 4px;
+    bottom: -8px;
+    border-width: 1.4px;
   }
 
   .figurines-stage.crowd .figurine-piece {
-    margin: 0 -8px;
+    margin: 0 -10px;
   }
 
   .figurines-stage.crowd .figurine-sprite {
-    height: 30px;
+    height: 52px;
   }
 
   .figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
-    height: 24px;
+    height: 42px;
+  }
+
+  .figurines-stage.crowd .figurine-token-socket {
+    width: 30px;
+    height: 10px;
   }
 
   .figurines-stage.crowd .figurine-plate {
-    font-size: 0.45rem;
+    font-size: 0.44rem;
     padding: 1px 3px;
+  }
+
+  .figurines-stage.crowd-3 .figurine-piece[data-idx='1'] {
+    transform: translateY(-12px) scale(0.89);
+  }
+
+  .figurines-stage.crowd-3 .figurine-piece[data-idx='1'] .figurine-plate {
+    top: -12px;
+    bottom: auto;
+  }
+
+  .figurines-stage.crowd-4 .figurine-piece[data-idx='1'] {
+    transform: translate(-2px, -13px) scale(0.88);
+  }
+
+  .figurines-stage.crowd-4 .figurine-piece[data-idx='2'] {
+    transform: translate(2px, -12px) scale(0.9);
+  }
+
+  .figurines-stage.crowd-4 .figurine-piece[data-idx='1'] .figurine-plate,
+  .figurines-stage.crowd-4 .figurine-piece[data-idx='2'] .figurine-plate {
+    top: -12px;
+    bottom: auto;
   }
 
   .chore-table-row {
@@ -3152,15 +3366,15 @@ img {
 }
 
 .room-tile.blocked .figurines-stage {
-  bottom: 1px;
+  bottom: 9px;
 }
 
 .room-tile.blocked .figurine-sprite {
-  height: 52px;
+  height: 86px;
 }
 
 .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
-  height: 42px;
+  height: 68px;
 }
 
 /* Sticky Mobile Bottom Turn Dock (hidden on desktop) */
@@ -3204,8 +3418,8 @@ img {
   }
 
   .house-grid {
-    gap: 8px 10px;
-    padding-top: 2px;
+    gap: 12px 10px;
+    padding-top: 8px;
   }
 
   .room-slot-wrap {
@@ -3222,23 +3436,31 @@ img {
   }
 
   .room-footer {
-    padding: 5px 7px 6px;
+    padding: 10px 7px 6px;
   }
 
   .figurine-sprite {
-    height: 70px;
+    height: 104px;
   }
 
   .figurine-piece.is-mekimi .figurine-sprite {
-    height: 54px;
+    height: 82px;
+  }
+
+  .room-tile.blocked .figurine-sprite {
+    height: 82px;
+  }
+
+  .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
+    height: 66px;
   }
 
   .figurines-stage.crowd .figurine-sprite {
-    height: 56px;
+    height: 88px;
   }
 
   .figurines-stage.crowd .figurine-piece.is-mekimi .figurine-sprite {
-    height: 44px;
+    height: 70px;
   }
 }
 
@@ -3427,11 +3649,11 @@ img {
   }
 
   .room-tile.blocked .figurine-sprite {
-    height: 28px;
+    height: 50px;
   }
 
   .room-tile.blocked .figurine-piece.is-mekimi .figurine-sprite {
-    height: 22px;
+    height: 40px;
   }
 }
 

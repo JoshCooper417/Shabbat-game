@@ -74,7 +74,7 @@ export function hasNaelClutteredBoost(state: GameState, slot: number): boolean {
 }
 
 /**
- * Abba's "Balagan Barrier" (Always On):
+ * Abba's "Clutter Guard" (Always On):
  * While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked.
  */
 export function isProtectedByAbba(state: GameState, slot: number): boolean {

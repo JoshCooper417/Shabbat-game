@@ -147,7 +147,13 @@ export function BoardGrid({
             .join(' ');
 
           const crowdClass =
-            occupants.length >= 3 ? 'crowd' : occupants.length === 2 ? 'duo' : 'solo';
+            occupants.length >= 4
+              ? 'crowd crowd-4'
+              : occupants.length === 3
+                ? 'crowd crowd-3'
+                : occupants.length === 2
+                  ? 'duo'
+                  : 'solo';
 
           return (
             <div key={room.card.id} className="room-slot-wrap">
@@ -232,7 +238,7 @@ export function BoardGrid({
                       className={`figurines-stage ${crowdClass}`}
                       aria-label={`Helpers in ${room.card.name}: ${occupants.map((h) => HELPER_DEFS[h].name).join(', ')}`}
                     >
-                      {occupants.map((hid) => {
+                      {occupants.map((hid, idx) => {
                         const def = HELPER_DEFS[hid];
                         const hState = state.helpers[hid];
                         const isActive =
@@ -250,18 +256,21 @@ export function BoardGrid({
                         return (
                           <div
                             key={hid}
+                            data-idx={idx}
                             className={`figurine-piece ${isActive ? 'is-active' : ''} ${
                               isMekimi ? 'is-mekimi' : ''
                             }`}
                             style={{ '--helper-color': def.accent } as React.CSSProperties}
                             title={errandTooltip}
                           >
-                            <div className="figurine-shadow" />
-                            <img
-                              src={assetUrl(def.figurineImage)}
-                              alt={`${def.name} 3D figurine`}
-                              className="figurine-sprite"
-                            />
+                            <div className="figurine-token-socket" />
+                            <div className="figurine-sprite-wrap">
+                              <img
+                                src={assetUrl(def.figurineImage)}
+                                alt={`${def.name} 3D figurine`}
+                                className="figurine-sprite"
+                              />
+                            </div>
                             <div className="figurine-plate">
                               <span>{def.name}</span>
                               {hState.carriedErrands.length > 0 && (

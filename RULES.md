@@ -163,7 +163,7 @@ Every Helper gets **2 Actions per turn** plus their own Cooper family superpower
 
 | Helper | Corner | Superpower |
 | --- | --- | --- |
-| **1. ABBA** | Top-Left | **Solo Cleanup (Your Turn):** Unblock a Red Blocked room alone (1 Action). **Balagan Barrier (Always On):** While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!). |
+| **1. ABBA** | Top-Left | **Solo Cleanup (Your Turn):** Unblock a Red Blocked room alone (1 Action). **Clutter Guard (Always On):** While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!). |
 | **2. NAEL** | Top-Right | **Learning Tower Power! (Always On):** While Nael and a teammate share a **Cluttered** room, either one can finish a **Team Chore** there on either player's turn (not Blocked). |
 | **3. MOMMY** | Bottom-Right | **Errand Express (Your Turn):** Once per turn, Pick Up or Deliver an Errand for **FREE** (in addition to your 2 Actions!). Pick Up & Deliver also work in **Cluttered** rooms (not Blocked)! |
 | **4. MEKIMI** | Bottom-Left | **Turbo Crawl (Your Turn):** Whenever Mekimi spends 1 Action to Move, crawl straight into **ANY room** on the board! |
@@ -180,7 +180,7 @@ Check the orientation of the Room card your Helper stands on:
 | **Cluttered (sideways)** | ✓ Move in/out, Tidy (1 Helper), Free Handoff, Tools. Team Chores if Nael + teammate are here. Errands on Mommy's turn. | ✗ Team Chores (without Nael). ✗ Pick Up or Deliver Errands (if not Mommy). |
 | **Blocked (red back)** | ✓ Move in/out, Unblock (2+ Helpers or Abba alone), Free Handoff, Tools. | ✗ No Team Chores. ✗ No Pick Up or Deliver Errands (not even Nael or Mommy!). |
 
-> **Watch Out for Cluttered Rooms!** Slow-Downs always flip Cluttered rooms to **Red Blocked** first—Tidy messy rooms early (or stand **Abba** there with *Balagan Barrier*)!
+> **Watch Out for Cluttered Rooms!** Slow-Downs always flip Cluttered rooms to **Red Blocked** first—Tidy messy rooms early (or stand **Abba** there with *Clutter Guard*)!
 
 ---
 
@@ -205,7 +205,7 @@ A sample Standard-mode round showing combos and all 4 Cooper Helpers:
 - **1. Abba (2 Actions):** Walks right into Red Blocked *The Salon* (Action 1) and uses **Solo Cleanup** to flip it Clear alone (Action 2)! *Event:* Kitchen Slow-Down → Cluttered *The Fridge* (where Mommy stands) flips Blocked.
 - **2. Nael (2 Actions):** Plays **Snack Summons** to pull Abba into Nael's Cluttered *Dining Table* (Action 1), then uses **Learning Tower Power!** to finish *Set the Shabbat Table* right away (Action 2)! Refill Mission Row to 4. *Event:* Draws *Cousin Aviel Drops By!* → added to Family Toolbox!
 - **3. Mommy (2 Actions + Free Errand):** Walks out of Blocked *Fridge* into Clear *Chairs* (Action 1), Delivers *Challah* for **FREE** (**Errand Express**!), and puts *Cousin Aviel* on the Clock (Action 2)! *Event:* Downstairs Slow-Down → Clear *Salon* tilts sideways.
-- **4. Mekimi (2 Actions):** Uses **Turbo Crawl** straight to Clear *Giant Island* (Action 1) and Picks Up *Showstopper* Errand (Action 2)! Refill Mission Row. *Event:* Table Slow-Down targets Cluttered *Dining Table*—**Abba's Balagan Barrier** cancels the Slow-Down! *End of Round:* **Cousin Aviel** blocks the Clock flip and returns to the box! The next round starts with **Abba**!
+- **4. Mekimi (2 Actions):** Uses **Turbo Crawl** straight to Clear *Giant Island* (Action 1) and Picks Up *Showstopper* Errand (Action 2)! Refill Mission Row. *Event:* Table Slow-Down targets Cluttered *Dining Table*—**Abba's Clutter Guard** cancels the Slow-Down! *End of Round:* **Cousin Aviel** blocks the Clock flip and returns to the box! The next round starts with **Abba**!
 
 ---
 

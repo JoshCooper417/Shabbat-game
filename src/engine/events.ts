@@ -58,7 +58,7 @@ function applyRoomHit(
     };
   }
 
-  // Room is CLUTTERED -> check Abba's Balagan Barrier (Always On)
+  // Room is CLUTTERED -> check Abba's Clutter Guard (Always On)
   if (isProtectedByAbba(state, slotIndex)) {
     return {
       state,
@@ -66,7 +66,7 @@ function applyRoomHit(
         slotIndex,
         roomName: room.card.name,
         kind: 'BARRIER',
-        text: `Abba’s Balagan Barrier protected ${room.card.name} — flip to Blocked canceled!`,
+        text: `Abba’s Clutter Guard protected ${room.card.name} — flip to Blocked canceled!`,
       },
     };
   }

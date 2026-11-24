@@ -155,8 +155,9 @@ html, body {
   color: #FFFFFF;
 }
 .arrow-sep {
-  font-size: 26px;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #0F172A;
 }
 .plus-sep {
@@ -271,7 +272,7 @@ HELPERS_SPEC = [
         "art_h": 375,
         "powers": [
             ("Solo Cleanup", "YOUR TURN", "Flip a Red Blocked room you're in back to Clear all by yourself (1 Action — no teammate needed)."),
-            ("Balagan Barrier", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!)."),
+            ("Clutter Guard", "ALWAYS ON", "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!)."),
         ],
         "flavor": "“Flour on the counter? Fine. Total meltdown? Not on his watch.”",
     },
@@ -399,8 +400,9 @@ def render_chore_html(c: tuple) -> str:
         )
     else:
         arrow_icon = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>'
+        arrow_sep = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="m14 6 6 6-6 6"/></svg>'
         left_pill = f'<span class="pill" style="background:#FFFFFF; color:#0F172A; border:3px solid #1E293B;">{arrow_icon}<span>ERRAND</span></span>'
-        right_pills = f'{zone_badge(z1)}<span class="arrow-sep">→</span>{zone_badge(z2)}'
+        right_pills = f'{zone_badge(z1)}<span class="arrow-sep">{arrow_sep}</span>{zone_badge(z2)}'
         rules = (
             f"<strong>1 Action:</strong> Pick Up in a Clear <strong>{zone_room_phrase(z1)}</strong>, then "
             f"<strong>1 Action:</strong> Deliver in a Clear <strong>{zone_room_phrase(z2)}</strong>. "
@@ -743,9 +745,32 @@ tr:nth-child(even) td { background: #F8FAFC; }
   font-weight: 700;
   color: #FFF;
 }
+.inline-arrow {
+  display: inline-block;
+  width: 0.92em;
+  height: 0.72em;
+  vertical-align: -0.05em;
+  margin: 0 0.08em;
+}
 """
 
+BOOKLET_INLINE_ARROW_SVG = (
+    '<svg class="inline-arrow" viewBox="0 0 18 12" aria-hidden="true">'
+    '<path d="M1.5 6h14M10.5 2l5 4-5 4" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+    '</svg>'
+)
+
+def _replace_arrows_in_html(html_str: str) -> str:
+    """Replace raw Unicode → with a vertically centered inline SVG arrow (skipping inside <svg>…</svg>)."""
+    import re
+    parts = re.split(r'(<svg\b[^>]*>.*?</svg>)', html_str, flags=re.S)
+    for i in range(0, len(parts), 2):
+        parts[i] = parts[i].replace("→", BOOKLET_INLINE_ARROW_SVG)
+    return "".join(parts)
+
 def booklet_page(page_num: int, title: str, inner_html: str) -> str:
+    rendered_inner = _replace_arrows_in_html(inner_html)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="utf-8"><style>{BOOKLET_CSS}</style></head>
@@ -753,7 +778,7 @@ def booklet_page(page_num: int, title: str, inner_html: str) -> str:
   <div class="page">
     <div class="page-body">
       <h1>{title}</h1>
-      {inner_html}
+      {rendered_inner}
     </div>
     <div class="footer">
       <span>Preparing for Shabbat: Cooper Family Edition</span>
@@ -792,11 +817,15 @@ def build_booklet_pages() -> list[tuple[int, str]]:
     """
 
     # Page 5: Bird's-Eye Table Layout Diagram (Standard Mode — faces Setup Page 4! Zero forward refs, zero Beg. clutter, neutral Mission cards!)
-    diagram_svg = """
+    diagram_svg = f"""
     <svg viewBox="0 0 673 730" width="673" height="730" xmlns="http://www.w3.org/2000/svg" style="display:block;">
       <!-- Clock Strip -->
       <rect x="0" y="0" width="673" height="92" rx="16" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5"/>
-      <text x="16" y="25" font-size="16" font-weight="800" fill="#92400E">SHABBAT CLOCK (face-down left → right; Shabbat Begins! on far right)</text>
+      <foreignObject x="16" y="7" width="642" height="26">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'DM Sans','Liberation Sans','DejaVu Sans',sans-serif; font-size:16px; font-weight:800; color:#92400E; line-height:1.2;">
+          SHABBAT CLOCK (face-down left {BOOKLET_INLINE_ARROW_SVG} right; Shabbat Begins! on far right)
+        </div>
+      </foreignObject>
       <g transform="translate(16, 36)">
         <rect x="0" y="0" width="94" height="44" rx="8" fill="#FDE68A" stroke="#B45309" stroke-width="2"/>
         <text x="47" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#78350F">Fri Aft</text>
@@ -1103,7 +1132,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             <div>
               <h3>1. ABBA · Top-Left</h3>
               <p><strong>Solo Cleanup (Your Turn):</strong> Unblock a Red Blocked room alone (1 Action).<br>
-              <strong>Balagan Barrier (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!).</p>
+              <strong>Clutter Guard (Always On):</strong> While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!).</p>
             </div>
           </div>
           <div class="helper-row" style="--c:#059669;">
@@ -1159,7 +1188,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
             </tbody>
           </table>
           <div class="callout callout-red">
-            <strong>Watch Out for Cluttered Rooms!</strong> Slow-Downs always flip Cluttered rooms to <strong>Red Blocked</strong> first—Tidy messy rooms early (or stand <strong>Abba</strong> there with <em>Balagan Barrier</em>)!
+            <strong>Watch Out for Cluttered Rooms!</strong> Slow-Downs always flip Cluttered rooms to <strong>Red Blocked</strong> first—Tidy messy rooms early (or stand <strong>Abba</strong> there with <em>Clutter Guard</em>)!
           </div>
         """),
 
@@ -1222,7 +1251,7 @@ def build_booklet_pages() -> list[tuple[int, str]]:
           </div>
           <div class="box-card" style="border-left:6px solid #7C3AED; font-size:17.5px;">
             <strong>4. Mekimi (2 Actions):</strong> Uses <strong>Turbo Crawl</strong> straight to Clear <em>Giant Island</em> (Action 1) and Picks Up <em>Showstopper</em> Errand (Action 2)! Refill Mission Row.<br>
-            <em>Event:</em> Table Slow-Down targets Cluttered <em>Dining Table</em>—<strong>Abba's Balagan Barrier</strong> cancels the Slow-Down!<br>
+            <em>Event:</em> Table Slow-Down targets Cluttered <em>Dining Table</em>—<strong>Abba's Clutter Guard</strong> cancels the Slow-Down!<br>
             <em>End of Round:</em> <strong>Cousin Aviel</strong> blocks the Clock flip and returns to the box! The next round starts with <strong>Abba</strong>!
           </div>
         """),
@@ -1485,10 +1514,21 @@ def render_tuck_box_html(orig_path: Path) -> str:
       </div>
     </body></html>"""
 
-def render_all(only_backs_and_pages: set[int] | None = None, only_abba_and_pages: set[int] | None = None):
+def render_all(
+    only_backs_and_pages: set[int] | None = None,
+    only_abba_and_pages: set[int] | None = None,
+    arrows_and_clutter_guard: bool = False,
+):
     jobs: list[tuple[Path, str]] = []
 
-    if only_abba_and_pages is not None:
+    if arrows_and_clutter_guard:
+        jobs.append((FRONTS_DIR / HELPERS_SPEC[0]["file"], render_helper_html(HELPERS_SPEC[0])))
+        for c in CHORES_SPEC:
+            if c[1] == "ERRAND":
+                jobs.append((FRONTS_DIR / c[0], render_chore_html(c)))
+        for num, html in build_booklet_pages():
+            jobs.append((BOOKLET_DIR / f"small_booklet_page_{num:02d}.png", html))
+    elif only_abba_and_pages is not None:
         jobs.append((FRONTS_DIR / HELPERS_SPEC[0]["file"], render_helper_html(HELPERS_SPEC[0])))
         for num, html in build_booklet_pages():
             if num in only_abba_and_pages:
@@ -1555,7 +1595,9 @@ def render_all(only_backs_and_pages: set[int] | None = None, only_abba_and_pages
 
 if __name__ == "__main__":
     import sys
-    if "--targeted-polish" in sys.argv:
+    if "--arrows-and-clutter-guard" in sys.argv:
+        render_all(arrows_and_clutter_guard=True)
+    elif "--targeted-polish" in sys.argv:
         render_all(only_abba_and_pages={7, 12, 15, 16})
     elif "--backs-and-booklet" in sys.argv:
         render_all(only_backs_and_pages={7, 12, 13, 14, 15, 16})

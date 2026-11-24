@@ -103,7 +103,7 @@ export const HELPER_DEFS: Record<HelperId, HelperDef> = {
         text: "Flip a Red Blocked room you're in back to Clear all by yourself (1 Action — no teammate needed).",
       },
       {
-        name: 'Balagan Barrier',
+        name: 'Clutter Guard',
         timing: 'Always On',
         text: "While Abba stands in a Cluttered room, Slow-Downs can't flip it Blocked (the Slow-Down is canceled!).",
       },

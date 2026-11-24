@@ -117,7 +117,7 @@ export function ActionPanel({
             <span className="action-bonus-tag">Turbo Crawl: Any Room</span>
           )}
           {state.activeHelperId === 'ABBA' && (
-            <span className="action-bonus-tag">Solo Unblock &amp; Barrier</span>
+            <span className="action-bonus-tag">Solo Unblock &amp; Clutter Guard</span>
           )}
           {state.activeHelperId === 'NAEL' && (
             <span className="action-bonus-tag">Cluttered Team Chores</span>
