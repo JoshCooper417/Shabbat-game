@@ -10,7 +10,7 @@ Components: 72 poker-size cards + 4 3D-Printed Family Helpers (Abba, Nael, Mommy
 
 **You may think you are just coming to play a game, but today we are Mommy, Abba, Nael, and Mekimi!**
 
-Work together as a family to finish every **Mission** before **Shabbat Begins!** flips face-up on the **Shabbat Clock**.
+It's Friday afternoon in Givot Eden—challah is rising, toys are spilling out of the Mamad, and winter sunset is coming fast! Dash through the Cooper house together to finish every **Mission** before **Shabbat Begins!** flips face-up on the **Shabbat Clock**.
 
 > **Win Right Away:** The instant your family finishes the final Mission, **Shabbat Shalom—the game ends immediately and you win!**
 > **Lose Right Away:** If **Shabbat Begins!** flips face-up before all Missions are done, stop right away and try again!
@@ -34,13 +34,13 @@ All 4 Helpers always play in every game. Pick whoever you want—let the younges
 
 Everything fits in **72 poker-size cards** plus your **4 3D-Printed Family Helpers**:
 
-### Rooms & Helpers (16 cards)
+### The Cooper House & Helpers (16 cards)
 
-- **12 Double-Sided Room Cards:** 3 rooms in each of the 4 House Zones—an illustrated room scene on the front and a red-striped **Blocked** side on the back (the Zone badge stays visible on both sides):
-  - **Kitchen** — Orange · Chef's Hat
-  - **Downstairs Balagan** — Teal · Toy Blocks
-  - **Table** — Blue · Shabbat Candles
-  - **Upstairs** — Purple · Stairs & Star
+- **12 Double-Sided Room Cards:** 3 real spots in each of the **4 House Zones**—bright room art on the front and a red-striped **Blocked** side on the back (the Zone badge stays visible on both sides):
+  - **Kitchen** *(Orange · Chef's Hat)* — *Friday cooking & food prep:* **The Giant Island**, **Mixer Counter (Plata & Kumkum)**, **The Fridge**.
+  - **Downstairs Balagan** *(Teal · Toy Blocks)* — *Main-floor toys & dish pileups:* **The Mamad (Playroom)**, **The Salon**, **Sink & Dishwasher**.
+  - **Table** *(Blue · Shabbat Candles)* — *Setting the Shabbat table:* **The Dining Table**, **Shabbat Candles Cabinet**, **Chairs**.
+  - **Upstairs** *(Purple · Stairs & Star)* — *Bath time & Shabbat outfits:* **The Bathtub**, **The Shower**, **The Bedrooms**.
 - **4 Helper Power Cards:** **Abba**, **Nael**, **Mommy**, and **Mekimi** (matching your 4 3D-Printed Family Helpers).
 
 ### Missions Deck (18 cards)
@@ -60,7 +60,7 @@ Everything fits in **72 poker-size cards** plus your **4 3D-Printed Family Helpe
 
 *First game? Check Section 9 for Beginner Mode! See the Table Layout diagram below as you set up.*
 
-1. **Build the 3×3 House:** Shuffle the 12 Room cards, deal **9** bright-side upright (**Clear**) in a 3×3 grid with a small gap between cards, and set the other 3 aside. Make sure all 4 House Zones appear—if a zone is missing, swap the **bottom-right room** for a **random** set-aside room of that zone. Return the 3 unused rooms to the box.
+1. **Build the 3×3 House:** Every Friday rush hits different corners of the house—shuffle the 12 Room cards and deal **9** bright-side upright (**Clear**) in a 3×3 grid with a small gap between cards (the other 3 spots are already taken care of in the box!). Make sure all 4 House Zones appear—if a zone is missing, swap the **bottom-right room** for a **random** set-aside room of that zone, then box the 3 unused rooms. *(Rooms from the same Zone don't need to touch—walk straight card-to-card across the grid as you race around the house!)*
 2. **Starting Clutter:** Turn the **Top-Center** and **Bottom-Center** rooms sideways (**Cluttered**). Leave all other **7 rooms** (the Center, both sides, and all 4 corners) upright (**Clear**).
 3. **Place the 4 Helpers:** Set the 3D Helpers in the 4 corners: **Top-Left:** Abba · **Top-Right:** Nael · **Bottom-Left:** Mekimi · **Bottom-Right:** Mommy. Place each Helper Power Card face-up in front of the player who chose that Helper (Section 1).
 4. **Deal the Missions:** Shuffle all 18 Mission cards and deal **13** (box the other 5 unseen). Flip **4 face-up** into the **Mission Row** and stack **9 face-down** as the **Mission Deck**. Leave space for the **Done Pile**.

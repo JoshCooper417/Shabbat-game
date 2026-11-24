@@ -794,24 +794,24 @@ def build_booklet_pages() -> list[tuple[int, str]]:
     av_nael = avatar_data_uri("nael")
     av_mekimi = avatar_data_uri("mekimi")
 
-    # 4-Zone Visual Legend Strip (Page 3 — pairs each Zone's color + icon!)
+    # 4-Zone Visual House Tour (Page 3 — color, icon, Friday role, and all 3 real rooms per Zone!)
     zone_legend_html = """
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;">
-      <div style="display:flex; align-items:center; gap:9px; background:#FEF3C7; border:2px solid #D97706; border-radius:12px; padding:7px 11px;">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#D97706; color:#FFF; flex-shrink:0;">""" + ZONES["KITCHEN"]["icon"] + """</span>
-        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#92400E;">Kitchen</strong><br><span style="font-size:14px; color:#78350F;">Orange · Chef's Hat</span></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;">
+      <div style="display:flex; align-items:flex-start; gap:8px; background:#FEF3C7; border:2px solid #D97706; border-radius:12px; padding:8px 10px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:#D97706; color:#FFF; flex-shrink:0; margin-top:2px;">""" + ZONES["KITCHEN"]["icon"] + """</span>
+        <div style="font-size:13.5px; line-height:1.25; color:#78350F;"><strong style="font-size:15.5px; color:#92400E;">Kitchen</strong> <span style="font-size:12px;">(Orange · Chef's Hat)</span><br><em>Friday cooking &amp; food prep:</em> <strong>The Giant Island</strong>, <strong>Mixer Counter (Plata &amp; Kumkum)</strong>, <strong>The Fridge</strong>.</div>
       </div>
-      <div style="display:flex; align-items:center; gap:9px; background:#CCFBF1; border:2px solid #0D9488; border-radius:12px; padding:7px 11px;">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#0D9488; color:#FFF; flex-shrink:0;">""" + ZONES["DOWNSTAIRS"]["icon"] + """</span>
-        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#115E59;">Downstairs Balagan</strong><br><span style="font-size:14px; color:#0F766E;">Teal · Toy Blocks</span></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; background:#CCFBF1; border:2px solid #0D9488; border-radius:12px; padding:8px 10px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:#0D9488; color:#FFF; flex-shrink:0; margin-top:2px;">""" + ZONES["DOWNSTAIRS"]["icon"] + """</span>
+        <div style="font-size:13.5px; line-height:1.25; color:#0F766E;"><strong style="font-size:15.5px; color:#115E59;">Downstairs Balagan</strong> <span style="font-size:12px;">(Teal · Toy Blocks)</span><br><em>Main-floor toys &amp; dish pileups:</em> <strong>The Mamad (Playroom)</strong>, <strong>The Salon</strong>, <strong>Sink &amp; Dishwasher</strong>.</div>
       </div>
-      <div style="display:flex; align-items:center; gap:9px; background:#DBEAFE; border:2px solid #2563EB; border-radius:12px; padding:7px 11px;">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#2563EB; color:#FFF; flex-shrink:0;">""" + ZONES["TABLE"]["icon"] + """</span>
-        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#1E40AF;">Table</strong><br><span style="font-size:14px; color:#1E3A8A;">Blue · Shabbat Candles</span></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; background:#DBEAFE; border:2px solid #2563EB; border-radius:12px; padding:8px 10px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:#2563EB; color:#FFF; flex-shrink:0; margin-top:2px;">""" + ZONES["TABLE"]["icon"] + """</span>
+        <div style="font-size:13.5px; line-height:1.25; color:#1E3A8A;"><strong style="font-size:15.5px; color:#1E40AF;">Table</strong> <span style="font-size:12px;">(Blue · Shabbat Candles)</span><br><em>Setting the Shabbat table:</em> <strong>The Dining Table</strong>, <strong>Shabbat Candles Cabinet</strong>, <strong>Chairs</strong>.</div>
       </div>
-      <div style="display:flex; align-items:center; gap:9px; background:#F3E8FF; border:2px solid #7C3AED; border-radius:12px; padding:7px 11px;">
-        <span style="display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:9px; background:#7C3AED; color:#FFF; flex-shrink:0;">""" + ZONES["UPSTAIRS"]["icon"] + """</span>
-        <div style="font-size:16.5px; line-height:1.2;"><strong style="color:#6B21A8;">Upstairs</strong><br><span style="font-size:14px; color:#5B21B6;">Purple · Stairs &amp; Star</span></div>
+      <div style="display:flex; align-items:flex-start; gap:8px; background:#F3E8FF; border:2px solid #7C3AED; border-radius:12px; padding:8px 10px;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; background:#7C3AED; color:#FFF; flex-shrink:0; margin-top:2px;">""" + ZONES["UPSTAIRS"]["icon"] + """</span>
+        <div style="font-size:13.5px; line-height:1.25; color:#5B21B6;"><strong style="font-size:15.5px; color:#6B21A8;">Upstairs</strong> <span style="font-size:12px;">(Purple · Stairs &amp; Star)</span><br><em>Bath time &amp; Shabbat outfits:</em> <strong>The Bathtub</strong>, <strong>The Shower</strong>, <strong>The Bedrooms</strong>.</div>
       </div>
     </div>
     """
@@ -941,54 +941,54 @@ def build_booklet_pages() -> list[tuple[int, str]]:
     pages = [
         # PAGE 2: Welcome, Goal & Choosing Helpers (Strictly Zero Forward References!)
         (2, "1. Welcome, Goal &amp; Players", """
-          <p style="font-size:20.5px; color:#1E3A8A;"><strong>You may think you are just coming to play a game, but today we are Mommy, Abba, Nael, and Mekimi!</strong></p>
-          <p>Work together as a family to finish every <strong>Mission</strong> before <strong>Shabbat Begins!</strong> flips face-up on the <strong>Shabbat Clock</strong>.</p>
-          <div class="callout">
+          <p style="font-size:20px; color:#1E3A8A;"><strong>You may think you are just coming to play a game, but today we are Mommy, Abba, Nael, and Mekimi!</strong></p>
+          <p style="font-size:19.5px;">It's Friday afternoon in Givot Eden—challah is rising, toys are spilling out of the Mamad, and winter sunset is coming fast! Dash through the Cooper house together to finish every <strong>Mission</strong> before <strong>Shabbat Begins!</strong> flips face-up on the <strong>Shabbat Clock</strong>.</p>
+          <div class="callout" style="font-size:19px; padding:13px 16px;">
             <strong>Win Right Away:</strong> The instant your family finishes the final Mission, <strong>Shabbat Shalom—the game ends immediately and you win!</strong><br>
             <strong>Lose Right Away:</strong> If <strong>Shabbat Begins!</strong> flips face-up before all Missions are done, stop right away and try again!
           </div>
-          <p style="font-size:19.5px;"><strong>Table Talk:</strong> This is a collaborative game so discuss freely! The player taking the current turn makes the final call.</p>
-          <div class="callout callout-blue" style="text-align:center; font-size:20.5px; padding:11px 14px;">
+          <p style="font-size:19px;"><strong>Table Talk:</strong> This is a collaborative game so discuss freely! The player taking the current turn makes the final call.</p>
+          <div class="callout callout-blue" style="text-align:center; font-size:20px; padding:10px 14px;">
             <strong>Clockwise Turn Order (Every Game):</strong><br>
             <span style="color:#2563EB; font-weight:800;">1. Abba</span> →
             <span style="color:#059669; font-weight:800;">2. Nael</span> →
             <span style="color:#DB2777; font-weight:800;">3. Mommy</span> →
             <span style="color:#7C3AED; font-weight:800;">4. Mekimi</span>
           </div>
-          <h2>Choosing Helpers (1–4 Players)</h2>
-          <p style="font-size:18.5px;">All 4 Helpers always play in every game. Pick whoever you want—let the youngest player pick first, choose freely, or deal them randomly:</p>
-          <ul style="gap:6px;">
-            <li style="font-size:18.5px;"><strong>4 Players:</strong> Each player controls 1 Helper.</li>
-            <li style="font-size:18.5px;"><strong>3 Players:</strong> One player controls 2 Helpers (for example, Abba &amp; Mekimi); the other two control 1 each.</li>
-            <li style="font-size:18.5px;"><strong>2 Players:</strong> Player 1 controls <strong>Abba &amp; Mommy</strong> (turns 1 &amp; 3); Player 2 controls <strong>Nael &amp; Mekimi</strong> (turns 2 &amp; 4) to alternate every turn!</li>
-            <li style="font-size:18.5px;"><strong>1 Player (Solo):</strong> Control all 4 Helpers in order.</li>
+          <h2 style="margin-top:2px;">Choosing Helpers (1–4 Players)</h2>
+          <p style="font-size:18px;">All 4 Helpers always play in every game. Pick whoever you want—let the youngest player pick first, choose freely, or deal them randomly:</p>
+          <ul style="gap:5px;">
+            <li style="font-size:18px;"><strong>4 Players:</strong> Each player controls 1 Helper.</li>
+            <li style="font-size:18px;"><strong>3 Players:</strong> One player controls 2 Helpers (for example, Abba &amp; Mekimi); the other two control 1 each.</li>
+            <li style="font-size:18px;"><strong>2 Players:</strong> Player 1 controls <strong>Abba &amp; Mommy</strong> (turns 1 &amp; 3); Player 2 controls <strong>Nael &amp; Mekimi</strong> (turns 2 &amp; 4) to alternate every turn!</li>
+            <li style="font-size:18px;"><strong>1 Player (Solo):</strong> Control all 4 Helpers in order.</li>
           </ul>
         """),
 
-        # PAGE 3: What's in the Box (Purely Physical Inventory + 4-Zone Visual Legend!)
+        # PAGE 3: What's in the Box (Physical Inventory + Cooper House 4-Zone Tour!)
         (3, "2. What's in the Box (72 Cards)", f"""
-          <p style="font-size:19.5px;">Everything fits in <strong>72 poker-size cards</strong> plus your <strong>4 3D-Printed Family Helpers</strong>:</p>
-          <div class="box-card" style="padding:11px 14px;">
-            <h2 style="margin-top:0; font-size:20.5px;">Rooms &amp; Helpers (16 cards)</h2>
-            <ul style="gap:5px;">
-              <li style="font-size:18.5px;"><strong>12 Double-Sided Room Cards:</strong> 3 rooms in each of the 4 House Zones—an illustrated room scene on the front and a red-striped <strong>Blocked</strong> side on the back (the Zone badge stays visible on both sides).</li>
-              <li style="font-size:18.5px;"><strong>4 Helper Power Cards:</strong> <strong>Abba</strong>, <strong>Nael</strong>, <strong>Mommy</strong>, and <strong>Mekimi</strong> (matching your 4 3D-Printed Family Helpers).</li>
+          <p style="font-size:19px;">Everything fits in <strong>72 poker-size cards</strong> plus your <strong>4 3D-Printed Family Helpers</strong>:</p>
+          <div class="box-card" style="padding:10px 14px;">
+            <h2 style="margin-top:0; font-size:20px;">The Cooper House &amp; Helpers (16 cards)</h2>
+            <ul style="gap:4px;">
+              <li style="font-size:17.5px;"><strong>12 Double-Sided Room Cards:</strong> 3 real spots in each of the <strong>4 House Zones</strong>—bright room art on the front and a red-striped <strong>Blocked</strong> side on the back (the Zone badge stays visible on both sides).</li>
+              <li style="font-size:17.5px;"><strong>4 Helper Power Cards:</strong> <strong>Abba</strong>, <strong>Nael</strong>, <strong>Mommy</strong>, and <strong>Mekimi</strong> (matching your 4 3D-Printed Family Helpers).</li>
             </ul>
             {zone_legend_html}
           </div>
-          <div class="box-card" style="padding:11px 14px;">
-            <h2 style="margin-top:0; font-size:20.5px;">Missions Deck (18 cards)</h2>
-            <ul style="gap:5px;">
-              <li style="font-size:18.5px;"><strong>10 Team Chores</strong> (marked <strong>TEAM CHORE · 2+</strong>)</li>
-              <li style="font-size:18.5px;"><strong>8 Errands</strong> (marked <strong>ERRAND · Start → End</strong>)</li>
+          <div class="box-card" style="padding:10px 14px;">
+            <h2 style="margin-top:0; font-size:20px;">Missions Deck (18 cards)</h2>
+            <ul style="gap:4px;">
+              <li style="font-size:18px;"><strong>10 Team Chores</strong> (marked <strong>TEAM CHORE · 2+</strong>)</li>
+              <li style="font-size:18px;"><strong>8 Errands</strong> (marked <strong>ERRAND · Start → End</strong>)</li>
             </ul>
           </div>
-          <div class="box-card" style="padding:11px 14px;">
-            <h2 style="margin-top:0; font-size:20.5px;">Shabbat Clock (10) &amp; Friday Events (28)</h2>
-            <ul style="gap:5px;">
-              <li style="font-size:18.5px;"><strong>10 Clock Cards:</strong> 9 <em>Friday Afternoon</em> + 1 <em>Shabbat Begins!</em></li>
-              <li style="font-size:18.5px;"><strong>18 Slow-Downs:</strong> 15 Single-Zone, 2 Double Trouble, and 1 Time Flies.</li>
-              <li style="font-size:18.5px;"><strong>10 Household Tools:</strong> 4 <em>Ice Coffee Boost</em>, 3 <em>Strategic Snack Summons</em>, and 3 <em>Cousin Aviel Drops By!</em></li>
+          <div class="box-card" style="padding:10px 14px;">
+            <h2 style="margin-top:0; font-size:20px;">Shabbat Clock (10) &amp; Friday Events (28)</h2>
+            <ul style="gap:4px;">
+              <li style="font-size:18px;"><strong>10 Clock Cards:</strong> 9 <em>Friday Afternoon</em> + 1 <em>Shabbat Begins!</em></li>
+              <li style="font-size:18px;"><strong>18 Slow-Downs:</strong> 15 Single-Zone, 2 Double Trouble, and 1 Time Flies.</li>
+              <li style="font-size:18px;"><strong>10 Household Tools:</strong> 4 <em>Ice Coffee Boost</em>, 3 <em>Strategic Snack Summons</em>, and 3 <em>Cousin Aviel Drops By!</em></li>
             </ul>
           </div>
         """),
@@ -996,13 +996,13 @@ def build_booklet_pages() -> list[tuple[int, str]]:
         # PAGE 4: Setup (Standard Mode) — Faces Table Layout Page 5!
         (4, "3. Setup (Standard Mode)", """
           <p style="font-size:18.5px; color:#475569;"><em>First game? Check Page 13 for Beginner Mode! See the diagram on Page 5 as you set up.</em></p>
-          <ol style="gap:10px;">
-            <li style="font-size:19px;"><strong>Build the 3×3 House:</strong> Shuffle the 12 Room cards, deal <strong>9</strong> bright-side upright (<strong>Clear</strong>) in a 3×3 grid with a small gap between cards, and set the other 3 aside. Make sure all 4 House Zones appear—if a zone is missing, swap the <strong>bottom-right room</strong> for a <strong>random</strong> set-aside room of that zone. Return the 3 unused rooms to the box.</li>
-            <li style="font-size:19px;"><strong>Starting Clutter:</strong> Turn the <strong>Top-Center</strong> and <strong>Bottom-Center</strong> rooms sideways (<strong>Cluttered</strong>). Leave all other <strong>7 rooms</strong> (the Center, both sides, and all 4 corners) upright (<strong>Clear</strong>).</li>
-            <li style="font-size:19px;"><strong>Place the 4 Helpers:</strong> Set the 3D Helpers in the 4 corners: <strong>Top-Left:</strong> Abba · <strong>Top-Right:</strong> Nael · <strong>Bottom-Left:</strong> Mekimi · <strong>Bottom-Right:</strong> Mommy. Place each Helper Power Card face-up in front of the player who chose that Helper (Page 2).</li>
-            <li style="font-size:19px;"><strong>Deal the Missions:</strong> Shuffle all 18 Mission cards and deal <strong>13</strong> (box the other 5 unseen). Flip <strong>4 face-up</strong> into the <strong>Mission Row</strong> and stack <strong>9 face-down</strong> as the <strong>Mission Deck</strong>. Leave space for the <strong>Done Pile</strong>.</li>
-            <li style="font-size:19px;"><strong>Build the Shabbat Clock:</strong> Place <strong>5 Friday Afternoon</strong> cards face-down left to right, with <strong>Shabbat Begins!</strong> face-down on the far right (6 total; box the other 4).</li>
-            <li style="font-size:19px;"><strong>Tools &amp; Event Deck:</strong> Shuffle all 10 Tools face-down: place <strong>2 face-up</strong> in the <strong>Family Toolbox</strong>, box <strong>4 unseen</strong>, and shuffle the <strong>remaining 4</strong> with all <strong>18 Slow-Downs</strong> face-down to form the <strong>Event Deck</strong> (22 cards). Leave space for an <strong>Event Discard Pile</strong>.</li>
+          <ol style="gap:9px;">
+            <li style="font-size:18.5px;"><strong>Build the 3×3 House:</strong> Every Friday rush hits different corners of the house—shuffle the 12 Room cards and deal <strong>9</strong> bright-side upright (<strong>Clear</strong>) in a 3×3 grid with a small gap between cards (the other 3 spots are already taken care of in the box!). Make sure all 4 House Zones appear—if a zone is missing, swap the <strong>bottom-right room</strong> for a <strong>random</strong> set-aside room of that zone, then box the 3 unused rooms. <em>(Rooms from the same Zone don't need to touch—walk straight card-to-card across the grid as you race around the house!)</em></li>
+            <li style="font-size:18.5px;"><strong>Starting Clutter:</strong> Turn the <strong>Top-Center</strong> and <strong>Bottom-Center</strong> rooms sideways (<strong>Cluttered</strong>). Leave all other <strong>7 rooms</strong> (the Center, both sides, and all 4 corners) upright (<strong>Clear</strong>).</li>
+            <li style="font-size:18.5px;"><strong>Place the 4 Helpers:</strong> Set the 3D Helpers in the 4 corners: <strong>Top-Left:</strong> Abba · <strong>Top-Right:</strong> Nael · <strong>Bottom-Left:</strong> Mekimi · <strong>Bottom-Right:</strong> Mommy. Place each Helper Power Card face-up in front of the player who chose that Helper (Page 2).</li>
+            <li style="font-size:18.5px;"><strong>Deal the Missions:</strong> Shuffle all 18 Mission cards and deal <strong>13</strong> (box the other 5 unseen). Flip <strong>4 face-up</strong> into the <strong>Mission Row</strong> and stack <strong>9 face-down</strong> as the <strong>Mission Deck</strong>. Leave space for the <strong>Done Pile</strong>.</li>
+            <li style="font-size:18.5px;"><strong>Build the Shabbat Clock:</strong> Place <strong>5 Friday Afternoon</strong> cards face-down left to right, with <strong>Shabbat Begins!</strong> face-down on the far right (6 total; box the other 4).</li>
+            <li style="font-size:18.5px;"><strong>Tools &amp; Event Deck:</strong> Shuffle all 10 Tools face-down: place <strong>2 face-up</strong> in the <strong>Family Toolbox</strong>, box <strong>4 unseen</strong>, and shuffle the <strong>remaining 4</strong> with all <strong>18 Slow-Downs</strong> face-down to form the <strong>Event Deck</strong> (22 cards). Leave space for an <strong>Event Discard Pile</strong>.</li>
           </ol>
         """),
 
