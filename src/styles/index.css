@@ -2863,6 +2863,8 @@ img {
 
 .booklet-mobile-select {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   font-family: inherit;
   font-size: 0.84rem;
   font-weight: 600;
