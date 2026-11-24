@@ -2856,6 +2856,11 @@ img {
   color: var(--bg-navy);
 }
 
+.booklet-mobile-select-wrap > span {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .booklet-mobile-select {
   flex: 1;
   font-family: inherit;
@@ -3102,7 +3107,7 @@ img {
   }
 
   .figurines-stage.crowd .figurine-piece {
-    margin: 0 -10px;
+    margin: 0 -7px;
   }
 
   .figurines-stage.crowd .figurine-sprite {
@@ -3133,11 +3138,11 @@ img {
   }
 
   .figurines-stage.crowd-4 .figurine-piece[data-idx='1'] {
-    transform: translate(-2px, -13px) scale(0.88);
+    transform: translate(-6px, -13px) scale(0.88);
   }
 
   .figurines-stage.crowd-4 .figurine-piece[data-idx='2'] {
-    transform: translate(2px, -12px) scale(0.9);
+    transform: translate(6px, -12px) scale(0.9);
   }
 
   .figurines-stage.crowd-4 .figurine-piece[data-idx='1'] .figurine-plate,

@@ -104,7 +104,7 @@ export function CoachBanner({ state, legalMoves }: CoachBannerProps) {
       const hasShieldTool = state.readyTools.some((t) => t.kind === 'EARLY_PREP');
       if (hasShieldTool) {
         tips.push(
-          'Turn 4 of 4! Playing Cousin Aviel Drops By! from the Toolbox will shield tonight’s Clock flip!',
+          'Turn 4 of 4! Playing Cousin Aviel Drops By! from the Toolbox will shield this round’s Clock flip!',
         );
       } else {
         tips.push('Turn 4 of 4: After this turn’s Event flip, 1 Shabbat Clock card will flip.');

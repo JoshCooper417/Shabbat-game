@@ -169,7 +169,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyId, DifficultyConfig> = {
   BEGINNER: {
     id: 'BEGINNER',
     name: 'Beginner',
-    tagline: 'First Game · Ages 6+',
+    tagline: 'First Game · 6+',
     clockLength: 7,
     afternoonCards: 6,
     totalChores: 10,
@@ -182,7 +182,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyId, DifficultyConfig> = {
   STANDARD: {
     id: 'STANDARD',
     name: 'Standard',
-    tagline: 'Balanced Family Play',
+    tagline: 'Family Balance',
     clockLength: 6,
     afternoonCards: 5,
     totalChores: 13,
@@ -195,7 +195,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyId, DifficultyConfig> = {
   HARD: {
     id: 'HARD',
     name: 'Hard',
-    tagline: 'Expert Friday Rush',
+    tagline: 'Friday Rush',
     clockLength: 6,
     afternoonCards: 5,
     totalChores: 15,
@@ -443,7 +443,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'KITCHEN',
     endZone: 'TABLE',
     rulesText:
-      '1 Action: Pick Up in a Clear Kitchen, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Kitchen, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Kneaded in the mixer, baked golden, and carried right to the table.”',
     frontImage: 'assets/cards/chore_17_challah_oven.webp',
   },
@@ -455,7 +455,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'KITCHEN',
     endZone: 'TABLE',
     rulesText:
-      '1 Action: Pick Up in a Clear Kitchen, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Kitchen, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“23 ingredients, 4 mixing bowls, zero regrets—straight to the table.”',
     frontImage: 'assets/cards/chore_22_hbh_showstopper.webp',
   },
@@ -467,7 +467,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'DOWNSTAIRS',
     endZone: 'TABLE',
     rulesText:
-      '1 Action: Pick Up in a Clear Downstairs room, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Downstairs room, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Put them with water in a vase on the table.”',
     frontImage: 'assets/cards/chore_23_shabbat_flowers.webp',
   },
@@ -479,7 +479,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'DOWNSTAIRS',
     endZone: 'UPSTAIRS',
     rulesText:
-      '1 Action: Pick Up in a Clear Downstairs room, then 1 Action: Deliver in a Clear Upstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Downstairs room, then 1 Action: Deliver in a Clear Upstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Peel everyone away from the toys and up the stairs.”',
     frontImage: 'assets/cards/chore_25_herd_kids_baths.webp',
   },
@@ -491,7 +491,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'TABLE',
     endZone: 'DOWNSTAIRS',
     rulesText:
-      '1 Action: Pick Up in a Clear Table room, then 1 Action: Deliver in a Clear Downstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Table room, then 1 Action: Deliver in a Clear Downstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Clear the last dishes off the table for strategic Friday dish-tetris.”',
     frontImage: 'assets/cards/chore_19_dishwasher_round3.webp',
   },
@@ -503,7 +503,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'TABLE',
     endZone: 'KITCHEN',
     rulesText:
-      '1 Action: Pick Up in a Clear Table room, then 1 Action: Deliver in a Clear Kitchen. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Table room, then 1 Action: Deliver in a Clear Kitchen. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Why is there a toy truck next to the Kiddush cup?”',
     frontImage: 'assets/cards/chore_24_mystery_table_pile.webp',
   },
@@ -515,7 +515,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'UPSTAIRS',
     endZone: 'DOWNSTAIRS',
     rulesText:
-      '1 Action: Pick Up in a Clear Upstairs room, then 1 Action: Deliver in a Clear Downstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Upstairs room, then 1 Action: Deliver in a Clear Downstairs room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Steer freshly dressed kids straight down without touching anything sticky.”',
     frontImage: 'assets/cards/chore_26_dressed_kids_clean.webp',
   },
@@ -527,7 +527,7 @@ export const CHORE_DECK: readonly ChoreCardDef[] = [
     zone: 'UPSTAIRS',
     endZone: 'TABLE',
     rulesText:
-      '1 Action: Pick Up in a Clear Upstairs room, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Errand/turn!)',
+      '1 Action: Pick Up in a Clear Upstairs room, then 1 Action: Deliver in a Clear Table room. (Mommy can do either in Cluttered rooms, plus 1 Free Pick Up or Deliver/turn!)',
     flavor: '“Clean, dressed, and spotless—straight to the Shabbat table!”',
     frontImage: 'assets/cards/chore_34_everyone_shabbat_clothes.webp',
   },
